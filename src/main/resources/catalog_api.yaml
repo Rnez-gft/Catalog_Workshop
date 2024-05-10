@@ -1,0 +1,272 @@
+openapi: 3.0.0
+info:
+  title: Catalog Service API
+  description: API for the catalog service that allows managing products, inventory, and promotions.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local Server
+tags:
+- name: "Products"
+  description: "Everything about the products"
+ 
+paths:
+  /catalog/products:
+    get:
+      tags:
+        - Products
+      summary: List all products
+      description: Returns a list of all products.
+      responses:
+        '200':
+          description: Product list
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Product'
+        '500': 
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Products
+      summary: Add a new product
+      description: Creates a new product in the catalog.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '500': 
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+ 
+  /catalog/products/{product_id}:
+    get:
+      tags:
+        - Products
+      summary: Get product details
+      description: Returns details of a specific product.
+      parameters:
+        - in: path
+          name: product_id
+          schema:
+            type: integer
+          required: true
+          description: Product ID
+      responses:
+        '200':
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404': 
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500': 
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - Products
+      summary: Update a product
+      description: Updates the details of a specific product.
+      parameters:
+        - in: path
+          name: product_id
+          schema:
+            type: integer
+          required: true
+          description: Product ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404': 
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500': 
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Products
+      summary: Delete a product
+      description: Deletes a specific product from the catalog.
+      parameters:
+        - in: path
+          name: product_id
+          schema:
+            type: integer
+          required: true
+          description: Product ID
+      responses:
+        '204':
+          description: Product deleted
+        '404': 
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500': 
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+ 
+  /catalog/products/{product_id}/recommendations:
+    get:
+      tags:
+        - Products
+      summary: Get related products
+      description: Returns a list of products related to a specific product.
+      parameters:
+        - in: path
+          name: product_id
+          schema:
+            type: integer
+          required: true
+          description: Product ID
+      responses:
+        '200':
+          description: List of related products
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Product'
+        '404': 
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500': 
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+ 
+  /catalog/products/{product_id}/stock:
+    patch:
+      tags:
+        - Products
+      summary: Update the stock of a product
+      description: Partially updates the stock of a specific product.
+      parameters:
+        - in: path
+          name: product_id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the product whose stock is being updated
+      requestBody:
+        description: New stock value
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStockRequest'
+      responses:
+        '200':
+          description: Stock successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+        '500':
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Product ID
+        name:
+          type: string
+          description: Product name
+        description:
+          type: string
+          description: Product description
+        price:
+          type: number
+          format: double
+          description: Product price
+        stock:
+          type: integer
+          format: int64
+          description: Quantity of product available
+        category:
+          type: string
+          description: Product category
+        discount:
+          type: number
+          format: double
+          description: Discount applied to the product
+      required:
+        - name
+        - price
+        - stock
+        - category
+    ErrorResponse:
+      type: object
+      properties:
+        msg:
+          type: string
+        error_code:
+          type: integer
+    UpdateStockRequest:
+      type: object
+      properties:
+        stock:
+          type: integer
+          description: New stock value
+      required:
+        - stock
