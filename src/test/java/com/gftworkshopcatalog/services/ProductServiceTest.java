@@ -35,6 +35,7 @@ public class ProductServiceTest {
 //                .price(50.0)
 //                .build();
 
+        Product product1= new Product();
         product1.setId(1L);
         product1.setName("Product 1");
         product1.setPrice(50.0);
