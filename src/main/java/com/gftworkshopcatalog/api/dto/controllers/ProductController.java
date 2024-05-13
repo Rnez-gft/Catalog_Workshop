@@ -46,4 +46,24 @@ public class ProductController {
         productService.deleteProduct(productId);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{productId}/price")
+    public ResponseEntity<?> updateProductPrice(@PathVariable("productId") long productId, @RequestParam("newPrice") double newPrice) {
+        try {
+            Product updatedProduct = productService.updateProductPrice(productId, newPrice);
+            return ResponseEntity.ok(updatedProduct);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating product price: " + e.getMessage());
+        }
+    }
+
+    @PatchMapping("/{productId}/stock")
+    public ResponseEntity<?> updateProductStock(@PathVariable("productId") long productId, @RequestParam("newStock") long newStock) {
+        try {
+            Product updatedProduct = productService.updateProductStock(productId, newStock);
+            return ResponseEntity.ok(updatedProduct);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating product price: " + e.getMessage());
+        }
+    }
 }

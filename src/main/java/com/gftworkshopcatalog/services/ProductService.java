@@ -49,5 +49,32 @@ public class ProductService {
         productRepository.delete(product);
     }
 
+    public Product updateProductPrice(long productId, double newPrice) {
+        Optional<Product> productOptional = productRepository.findById(productId);
+
+        if (!productOptional.isPresent()) {
+            throw new RuntimeException("Product not found with ID: " + productId);
+        }
+
+        Product product = productOptional.get();
+
+        product.setPrice(newPrice);
+        return productRepository.save(product);
+    }
+
+    public Product updateProductStock(long productId, long newStock) {
+        Optional<Product> productOptional = productRepository.findById(productId);
+
+        if (!productOptional.isPresent()) {
+            throw new RuntimeException("Product not found with ID: " + productId);
+        }
+
+        Product product = productOptional.get();
+
+        product.setStock(newStock);
+
+        return productRepository.save(product);
+    }
+
    
 }
