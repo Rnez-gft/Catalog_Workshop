@@ -170,5 +170,79 @@ public class ProductServiceTest {
         assertTrue(exception.getMessage().contains(expectedMessage));
         verify(productRepository, never()).delete(any(Product.class));
     }
+
+    @Test
+    public void updateProductStock(){
+        Long productId = 1L;
+        Long newStock = 20L;
+        Product product = new Product();
+        product.setId(productId);
+        product.setName("Computadora");
+        product.setStock(10L);
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(productRepository.save(product)).thenReturn(product);
+
+        Product updatedProduct = productService.updateProductStock(productId, newStock);
+
+        assertEquals(newStock, updatedProduct.getStock());
+        verify(productRepository, times(1)).save(product);
+    }
+
+    @Test
+    public void updateProductStock_NegativeStock_ThrowsException() {
+        Long productId = 1L;
+        Long newStock = -10L;
+
+        Product product = new Product();
+        product.setId(productId);
+
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+
+
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+            productService.updateProductStock(productId, newStock);
+        }, "Expected updateProductStock() to throw IllegalArgumentException, but it didn't");
+
+        assertTrue(thrown.getMessage().contains("Stock cannot be negative"));
+    }
+
+
+    @Test
+    public void updateProductPrice(){
+        Long productId = 1L;
+        double newPrice = 20L;
+        Product product = new Product();
+        product.setId(productId);
+        product.setName("Computadora");
+        product.setPrice(1234.45);
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(productRepository.save(product)).thenReturn(product);
+
+        Product updatedProduct = productService.updateProductPrice(productId, newPrice);
+
+        assertEquals(newPrice, updatedProduct.getPrice());
+        verify(productRepository, times(1)).save(product);
+    }
+
+    @Test
+    public void updateProductPrice_NegativePrice_ThrowsException() {
+        Long productId = 1L;
+        double newPrice = -1;
+
+        Product product = new Product();
+        product.setId(productId);
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+
+
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
+            productService.updateProductPrice(productId, newPrice);
+        }, "Expected updateProductStock() to throw IllegalArgumentException, but it didn't");
+
+        assertTrue(thrown.getMessage().contains("Price cannot be negative"));
+    }
 }
  

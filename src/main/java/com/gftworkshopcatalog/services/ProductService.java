@@ -50,6 +50,9 @@ public class ProductService {
     }
 
     public Product updateProductPrice(long productId, double newPrice) {
+        if (newPrice < 0) {
+            throw new IllegalArgumentException("Price cannot be negative");
+        }
         Optional<Product> productOptional = productRepository.findById(productId);
 
         if (!productOptional.isPresent()) {
@@ -63,18 +66,17 @@ public class ProductService {
     }
 
     public Product updateProductStock(long productId, long newStock) {
-        Optional<Product> productOptional = productRepository.findById(productId);
+        if (newStock < 0) {
+            throw new IllegalArgumentException("Stock cannot be negative");
+        }
 
+        Optional<Product> productOptional = productRepository.findById(productId);
         if (!productOptional.isPresent()) {
             throw new RuntimeException("Product not found with ID: " + productId);
         }
 
         Product product = productOptional.get();
-
         product.setStock(newStock);
-
         return productRepository.save(product);
     }
-
-   
 }
