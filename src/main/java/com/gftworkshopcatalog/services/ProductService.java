@@ -10,18 +10,18 @@ import java.util.Optional;
 @Service
 public class ProductService {
     private ProductRepository productRepository;
-    
+
     public ProductService(ProductRepository productRepository) {
-		super();
-		this.productRepository = productRepository;
-	}
+        super();
+        this.productRepository = productRepository;
+    }
 
     public List<Product> findAllProducts() {
         return productRepository.findAll();
     }
 
     public Product addProduct(Product product) {
-    	System.out.println(product.toString());
+        System.out.println(product.toString());
         return productRepository.save(product);
     }
 
@@ -36,9 +36,6 @@ public class ProductService {
         product.setName(productDetails.getName());
         product.setDescription(productDetails.getDescription());
         product.setPrice(productDetails.getPrice());
-        product.setStock(productDetails.getStock());
-        product.setCategory(productDetails.getCategory());
-        product.setDiscount(productDetails.getDiscount());
         product.setWeight(productDetails.getWeight());
 
         return productRepository.save(product);
@@ -76,7 +73,6 @@ public class ProductService {
         }
 
         Product product = productOptional.get();
-        product.setStock(newStock);
         return productRepository.save(product);
     }
 }

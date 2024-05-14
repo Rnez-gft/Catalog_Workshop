@@ -23,8 +23,7 @@ public class Product {
     @Column(name = "product_id")
     private Long id;
 
-
-	@Column(nullable = false)
+    @Column(nullable = false)
     private String name;
 
     @Column
@@ -33,22 +32,30 @@ public class Product {
     @Column(nullable = false)
     private Double price;
 
-    @Column(nullable = false)
-    private Long stock;
-
-    @Column(nullable = false)
-    private String category;
-
     @Column
-    private Double discount;
-    
+    private Integer category_Id;
+
     @Column(nullable = false)
     private Double weight;
 
+    @Column(nullable = false)
+    private Integer current_stock;
 
-	@Override
-	public String toString() {
-		return "Product [id=" + id + ", name=" + name + ", description=" + description + ", price=" + price + ", stock="
-				+ stock + ", category=" + category + ", discount=" + discount + ", weight=" + weight + "]";
-	}
+    @Column(nullable = false)
+    private Integer min_stock;
+
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", category_Id=" + category_Id +
+                ", weight=" + weight +
+                ", current_stock=" + current_stock +
+                ", min_stock=" + min_stock +
+                '}';
+    }
 }
