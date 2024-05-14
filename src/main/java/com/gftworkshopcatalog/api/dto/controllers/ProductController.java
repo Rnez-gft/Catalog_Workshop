@@ -57,6 +57,7 @@ public class ProductController {
         }
     }
 
+
     @PatchMapping("/{productId}/stock")
     public ResponseEntity<?> updateProductStock(@PathVariable("productId") long productId, @RequestParam("newStock") long newStock) {
         try {
