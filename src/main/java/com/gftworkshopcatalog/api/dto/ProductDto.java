@@ -1,14 +1,12 @@
 package com.gftworkshopcatalog.api.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Generated
 public class ProductDto {
     private Long id;
     private String name;
