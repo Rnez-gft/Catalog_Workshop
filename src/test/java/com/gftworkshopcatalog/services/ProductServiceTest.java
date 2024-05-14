@@ -3,28 +3,22 @@ package com.gftworkshopcatalog.services;
 import com.gftworkshopcatalog.model.Product;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
-<<<<<<< HEAD
 import org.junit.jupiter.api.DisplayName;
-=======
->>>>>>> feature/refactorTests
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-<<<<<<< HEAD
-=======
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
->>>>>>> feature/refactorTests
+
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-<<<<<<< HEAD
 class ProductServiceTest {
 
     @Mock
@@ -136,17 +130,6 @@ class ProductServiceTest {
 
         assertEquals("Unexpected server error", exception.getMessage());
         verify(productRepository).save(product);
-=======
-public class ProductServiceTest {
-    @Mock
-    ProductRepository productRepository;
-
-    @InjectMocks
-    ProductService productService;
-
-    @BeforeEach
-    public void setUp(){
-        MockitoAnnotations.openMocks(this);
     }
     @Test
     public void test_findAllProducts(){
@@ -295,11 +278,12 @@ public class ProductServiceTest {
     public void shouldThrowExceptionWhenProductNotFound(){
         long nonExistentProductId = 99L;
         when(productRepository.findById(nonExistentProductId)).thenReturn(Optional.empty());
+
         Exception exception = assertThrows(RuntimeException.class, () -> {
             productService.findProductById(nonExistentProductId);
         });
 
-        String expectedMessage = "Product not found with id: " + nonExistentProductId;
+        String expectedMessage = "Product not found with ID: " + nonExistentProductId;
         assertTrue(exception.getMessage().contains(expectedMessage));
     }
     @Test
@@ -325,9 +309,8 @@ public class ProductServiceTest {
             productService.deleteProduct(nonExistentProductId);
         });
 
-        String expectedMessage = "Product not found with id: " + nonExistentProductId;
+        String expectedMessage = "Product not found with ID: " + nonExistentProductId;
         assertTrue(exception.getMessage().contains(expectedMessage));
         verify(productRepository, never()).delete(any(Product.class));
->>>>>>> feature/refactorTests
     }
 }
