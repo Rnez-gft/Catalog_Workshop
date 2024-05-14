@@ -26,17 +26,19 @@ public class ProductService {
     }
 
     public Product findProductById(long productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+        return productRepository.findById(productId).orElse(null);
     }
 
-    public Product updateProduct(Long productId, Product productDetails) {
+    public Product updateProduct(long productId, Product productDetails) {
         Product product = productRepository.findById(productId).orElse(null);
 
         product.setName(productDetails.getName());
         product.setDescription(productDetails.getDescription());
         product.setPrice(productDetails.getPrice());
+        product.setCategory_Id(productDetails.getCategory_Id());
         product.setWeight(productDetails.getWeight());
+        product.setCurrent_stock(productDetails.getCurrent_stock());
+        product.setMin_stock(productDetails.getMin_stock());
 
         return productRepository.save(product);
     }
@@ -62,7 +64,7 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public Product updateProductStock(long productId, long newStock) {
+    public Product updateProductStock(long productId, int newStock) {
         if (newStock < 0) {
             throw new IllegalArgumentException("Stock cannot be negative");
         }
@@ -73,6 +75,8 @@ public class ProductService {
         }
 
         Product product = productOptional.get();
+
+        product.setCurrent_stock(newStock);
         return productRepository.save(product);
     }
 }
