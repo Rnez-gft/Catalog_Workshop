@@ -136,7 +136,7 @@ public class ProductController {
 
 
     @PatchMapping("/{productId}/stock")
-    public ResponseEntity<?> updateProductStock(@PathVariable("productId") long productId, @RequestParam("newStock") long newStock) {
+    public ResponseEntity<?> updateProductStock(@PathVariable("productId") long productId, @RequestParam("newStock") int newStock) {
         try {
             Product updatedProduct = productService.updateProductStock(productId, newStock);
             return ResponseEntity.ok(updatedProduct);
