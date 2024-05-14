@@ -46,7 +46,6 @@ public class ProductService {
     public Product updateProduct(Long productId, Product productDetails) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found with ID: " + productId));
-
         if (productDetails == null) {
             throw new IllegalArgumentException("Product details cannot be null");
         }
