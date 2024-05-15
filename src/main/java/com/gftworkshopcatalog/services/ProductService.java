@@ -26,6 +26,11 @@ public class ProductService {
         }
     }
 
+    public Product findProductById(long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with ID: " + productId));
+    }
+
     public Product addProduct(Product product) {
         if (product == null || product.getName() == null || product.getPrice() == null || product.getCategory_Id() == null || product.getWeight() == null
                 || product.getCurrent_stock() == null || product.getMin_stock() == null) {
@@ -41,10 +46,7 @@ public class ProductService {
         }
     }
 
-    public Product findProductById(long productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new EntityNotFoundException("Product not found with ID: " + productId));
-    }
+
 
 
     public Product updateProduct(Long productId, Product productDetails) {

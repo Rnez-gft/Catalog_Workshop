@@ -485,13 +485,13 @@ class ProductServiceTest {
     @Test
     @DisplayName("Delete Product - Throws IllegalArgumentException for Invalid Product ID")
     public void deleteProduct_InvalidProductId_ThrowsIllegalArgumentException() {
-        long invalidProductId = -1L; // Considerando que -1 es un ID inválido
+        long invalidProductId = -1L;
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        Exception exception = assertThrows(EntityNotFoundException.class, () -> {
             productService.deleteProduct(invalidProductId);
         });
 
-        assertEquals("Invalid product ID", exception.getMessage());
+        assertEquals("Product not found with ID: "+ invalidProductId, exception.getMessage());
         verify(productRepository, never()).delete(any(Product.class));
     }
 }
