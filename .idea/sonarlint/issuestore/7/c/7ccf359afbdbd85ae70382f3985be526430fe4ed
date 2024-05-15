@@ -1,0 +1,8 @@
+
+`	java:S1128"FDefine and throw a dedicated exception instead of using a generic one.(Ê¥›ìÿÿÿÿÿ
+`	java:S112H"FDefine and throw a dedicated exception instead of using a generic one.(Ê¥›ìÿÿÿÿÿ
+[
+java:S2259$"EA "NullPointerException" could be thrown; "product" is nullable here.(ÂÅå–
+E	java:S106"+Replace this use of System.out by a logger.(Þ´öžùÿÿÿÿ
+n
+java:S1128"SRemove this unused import 'org.springframework.beans.factory.annotation.Autowired'.(¡ž¸Îùÿÿÿÿ
