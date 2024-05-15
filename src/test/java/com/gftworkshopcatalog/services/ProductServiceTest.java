@@ -28,7 +28,7 @@ class ProductServiceTest {
     private ProductService productService;
 
     private Product product;
-    private long productId = 1L;
+    private final long productId = 1L;
 
     @BeforeEach
     void setUp() {
@@ -132,7 +132,7 @@ class ProductServiceTest {
         verify(productRepository).save(product);
     }
     @Test
-    public void test_findAllProducts(){
+    void test_findAllProducts(){
         Product product1 = new Product();
         product1.setId(1L);
         product1.setName("Product 1");
@@ -165,7 +165,7 @@ class ProductServiceTest {
         assertTrue(allProducts.contains(product2), "The list should contain 'Product 2'");
     }
     @Test
-    public void shouldReturnEmptyListWhenNoProductsExists(){
+    void shouldReturnEmptyListWhenNoProductsExists(){
 
         when(productRepository.findAll()).thenReturn(Collections.emptyList());
 
@@ -175,7 +175,7 @@ class ProductServiceTest {
         assertTrue(allProducts.isEmpty(),"The product list should be empty");
     }
     @Test
-    public void test_AddProduct (){
+    void test_AddProduct (){
         Product newProduct = new Product();
         newProduct.setId(1L);
         newProduct.setName("Product 1");
@@ -211,7 +211,7 @@ class ProductServiceTest {
         assertEquals(10,result.getMin_stock(),"The min stock should be the saved value");
     }
     @Test
-    public void test_finProductById(){
+    void test_finProductById(){
         long productId = 2L;
         Product product = new Product();
         product.setId(2L);
@@ -237,7 +237,7 @@ class ProductServiceTest {
         assertEquals(10, foundProduct.getMin_stock());
     }
     @Test
-    public void test_updateProduct(){
+     void test_updateProduct(){
         Product existingProduct = new Product();
         existingProduct.setId(1L);
         existingProduct.setName("Product 1");
@@ -275,7 +275,7 @@ class ProductServiceTest {
         verify(productRepository,times(1)).save(existingProduct);
     }
     @Test
-    public void shouldThrowExceptionWhenProductNotFound(){
+     void shouldThrowExceptionWhenProductNotFound(){
         long nonExistentProductId = 99L;
         when(productRepository.findById(nonExistentProductId)).thenReturn(Optional.empty());
 
@@ -287,7 +287,7 @@ class ProductServiceTest {
         assertTrue(exception.getMessage().contains(expectedMessage));
     }
     @Test
-    public void test_deleteProduct(){
+     void test_deleteProduct(){
         long productId = 1L;
         Product product = new Product();
         product.setId(productId);
@@ -300,7 +300,7 @@ class ProductServiceTest {
         verify(productRepository, times(1)).delete(product);
     }
     @Test
-    public void shouldThrowExceptionWhenDeletingNonExistentProduct() {
+     void shouldThrowExceptionWhenDeletingNonExistentProduct() {
         long nonExistentProductId = 99L;
 
         when(productRepository.findById(nonExistentProductId)).thenReturn(Optional.empty());

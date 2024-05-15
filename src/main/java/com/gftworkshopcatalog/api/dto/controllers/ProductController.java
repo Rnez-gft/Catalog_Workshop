@@ -1,6 +1,5 @@
 package com.gftworkshopcatalog.api.dto.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.gftworkshopcatalog.model.Product;
@@ -13,9 +12,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import java.util.NoSuchElementException;
-
 @RestController
 @RequestMapping("/products")
 @Tag(name = "Products", description = "Everything about the products")
