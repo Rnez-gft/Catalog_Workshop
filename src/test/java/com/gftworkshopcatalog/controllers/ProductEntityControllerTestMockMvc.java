@@ -1,7 +1,7 @@
 package com.gftworkshopcatalog.controllers;
 
-import com.gftworkshopcatalog.api.dto.controllers.ProductController;
-import com.gftworkshopcatalog.model.Product;
+import com.gftworkshopcatalog.api.controllers.ProductController;
+import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import java.util.List;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class ProductControllerTestMockMvc {
+class ProductEntityControllerTestMockMvc {
 
     
     private MockMvc mockMvc;
@@ -37,8 +37,8 @@ class ProductControllerTestMockMvc {
     @Test
     void testListAllProducts() throws Exception {
         // Given
-        List<Product> productList = Arrays.asList(new Product(), new Product());
-        when(productService.findAllProducts()).thenReturn(productList);
+        List<ProductEntity> productEntityList = Arrays.asList(new ProductEntity(), new ProductEntity());
+        when(productService.findAllProducts()).thenReturn(productEntityList);
 
         // When, Then
         mockMvc.perform(MockMvcRequestBuilders.get("/products"))
@@ -49,8 +49,8 @@ class ProductControllerTestMockMvc {
     @Test
     void testAddNewProduct() throws Exception {
         // Given
-        Product product = new Product(1L,"Test Product", "Test Description", 10.0, 1, 2.0, 100, 10);
-        when(productService.addProduct(product)).thenReturn(product);
+        ProductEntity productEntity = new ProductEntity(1L,"Test Product", "Test Description", 10.0, 1, 2.0, 100, 10);
+        when(productService.addProduct(productEntity)).thenReturn(productEntity);
 
         // When, Then
         mockMvc.perform(MockMvcRequestBuilders.post("/products")
@@ -65,8 +65,8 @@ class ProductControllerTestMockMvc {
     void testGetProductDetails() throws Exception {
         // Given
         long productId = 1L;
-        Product product = new Product(1L,"Test Product", "Test Description", 10.0, 1, 2.0, 100, 10);
-        when(productService.findProductById(productId)).thenReturn(product);
+        ProductEntity productEntity = new ProductEntity(1L,"Test Product", "Test Description", 10.0, 1, 2.0, 100, 10);
+        when(productService.findProductById(productId)).thenReturn(productEntity);
 
         // When, Then
         mockMvc.perform(MockMvcRequestBuilders.get("/products/{id}", productId)
@@ -81,8 +81,8 @@ class ProductControllerTestMockMvc {
     void testUpdateProduct() throws Exception {
         // Given
         long productId = 1L;
-        Product product = new Product(productId, "Test Product", "Test Description", 10.0, 1, 2.0, 100, 10);
-        when(productService.updateProduct(productId, product)).thenReturn(product);
+        ProductEntity productEntity = new ProductEntity(productId, "Test Product", "Test Description", 10.0, 1, 2.0, 100, 10);
+        when(productService.updateProduct(productId, productEntity)).thenReturn(productEntity);
 
         // When, Then
         mockMvc.perform(MockMvcRequestBuilders.put("/products/{id}", productId)
@@ -108,9 +108,9 @@ class ProductControllerTestMockMvc {
         // Given
         long productId = 1L;
         double newPrice = 20.0;
-        Product updatedProduct = new Product(productId, "Test Product", "Test Description", newPrice, 1, 2.0, 100, 10);
+        ProductEntity updatedProductEntity = new ProductEntity(productId, "Test Product", "Test Description", newPrice, 1, 2.0, 100, 10);
 
-        when(productService.updateProductPrice(productId, newPrice)).thenReturn(updatedProduct);
+        when(productService.updateProductPrice(productId, newPrice)).thenReturn(updatedProductEntity);
 
         // When, Then
         mockMvc.perform(MockMvcRequestBuilders.patch("/products/{productId}/price?newPrice={newPrice}", productId, newPrice)
@@ -125,8 +125,8 @@ class ProductControllerTestMockMvc {
         // Given
         long productId = 1L;
         int newStock = 200;
-        Product updatedProduct = new Product(productId, "Test Product", "Test Description", 10.0, 1, 2.0, newStock, 10);
-        when(productService.updateProductStock(productId, newStock)).thenReturn(updatedProduct);
+        ProductEntity updatedProductEntity = new ProductEntity(productId, "Test Product", "Test Description", 10.0, 1, 2.0, newStock, 10);
+        when(productService.updateProductStock(productId, newStock)).thenReturn(updatedProductEntity);
 
         // When, Then
         mockMvc.perform(MockMvcRequestBuilders.patch("/products/{productId}/stock?newStock={newStock}", productId, newStock)

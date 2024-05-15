@@ -1,6 +1,6 @@
 package com.gftworkshopcatalog;
 
-import com.gftworkshopcatalog.model.Product;
+import com.gftworkshopcatalog.model.ProductEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,18 +41,18 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
     @Test
     void testAddNewProduct() {
-        Product newProduct = new Product();
-        newProduct.setName("Test Product");
-        newProduct.setDescription("Test Description");
-        newProduct.setPrice(19.99);
-        newProduct.setCategory_Id(6);
-        newProduct.setWeight(2.0);
-        newProduct.setCurrent_stock(100);
-        newProduct.setMin_stock(10);
+        ProductEntity newProductEntity = new ProductEntity();
+        newProductEntity.setName("Test Product");
+        newProductEntity.setDescription("Test Description");
+        newProductEntity.setPrice(19.99);
+        newProductEntity.setCategory_Id(6);
+        newProductEntity.setWeight(2.0);
+        newProductEntity.setCurrent_stock(100);
+        newProductEntity.setMin_stock(10);
 
         webTestClient.post().uri("/products")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(newProduct)
+                .bodyValue(newProductEntity)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -92,18 +92,18 @@ import org.springframework.test.web.reactive.server.WebTestClient;
     void testUpdateProduct() {
         long productId = 1L; // Ajustar el ID según un producto existente en la base de datos
 
-        Product updatedProduct = new Product();
-        updatedProduct.setName("Updated Product Name");
-        updatedProduct.setDescription("Updated Product Description");
-        updatedProduct.setPrice(29.99);
-        updatedProduct.setCategory_Id(7);
-        updatedProduct.setWeight(2.5);
-        updatedProduct.setCurrent_stock(150);
-        updatedProduct.setMin_stock(15);
+        ProductEntity updatedProductEntity = new ProductEntity();
+        updatedProductEntity.setName("Updated Product Name");
+        updatedProductEntity.setDescription("Updated Product Description");
+        updatedProductEntity.setPrice(29.99);
+        updatedProductEntity.setCategory_Id(7);
+        updatedProductEntity.setWeight(2.5);
+        updatedProductEntity.setCurrent_stock(150);
+        updatedProductEntity.setMin_stock(15);
 
         webTestClient.put().uri("/products/{id}", productId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(updatedProduct)
+                .bodyValue(updatedProductEntity)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)

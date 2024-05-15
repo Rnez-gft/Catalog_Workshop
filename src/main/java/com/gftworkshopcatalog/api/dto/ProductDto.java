@@ -12,16 +12,22 @@ public class ProductDto {
     private String name;
     private String description;
     private Double price;
-    private Long stock;
-    private String category;
-    private Double discount;
+    private Integer category_Id;
     private Double weight;
-
-
+    private Integer current_stock;
+    private Integer min_stock;
 
     @Override
     public String toString() {
-        return "ProductDTO [id=" + id + ", name=" + name + ", description=" + description + ", price=" + price +
-                ", stock=" + stock + ", category=" + category + ", discount=" + discount + ", weight=" + weight + "]";
+        return "ProductDto{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", category_Id=" + category_Id +
+                ", weight=" + weight +
+                ", current_stock=" + current_stock +
+                ", min_stock=" + min_stock +
+                '}';
     }
 }
