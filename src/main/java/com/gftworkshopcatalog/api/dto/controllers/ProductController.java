@@ -15,6 +15,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.util.NoSuchElementException;
+
 @RestController
 @RequestMapping("/products")
 @Tag(name = "Products", description = "Everything about the products")
@@ -87,7 +89,7 @@ public class ProductController {
     })
     public ResponseEntity<?> updateProduct(
             @Parameter(description = "Product ID", required = true)
-            @PathVariable("id") long productId,
+            @PathVariable("id") Long productId,
             @RequestBody Product product) {
         Product updatedProduct = productService.updateProduct(productId, product);
         return ResponseEntity.ok(updatedProduct);
@@ -135,7 +137,6 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating product price: " + e.getMessage());
         }
     }
-
 
     @PatchMapping("/{productId}/stock")
     public ResponseEntity<?> updateProductStock(@PathVariable("productId") long productId, @RequestParam("newStock") int newStock) {

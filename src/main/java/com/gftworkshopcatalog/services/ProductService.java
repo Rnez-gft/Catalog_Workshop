@@ -39,24 +39,27 @@ public class ProductService {
 
     public Product findProductById(long productId) {
         return productRepository.findById(productId)
-                .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + productId));
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with ID: " + productId));
     }
 
-    public Product updateProduct(Long productId, Product productDetails) {
-        Product existingProduct = productRepository.findById(productId)
-                .orElseThrow(() -> new EntityNotFoundException("Product not found with ID: " + productId));
 
+    public Product updateProduct(Long productId, Product productDetails) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with ID: " + productId));
         if (productDetails == null) {
             throw new IllegalArgumentException("Product details cannot be null");
         }
 
         try {
-            existingProduct.setName(productDetails.getName());
-            existingProduct.setDescription(productDetails.getDescription());
-            existingProduct.setPrice(productDetails.getPrice());
-            existingProduct.setWeight(productDetails.getWeight());
+            product.setName(productDetails.getName());
+            product.setDescription(productDetails.getDescription());
+            product.setPrice(productDetails.getPrice());
+            product.setCategory_Id(productDetails.getCategory_Id());
+            product.setWeight(productDetails.getWeight());
+            product.setCurrent_stock(productDetails.getCurrent_stock());
+            product.setMin_stock(productDetails.getMin_stock());
 
-            return productRepository.save(existingProduct);
+            return productRepository.save(product);
         } catch (DataAccessException ex) {
             throw new ServiceException("Failed to update the product with ID: " + productId, ex);
         }
