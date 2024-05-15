@@ -95,7 +95,8 @@ public class ProductController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a product", description = "Deletes a specific product from the catalog.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Product deleted"),
+            @ApiResponse(responseCode = "204", description = "Product deleted",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessResponse.class)) }),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "500", description = "Error response",
@@ -171,4 +172,21 @@ public class ProductController {
             this.errorCode = errorCode;
         }
     }
+
+    public class SuccessResponse {
+        private String message;
+
+        public SuccessResponse(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+    }
+
 }
