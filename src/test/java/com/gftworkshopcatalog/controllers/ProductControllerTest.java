@@ -5,7 +5,9 @@ import com.gftworkshopcatalog.model.Product;
 import com.gftworkshopcatalog.services.ProductService;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.service.spi.ServiceException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -42,6 +44,15 @@ class ProductControllerTest {
         assertEquals(mockProducts, responseEntity.getBody());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
+    @DisplayName("Server Error listAllProducts()")
+    @Test
+    void test_listAllProducts_InternalServerError() {
+        when(productService.findAllProducts()).thenThrow(new ServiceException("Internal Server Error"));
+
+        ResponseEntity<?> responseEntity = productController.listAllProducts();
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+    }
     @Test
     void test_addNewProduct(){
         Product productToAdd = new Product(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1, 3.71, 26, 10);
@@ -54,6 +65,17 @@ class ProductControllerTest {
         assertEquals(addedProduct, responseEntity.getBody());
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
     }
+    @DisplayName("Server Error addNewProduct()")
+    @Test
+    void test_addNewProduct_InternalServerError() {
+        Product product = new Product(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1, 3.71, 26, 10);
+
+        when(productService.addProduct(product)).thenThrow(new ServiceException("Internal Server Error"));
+
+        ResponseEntity<?> responseEntity = productController.addNewProduct(product);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+    }
     @Test
     void test_getProductDetails(){
         long productId = 1L;
@@ -65,6 +87,17 @@ class ProductControllerTest {
 
         assertEquals(product, responseEntity.getBody());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+    }
+    @DisplayName("Server Error getProductDetails()")
+    @Test
+    void test_getProductDetails_InternalServerError() {
+        long productId = 1L;
+
+        when(productService.findProductById(productId)).thenThrow(new ServiceException("Internal Server Error"));
+
+        ResponseEntity<?> responseEntity = productController.getProductDetails(productId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
     }
     @Test
     void test_updateProduct(){
@@ -86,6 +119,19 @@ class ProductControllerTest {
         assertEquals(updatedProductResult.getCurrent_stock(), updatedProductInput.getCurrent_stock());
         assertEquals(updatedProductResult.getMin_stock(), updatedProductInput.getMin_stock());
     }
+    @DisplayName("Server Error updateProduct()")
+    @Test
+    void test_updateProduct_InternalServerError() {
+        long productId = 1L;
+        Product updatedProductInput = new Product(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1, 3.71, 26, 10);
+        Product updatedProductResult = new Product(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1, 3.71, 26, 10);
+
+        when(productService.updateProduct(productId, updatedProductInput)).thenThrow(new ServiceException("Internal Server Error"));
+
+        ResponseEntity<?> responseEntity = productController.updateProduct(productId, updatedProductResult);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+    }
     @Test
     void test_deleteProduct(){
         long productId = 1L;
@@ -96,5 +142,16 @@ class ProductControllerTest {
 
         verify(productService, times(1)).deleteProduct(productId);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
+    @DisplayName("Server Error deleteProduct()")
+    @Test
+    void test_deleteProduct_InternalServerError() {
+        long productId = 1L;
+
+        doThrow(new ServiceException("Internal Server Error")).when(productService).deleteProduct(productId);
+
+        ResponseEntity<?> responseEntity = productController.deleteProduct(productId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
     }
 }

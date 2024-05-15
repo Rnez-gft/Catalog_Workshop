@@ -5,7 +5,9 @@ import com.gftworkshopcatalog.repositories.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.dao.DataAccessException;
 
 import java.util.List;
 
@@ -70,14 +72,19 @@ public class ProductServiceImpl {
         }
     }
 
+
+
     public void deleteProduct(long productId) {
-        Product product = findProductById(productId); // Uses EntityNotFoundException if not found
+        Product product = findProductById(productId); // Utiliza EntityNotFoundException si no se encuentra
         try {
             productRepository.delete(product);
         } catch (DataAccessException ex) {
+            throw new DataIntegrityViolationException("Database error", ex);
+        } catch (ServiceException ex) {
             throw new ServiceException("Failed to delete product with ID: " + productId, ex);
         }
     }
+
 
     public Product updateProductPrice(long productId, double newPrice) {
         if (newPrice < 0) {
