@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.dao.DataAccessException;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -287,6 +288,7 @@ class ProductServiceTest {
         assertTrue(exception.getMessage().contains(expectedMessage));
     }
     @Test
+    @DisplayName("Delete Product - Success")
     public void test_deleteProduct(){
         long productId = 1L;
         Product product = new Product();
@@ -299,7 +301,9 @@ class ProductServiceTest {
 
         verify(productRepository, times(1)).delete(product);
     }
+
     @Test
+    @DisplayName("Delete Product - Throws RuntimeException for Non-Existent Product")
     public void shouldThrowExceptionWhenDeletingNonExistentProduct() {
         long nonExistentProductId = 99L;
 
@@ -311,6 +315,37 @@ class ProductServiceTest {
 
         String expectedMessage = "Product not found with ID: " + nonExistentProductId;
         assertTrue(exception.getMessage().contains(expectedMessage));
+        verify(productRepository, never()).delete(any(Product.class));
+    }
+
+    @Test
+    @DisplayName("Delete Product - Handles DataAccessException")
+    public void deleteProduct_DataAccessException() {
+        long productId = 1L;
+        Product product = new Product();
+        product.setId(productId);
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        doThrow(new DataAccessException("Database error") {}).when(productRepository).delete(product);
+
+        Exception exception = assertThrows(DataAccessException.class, () -> {
+            productService.deleteProduct(productId);
+        });
+
+        assertEquals("Database error", exception.getMessage());
+        verify(productRepository).delete(product);
+    }
+
+    @Test
+    @DisplayName("Delete Product - Throws IllegalArgumentException for Invalid Product ID")
+    public void deleteProduct_InvalidProductId_ThrowsIllegalArgumentException() {
+        long invalidProductId = -1L; // Considerando que -1 es un ID inválido
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            productService.deleteProduct(invalidProductId);
+        });
+
+        assertEquals("Invalid product ID", exception.getMessage());
         verify(productRepository, never()).delete(any(Product.class));
     }
 }
