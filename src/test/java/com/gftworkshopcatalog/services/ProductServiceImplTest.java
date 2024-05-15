@@ -32,7 +32,7 @@ class ProductServiceImplTest {
     private ProductServiceImpl productServiceImpl;
 
     private Product product;
-    private long productId = 1L;
+    private final long productId = 1L;
 
     @BeforeEach
     void setUp() {
@@ -136,8 +136,9 @@ class ProductServiceImplTest {
         verify(productRepository).save(product);
     }
     @Test
+
     @DisplayName("Find All Products")
-    public void test_findAllProducts(){
+    void test_findAllProducts(){
         Product product1 = new Product();
         product1.setId(1L);
         product1.setName("Product 1");
@@ -170,8 +171,11 @@ class ProductServiceImplTest {
         assertTrue(allProducts.contains(product2), "The list should contain 'Product 2'");
     }
     @Test
+
     @DisplayName("Should return empty list when no products exist")
-    public void shouldReturnEmptyListWhenNoProductsExists(){
+
+    void shouldReturnEmptyListWhenNoProductsExists(){
+
 
         when(productRepository.findAll()).thenReturn(Collections.emptyList());
 
@@ -193,7 +197,8 @@ class ProductServiceImplTest {
     }
     @Test
     @DisplayName("Add product")
-    public void test_AddProduct (){
+    void test_AddProduct (){
+
         Product newProduct = new Product();
         newProduct.setId(1L);
         newProduct.setName("Product 1");
@@ -229,6 +234,7 @@ class ProductServiceImplTest {
         assertEquals(10,result.getMin_stock(),"The min stock should be the saved value");
     }
     @Test
+
     @DisplayName("Should handle exception when adding product")
     public void shouldHandleExceptionWhenAddingProduct() {
         Product newProduct = new Product();
@@ -312,6 +318,7 @@ class ProductServiceImplTest {
     @Test
     @DisplayName("Find product by ID")
     public void test_findProductById(){
+
         long productId = 2L;
         Product product = new Product();
         product.setId(2L);
@@ -392,7 +399,8 @@ class ProductServiceImplTest {
     }
     @Test
     @DisplayName("Throw RuntimeException when product not found during update")
-    public void shouldThrowExceptionWhenProductNotFound(){
+     void shouldThrowExceptionWhenProductNotFound(){
+
         long nonExistentProductId = 99L;
         when(productRepository.findById(nonExistentProductId)).thenReturn(Optional.empty());
 
@@ -436,7 +444,7 @@ class ProductServiceImplTest {
     }
     @Test
     @DisplayName("Delete Product - Success")
-    public void test_deleteProduct(){
+     void test_deleteProduct(){
         long productId = 1L;
         Product product = new Product();
         product.setId(productId);
@@ -450,8 +458,10 @@ class ProductServiceImplTest {
     }
 
     @Test
+
     @DisplayName("Delete Product - Throws RuntimeException for Non-Existent Product")
-    public void shouldThrowExceptionWhenDeletingNonExistentProduct() {
+     void shouldThrowExceptionWhenDeletingNonExistentProduct() {
+
         long nonExistentProductId = 99L;
 
         when(productRepository.findById(nonExistentProductId)).thenReturn(Optional.empty());
