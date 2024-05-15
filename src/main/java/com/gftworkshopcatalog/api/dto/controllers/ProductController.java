@@ -179,7 +179,7 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> updateProductPrice(@PathVariable("productId") long productId, @RequestParam("newPrice") double newPrice) {
+    public ResponseEntity<?> updateProductPrice(@PathVariable("id") long productId, @RequestParam("newPrice") double newPrice) {
         try {
             Product updatedProduct = productServiceImpl.updateProductPrice(productId, newPrice);
             return ResponseEntity.ok(updatedProduct);
@@ -201,7 +201,7 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> updateProductStock(@PathVariable("productId") long productId, @RequestParam("newStock") int newStock) {
+    public ResponseEntity<?> updateProductStock(@PathVariable("id") long productId, @RequestParam("newStock") int newStock) {
         try {
             Product updatedProduct = productServiceImpl.updateProductStock(productId, newStock);
             return ResponseEntity.ok(updatedProduct);
