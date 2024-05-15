@@ -65,7 +65,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
                 .jsonPath("$.weight").isEqualTo(2.0)
                 .jsonPath("$.current_stock").isEqualTo(100)
                 .jsonPath("$.min_stock").isEqualTo(10)
-                .jsonPath("$.error_code").doesNotExist();
+                .jsonPath("$.errorCode").doesNotExist();
     }
 
     @Test
@@ -85,7 +85,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
                 .jsonPath("$.weight").isNumber()
                 .jsonPath("$.current_stock").isNumber()
                 .jsonPath("$.min_stock").isNumber()
-                .jsonPath("$.error_code").doesNotExist(); //Ajustar el valor existente en la base de datos
+                .jsonPath("$.errorCode").doesNotExist(); //Ajustar el valor existente en la base de datos
     }
 
     @Test
@@ -116,7 +116,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
                 .jsonPath("$.weight").isEqualTo(2.5)
                 .jsonPath("$.current_stock").isEqualTo(150)
                 .jsonPath("$.min_stock").isEqualTo(15)
-                .jsonPath("$.error_code").doesNotExist();
+                .jsonPath("$.errorCode").doesNotExist();
     }
 
     @Test
@@ -127,7 +127,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
                 .exchange()
                 .expectStatus().isNoContent()
                 .expectBody()
-                .jsonPath("$.error_code").doesNotExist();
+                .jsonPath("$.errorCode").doesNotExist();
     }
 
 
@@ -144,7 +144,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
                 .expectBody()
                 .jsonPath("$.id").isEqualTo(productId)
                 .jsonPath("$.current_stock").isEqualTo(newStock)
-                .jsonPath("$.error_code").doesNotExist();
+                .jsonPath("$.errorCode").doesNotExist();
     }
 
     @Test
@@ -159,9 +159,85 @@ import org.springframework.test.web.reactive.server.WebTestClient;
                 .expectBody()
                 .jsonPath("$.id").isEqualTo(productId)
                 .jsonPath("$.price").isEqualTo(newPrice)
-                .jsonPath("$.error_code").doesNotExist();
+                .jsonPath("$.errorCode").doesNotExist();
     }
 
+    @Test
+    void testProductNotFoundError() {
+        // Se espera que el servidor devuelva un error 404 (Producto no encontrado)
+        long productId = 999L;
+
+        webTestClient.get().uri("/products/{id}", productId)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.errorCode").isEqualTo(404)
+                .jsonPath("$.message").isEqualTo("Product not found");
+    }
+
+    @Test
+    void testBadRequestError() {
+        // Simulamos una solicitud incorrecta que cause un error 400
+        Product newProduct = new Product();
+        // No proporcionamos el nombre del producto, lo que debería generar un error de solicitud incorrecta
+        newProduct.setDescription("Test Description");
+        newProduct.setPrice(19.99);
+        newProduct.setCategory_Id(1);
+        newProduct.setWeight(15.00);
+        newProduct.setCurrent_stock(100);
+        newProduct.setMin_stock(10);
+
+        webTestClient.post().uri("/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newProduct)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.errorCode").isEqualTo(400)
+                .jsonPath("$.message").isEqualTo("Bad request, missing required fields");
+    }
+
+    @Test
+    void testUnauthorizedError() {
+        // Simulamos una solicitud que requiere autenticación pero no se proporcionan credenciales válidas
+        webTestClient.get().uri("/products")
+                .exchange()
+                .expectStatus().isUnauthorized()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.errorCode").isEqualTo(401)
+                .jsonPath("$.message").isEqualTo("Unauthorized access, please provide valid credentials");
+    }
+
+    @Test
+    void testForbiddenError() {
+        // Simulamos una solicitud que no tiene permiso para acceder a un recurso
+        long productId = 123L; // Supongamos que este ID de producto está protegido y el usuario no tiene permiso para acceder
+
+        webTestClient.get().uri("/products/{id}", productId)
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.errorCode").isEqualTo(403)
+                .jsonPath("$.message").isEqualTo("Forbidden, you don't have permission to access this resource");
+    }
+
+    @Test
+    void testInternalServerError() {
+        // Simular una solicitud que cause un error interno del servidor
+        long productId = 0L; // Este ID de producto provocará un error interno en el servidor
+
+        webTestClient.get().uri("/products/{id}", productId)
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.errorCode").isEqualTo(500)
+                .jsonPath("$.message").isEqualTo("Internal server error occurred");
+    }
 
     
 }

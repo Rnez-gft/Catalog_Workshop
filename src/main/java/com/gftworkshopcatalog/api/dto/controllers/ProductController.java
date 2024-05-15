@@ -1,5 +1,6 @@
 package com.gftworkshopcatalog.api.dto.controllers;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.gftworkshopcatalog.model.Product;
@@ -63,10 +64,10 @@ public class ProductController {
     public ResponseEntity<?> getProductDetails(
             @Parameter(description = "Product ID", required = true)
             @PathVariable("id") long productId) {
-        Product product = productService.findProductById(productId);
-        if (product != null) {
+        try {
+            Product product = productService.findProductById(productId);
             return ResponseEntity.ok(product);
-        } else {
+        } catch (EntityNotFoundException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
