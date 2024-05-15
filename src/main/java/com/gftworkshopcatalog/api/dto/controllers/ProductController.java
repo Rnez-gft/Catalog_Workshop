@@ -169,7 +169,7 @@ public class ProductController {
 
         }
     }
-    @PatchMapping("/{productId}/price")
+    @PatchMapping("/{id}/price")
     @Operation(summary = "Update the price of a product", description = "Partially updates the price of a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Price successfully updated",
@@ -191,7 +191,7 @@ public class ProductController {
         }
     }
 
-    @PatchMapping("/{productId}/stock")
+    @PatchMapping("/{id}/stock")
     @Operation(summary = "Update the stock of a product", description = "Partially updates the stock of a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Stock successfully updated",
