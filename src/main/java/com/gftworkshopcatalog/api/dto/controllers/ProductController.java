@@ -1,6 +1,6 @@
 package com.gftworkshopcatalog.api.dto.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.gftworkshopcatalog.model.Product;
@@ -13,8 +13,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/products")
@@ -67,10 +65,10 @@ public class ProductController {
     public ResponseEntity<?> getProductDetails(
             @Parameter(description = "Product ID", required = true)
             @PathVariable("id") long productId) {
-        Product product = productService.findProductById(productId);
-        if (product != null) {
+        try {
+            Product product = productService.findProductById(productId);
             return ResponseEntity.ok(product);
-        } else {
+        } catch (EntityNotFoundException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
@@ -172,4 +170,5 @@ public class ProductController {
             this.errorCode = errorCode;
         }
     }
+
 }
