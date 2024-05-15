@@ -27,8 +27,12 @@ public class ProductService {
     }
 
     public Product addProduct(Product product) {
-        if (product == null || product.getName() == null || product.getPrice() == null) {
-            throw new IllegalArgumentException("Product details must not be null and must include name and price");
+        if (product == null || product.getName() == null || product.getPrice() == null || product.getCategory_Id() == null || product.getWeight() == null
+                || product.getCurrent_stock() == null || product.getMin_stock() == null) {
+            throw new IllegalArgumentException("Product details must not be null except description");
+        }
+        if (product.getPrice() < 0 || product.getWeight() < 0 || product.getCurrent_stock() < 0 || product.getMin_stock() < 0) {
+            throw new IllegalArgumentException("Product details must not contain negative values");
         }
         try {
             return productRepository.save(product);

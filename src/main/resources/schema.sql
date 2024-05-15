@@ -4,7 +4,7 @@ CREATE TABLE products (
     description VARCHAR(255),
     price DECIMAL(10, 2) NOT NULL,
     category_Id INT NOT NULL,
-    weight DECIMAL(5, 2),
+    weight DECIMAL(5, 2) NOT NULL,
     current_stock INT NOT NULL,
     min_stock INT NOT NULL
 );
