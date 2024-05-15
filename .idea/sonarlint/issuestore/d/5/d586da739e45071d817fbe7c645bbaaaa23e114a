@@ -1,19 +1,21 @@
 
-<
-java:S1452%"&Remove usage of generic wildcard type.(“¯îý
-<
-java:S14521"&Remove usage of generic wildcard type.(ÃåîÊ
-A
-java:S1452A"&Remove usage of generic wildcard type.(…µóÖýÿÿÿÿ
-A
-java:S1452W"&Remove usage of generic wildcard type.(â€Îàúÿÿÿÿ
-<
-java:S1452i"&Remove usage of generic wildcard type.(žöÌ¶
-<
-java:S1452z"&Remove usage of generic wildcard type.(ÂÞäñ
-=
-java:S1452"&Remove usage of generic wildcard type.(õâÓƒ
-=
-java:S1452Œ"&Remove usage of generic wildcard type.(“Â’ˆ
-n
-java:S1128"SRemove this unused import 'org.springframework.beans.factory.annotation.Autowired'.(¡ž¸Îùÿÿÿÿ
+C
+java:S1452'"&Remove usage of generic wildcard type.(“¯îý8ºÑÂÛ÷1
+C
+java:S14523"&Remove usage of generic wildcard type.(ÃåîÊ8ÀÑÂÛ÷1
+H
+java:S1452C"&Remove usage of generic wildcard type.(…µóÖýÿÿÿÿ8ÇÑÂÛ÷1
+H
+java:S1452Y"&Remove usage of generic wildcard type.(â€Îàúÿÿÿÿ8ÎÑÂÛ÷1
+C
+java:S1452k"&Remove usage of generic wildcard type.(žöÌ¶8ÓÑÂÛ÷1
+C
+java:S1452|"&Remove usage of generic wildcard type.(ÂÞäñ8ØÑÂÛ÷1
+D
+java:S1452ƒ"&Remove usage of generic wildcard type.(õâÓƒ8ÝÑÂÛ÷1
+I
+java:S1452"&Remove usage of generic wildcard type.(îþ¼úýÿÿÿÿ8æÑÂÛ÷1
+›
+java:S1128"SRemove this unused import 'org.springframework.beans.factory.annotation.Autowired'.(¡ž¸Îùÿÿÿÿ8°É¿Û÷1J$555c8bed-df15-42e1-9674-ba90ac685a17
+_
+java:S1128"=Remove this unused import 'java.util.NoSuchElementException'.(®“ÿéúÿÿÿÿ8ˆÒÂÛ÷1
