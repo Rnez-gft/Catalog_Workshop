@@ -3,6 +3,7 @@ package com.gftworkshopcatalog.controllers;
 import com.gftworkshopcatalog.api.dto.controllers.ProductController;
 import com.gftworkshopcatalog.model.Product;
 import com.gftworkshopcatalog.services.ProductService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,11 +14,12 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class ProductControllerTest {
     @Mock
@@ -80,6 +82,18 @@ class ProductControllerTest {
         assertEquals(updatedProductResult.getPrice(), updatedProductInput.getPrice());
         assertEquals(updatedProductResult.getCategory_Id(), updatedProductInput.getCategory_Id());
         assertEquals(updatedProductResult.getWeight(), updatedProductInput.getWeight());
-        assertEquals(updatedProductResult.getWeight(), updatedProductInput.getWeight());
+        assertEquals(updatedProductResult.getCurrent_stock(), updatedProductInput.getCurrent_stock());
+        assertEquals(updatedProductResult.getMin_stock(), updatedProductInput.getMin_stock());
+    }
+    @Test
+    void test_deleteProduct(){
+        long productId = 1L;
+
+        doNothing().when(productService).deleteProduct(anyLong());
+
+        ResponseEntity<?> response = productController.deleteProduct(productId);
+
+        verify(productService, times(1)).deleteProduct(productId);
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 }
