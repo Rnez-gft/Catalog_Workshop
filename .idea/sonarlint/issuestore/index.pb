@@ -13,3 +13,5 @@ Asrc/main/java/com/gftworkshopcatalog/services/ProductService.java,7\c\7ccf359a
 Psrc/test/java/com/gftworkshopcatalog/CatalogServiceWorkshopApplicationTests.java,b\e\be1a9c1ef597fb75f624475dbcce774fb503b9e6
 l
 <src/main/java/com/gftworkshopcatalog/api/dto/ProductDto.java,d\d\dd136393331b66e0667f24536eef906072c0cfdb
+u
+Esrc/test/java/com/gftworkshopcatalog/services/ProductServiceTest.java,a\8\a87f4d55327f2d791a13d669978c887e83353fe9
