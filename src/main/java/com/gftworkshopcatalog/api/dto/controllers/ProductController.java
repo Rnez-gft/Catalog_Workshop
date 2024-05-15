@@ -1,11 +1,10 @@
 package com.gftworkshopcatalog.api.dto.controllers;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.gftworkshopcatalog.model.Product;
-import com.gftworkshopcatalog.services.ProductService;
+import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import org.springframework.http.HttpStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,18 +14,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import java.util.NoSuchElementException;
-
 @RestController
 @RequestMapping("/products")
 @Tag(name = "Products", description = "Everything about the products")
 public class ProductController {
 
-    private ProductService productService;
+    private ProductServiceImpl productServiceImpl;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductServiceImpl productServiceImpl) {
         super();
-        this.productService = productService;
+        this.productServiceImpl = productServiceImpl;
     }
 
     @GetMapping
@@ -38,7 +35,7 @@ public class ProductController {
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
     public ResponseEntity<?> listAllProducts() {
-        return ResponseEntity.ok(productService.findAllProducts());
+        return ResponseEntity.ok(productServiceImpl.findAllProducts());
     }
 
     @PostMapping
@@ -51,7 +48,7 @@ public class ProductController {
     })
     public ResponseEntity<?> addNewProduct(
             @RequestBody Product product) {
-        Product createdProduct = productService.addProduct(product);
+        Product createdProduct = productServiceImpl.addProduct(product);
         return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
 
@@ -69,7 +66,7 @@ public class ProductController {
             @Parameter(description = "Product ID", required = true)
             @PathVariable("id") long productId) {
         try {
-            Product product = productService.findProductById(productId);
+            Product product = productServiceImpl.findProductById(productId);
             return ResponseEntity.ok(product);
         } catch (EntityNotFoundException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
@@ -91,7 +88,7 @@ public class ProductController {
             @Parameter(description = "Product ID", required = true)
             @PathVariable("id") Long productId,
             @RequestBody Product product) {
-        Product updatedProduct = productService.updateProduct(productId, product);
+        Product updatedProduct = productServiceImpl.updateProduct(productId, product);
         return ResponseEntity.ok(updatedProduct);
     }
 
@@ -108,7 +105,7 @@ public class ProductController {
     public ResponseEntity<?> deleteProduct(
             @Parameter(description = "Product ID", required = true)
             @PathVariable("id") long productId) {
-        productService.deleteProduct(productId);
+        productServiceImpl.deleteProduct(productId);
         return ResponseEntity.noContent().build();
     }
 
@@ -131,7 +128,7 @@ public class ProductController {
     @PatchMapping("/{productId}/price")
     public ResponseEntity<?> updateProductPrice(@PathVariable("productId") long productId, @RequestParam("newPrice") double newPrice) {
         try {
-            Product updatedProduct = productService.updateProductPrice(productId, newPrice);
+            Product updatedProduct = productServiceImpl.updateProductPrice(productId, newPrice);
             return ResponseEntity.ok(updatedProduct);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating product price: " + e.getMessage());
@@ -141,7 +138,7 @@ public class ProductController {
     @PatchMapping("/{productId}/stock")
     public ResponseEntity<?> updateProductStock(@PathVariable("productId") long productId, @RequestParam("newStock") int newStock) {
         try {
-            Product updatedProduct = productService.updateProductStock(productId, newStock);
+            Product updatedProduct = productServiceImpl.updateProductStock(productId, newStock);
             return ResponseEntity.ok(updatedProduct);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating product price: " + e.getMessage());

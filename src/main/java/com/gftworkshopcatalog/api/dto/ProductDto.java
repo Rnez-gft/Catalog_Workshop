@@ -17,6 +17,8 @@ public class ProductDto {
     private Double discount;
     private Double weight;
 
+
+
     @Override
     public String toString() {
         return "ProductDTO [id=" + id + ", name=" + name + ", description=" + description + ", price=" + price +
