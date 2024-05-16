@@ -75,7 +75,7 @@ public class ProductServiceImpl {
 
 
     public void deleteProduct(long productId) {
-        Product product = findProductById(productId); // Utiliza EntityNotFoundException si no se encuentra
+        Product product = findProductById(productId);
         try {
             productRepository.delete(product);
         } catch (DataAccessException ex) {

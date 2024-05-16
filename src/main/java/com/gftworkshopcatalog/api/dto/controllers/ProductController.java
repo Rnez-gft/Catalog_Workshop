@@ -1,6 +1,9 @@
 package com.gftworkshopcatalog.api.dto.controllers;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.gftworkshopcatalog.model.Product;
@@ -19,7 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Products", description = "Everything about the products")
 public class ProductController {
 
-    private ProductServiceImpl productServiceImpl;
+    private final ProductServiceImpl productServiceImpl;
 
     public ProductController(ProductServiceImpl productServiceImpl) {
         super();
@@ -85,7 +88,6 @@ public class ProductController {
         } catch (Exception  ex) {
             ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-
         }
     }
 
@@ -221,7 +223,9 @@ public class ProductController {
         }
     }
 
+    @Data
     public class ErrorResponse {
+        // Getters y setters
         private String message;
         private int errorCode;
 
@@ -230,24 +234,10 @@ public class ProductController {
             this.errorCode = errorCode;
         }
 
-        // Getters y setters
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        public int getErrorCode() {
-            return errorCode;
-        }
-
-        public void setErrorCode(int errorCode) {
-            this.errorCode = errorCode;
-        }
     }
-
+    @Setter
+    @Getter
+    @Data
     public class SuccessResponse {
         private String message;
 
@@ -255,13 +245,6 @@ public class ProductController {
             this.message = message;
         }
 
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
     }
 
 }
