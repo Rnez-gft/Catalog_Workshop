@@ -169,7 +169,7 @@ public class ProductController {
 
         }
     }
-    @PatchMapping("/{id}/price")
+    @PatchMapping("/{id}/{newPrice}")
     @Operation(summary = "Update the price of a product", description = "Partially updates the price of a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Price successfully updated",
@@ -179,7 +179,11 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> updateProductPrice(@PathVariable("id") long productId, @RequestParam("newPrice") double newPrice) {
+    public ResponseEntity<?> updateProductPrice(
+            @Parameter(description = "Product ID", required = true)
+            @PathVariable("id") long productId,
+            @Parameter(description = "New price to update the current one", required = true)
+            @RequestParam("newPrice") double newPrice) {
         try {
             Product updatedProduct = productServiceImpl.updateProductPrice(productId, newPrice);
             return ResponseEntity.ok(updatedProduct);
@@ -191,7 +195,7 @@ public class ProductController {
         }
     }
 
-    @PatchMapping("/{id}/stock")
+    @PatchMapping("/{id}/{quantity}")
     @Operation(summary = "Update the stock of a product", description = "Partially updates the stock of a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Stock successfully updated",
@@ -201,9 +205,13 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> updateProductStock(@PathVariable("id") long productId, @RequestParam("newStock") int newStock) {
+    public ResponseEntity<?> updateProductStock(
+            @Parameter(description = "Product ID", required = true)
+            @PathVariable("id") long productId,
+            @Parameter(description = "Quantity of the stock to change", required = true)
+            @RequestParam("quantity") int quantity) {
         try {
-            Product updatedProduct = productServiceImpl.updateProductStock(productId, newStock);
+            Product updatedProduct = productServiceImpl.updateProductStock(productId, quantity);
             return ResponseEntity.ok(updatedProduct);
         } catch (EntityNotFoundException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
