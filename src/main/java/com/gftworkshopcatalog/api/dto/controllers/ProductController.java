@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.gftworkshopcatalog.model.Product;
+import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import org.springframework.http.HttpStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +33,7 @@ public class ProductController {
     @Operation(summary = "List all products", description = "Returns a list of all products.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product list",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class)) }),
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
@@ -51,14 +51,14 @@ public class ProductController {
     @Operation(summary = "Add a new product", description = "Creates a new product in the catalog.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Product created",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class)) }),
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> addNewProduct(@RequestBody Product product) {
+    public ResponseEntity<?> addNewProduct(@RequestBody ProductEntity productEntity) {
         try {
-            Product createdProduct = productServiceImpl.addProduct(product);
-            return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
+            ProductEntity createdProductEntity = productServiceImpl.addProduct(productEntity);
+            return new ResponseEntity<>(createdProductEntity, HttpStatus.CREATED);
         } catch (Exception  ex) {
             ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
@@ -70,7 +70,7 @@ public class ProductController {
     @Operation(summary = "Get product details", description = "Returns details of a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product details",
-                    content = { @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class)) }),
+                    content = { @Content(mediaType = "application/json",schema = @Schema(implementation = ProductEntity.class)) }),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "500", description = "Error response",
@@ -80,8 +80,8 @@ public class ProductController {
             @Parameter(description = "Product ID", required = true)
             @PathVariable("id") long productId) {
         try {
-            Product product = productServiceImpl.findProductById(productId);
-            return ResponseEntity.ok(product);
+            ProductEntity productEntity = productServiceImpl.findProductById(productId);
+            return ResponseEntity.ok(productEntity);
         } catch (EntityNotFoundException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
@@ -95,7 +95,7 @@ public class ProductController {
     @Operation(summary = "Update a product", description = "Updates the details of a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product updated",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class)) }),
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "500", description = "Error response",
@@ -104,11 +104,11 @@ public class ProductController {
     public ResponseEntity<?> updateProduct(
             @Parameter(description = "Product ID", required = true)
             @PathVariable("id") Long productId,
-            @RequestBody Product product) {
+            @RequestBody ProductEntity productEntity) {
 
         try {
-            Product updatedProduct = productServiceImpl.updateProduct(productId, product);
-            return ResponseEntity.ok(updatedProduct);
+            ProductEntity updatedProductEntity = productServiceImpl.updateProduct(productId, productEntity);
+            return ResponseEntity.ok(updatedProductEntity);
         } catch (EntityNotFoundException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
@@ -150,7 +150,7 @@ public class ProductController {
     @Operation(summary = "Get related products", description = "Returns a list of products related to a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of related products",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class)) }),
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "500", description = "Error response",
@@ -175,7 +175,7 @@ public class ProductController {
     @Operation(summary = "Update the price of a product", description = "Partially updates the price of a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Price successfully updated",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class)) }),
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "500", description = "Error response",
@@ -187,8 +187,8 @@ public class ProductController {
             @Parameter(description = "New price to update the current one", required = true)
             @RequestParam("newPrice") double newPrice) {
         try {
-            Product updatedProduct = productServiceImpl.updateProductPrice(productId, newPrice);
-            return ResponseEntity.ok(updatedProduct);
+            ProductEntity updatedProductEntity = productServiceImpl.updateProductPrice(productId, newPrice);
+            return ResponseEntity.ok(updatedProductEntity);
         } catch (EntityNotFoundException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
@@ -201,7 +201,7 @@ public class ProductController {
     @Operation(summary = "Update the stock of a product", description = "Partially updates the stock of a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Stock successfully updated",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class)) }),
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "500", description = "Error response",
@@ -213,8 +213,8 @@ public class ProductController {
             @Parameter(description = "Quantity of the stock to change", required = true)
             @RequestParam("quantity") int quantity) {
         try {
-            Product updatedProduct = productServiceImpl.updateProductStock(productId, quantity);
-            return ResponseEntity.ok(updatedProduct);
+            ProductEntity updatedProductEntity = productServiceImpl.updateProductStock(productId, quantity);
+            return ResponseEntity.ok(updatedProductEntity);
         } catch (EntityNotFoundException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
