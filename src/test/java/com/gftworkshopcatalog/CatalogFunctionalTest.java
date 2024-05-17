@@ -2,7 +2,7 @@ package com.gftworkshopcatalog;
 
 import com.gftworkshopcatalog.model.ProductEntity;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Disabled
 class CatalogFunctionalTest {
 
     private WebTestClient webTestClient;
@@ -24,6 +23,7 @@ class CatalogFunctionalTest {
     }
 
     @Test
+    @DisplayName("Test ListAllProducts()")
     void testListAllProducts() {
         webTestClient.get().uri("/products")
                 .exchange()
@@ -42,6 +42,7 @@ class CatalogFunctionalTest {
     }
 
     @Test
+    @DisplayName("Test AddNewProduct()")
     void testAddNewProduct() {
         ProductEntity newProductEntity = new ProductEntity();
         newProductEntity.setName("Test Product");
@@ -71,6 +72,7 @@ class CatalogFunctionalTest {
     }
 
     @Test
+    @DisplayName("Test GetProductDetails()")
     void testGetProductDetails() {
         long productId = 1L;
 
@@ -91,6 +93,7 @@ class CatalogFunctionalTest {
     }
 
     @Test
+    @DisplayName("Test UpdateProduct()")
     void testUpdateProduct() {
         long productId = 1L;
 
@@ -122,6 +125,7 @@ class CatalogFunctionalTest {
     }
 
     @Test
+    @DisplayName("Test DeleteProduct()")
     void testDeleteProduct() {
 
         webTestClient.delete().uri("/products/{id}", 1L)
@@ -132,8 +136,8 @@ class CatalogFunctionalTest {
     }
 
 
-
     @Test
+    @DisplayName("Test UpdateProductStock()")
     void testUpdateProductStock() {
         long productId = 1L;
         long newStock = 200;
@@ -149,7 +153,8 @@ class CatalogFunctionalTest {
     }
 
     @Test
-    void testUpdatePriceStock() {
+    @DisplayName("Test UpdateProductPrice()")
+    void testUpdateProductPrice() {
         long productId = 1L;
         long newPrice = 200;
 
@@ -164,6 +169,7 @@ class CatalogFunctionalTest {
     }
 
     @Test
+    @DisplayName("Test ProductNotFoundError()")
     void testProductNotFoundError() {
 
         long productId = 999L;
@@ -185,9 +191,21 @@ class CatalogFunctionalTest {
                 .expectBody()
                 .jsonPath("$.errorCode").isEqualTo(404)
                 .jsonPath("$.message").isEqualTo("Product not found");
+
+        long newPrice = 200;
+
+        webTestClient.patch().uri("/products/{productId}/price?newPrice={newPrice}", productId, newPrice)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.errorCode").isEqualTo(404)
+                .jsonPath("$.message").isEqualTo("Product not found");
+
     }
 
     @Test
+    @DisplayName("Test BadRequestError()")
     void testBadRequestError() {
 
         ProductEntity newProductEntity = new ProductEntity();
@@ -211,6 +229,7 @@ class CatalogFunctionalTest {
     }
 
     @Test
+    @DisplayName("Test InternalServerError()")
     void testInternalServerError() {
 
         long productId = -1L;
@@ -222,7 +241,7 @@ class CatalogFunctionalTest {
                 .expectBody()
                 .jsonPath("$.errorCode").isEqualTo(500)
                 .jsonPath("$.message").isEqualTo("Internal server error");
-    }
 
+    }
 
 }
