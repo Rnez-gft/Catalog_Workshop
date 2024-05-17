@@ -37,7 +37,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public ProductEntity addProduct(ProductEntity productEntity) {
-        // Checks for negative values
         if (productEntity.getPrice() != null && productEntity.getPrice() < 0 ||
                 productEntity.getWeight() != null && productEntity.getWeight() < 0 ||
                 productEntity.getCurrent_stock() != null && productEntity.getCurrent_stock() < 0 ||
@@ -45,7 +44,6 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Product details must not contain negative values");
         }
 
-        // Checks for null values
         if (productEntity.getName() == null ||
                 productEntity.getPrice() == null ||
                 productEntity.getCategory_Id() == null ||
@@ -72,8 +70,6 @@ public class ProductServiceImpl implements ProductService {
         if (productEntity == null) {
             throw new EntityNotFoundException("Product not found with ID: " + productId);
         }
-
-        // Updating the product entity with new details from productEntityDetails
         productEntity.setName(productEntityDetails.getName());
         productEntity.setDescription(productEntityDetails.getDescription());
         productEntity.setPrice(productEntityDetails.getPrice());
@@ -152,9 +148,6 @@ public class ProductServiceImpl implements ProductService {
             log.error("Product not found with ID: {}", productId);
             throw new IllegalArgumentException("ProductEntity cannot be null.");
         }
-
-
-
         if (productEntity.getPrice() < 0 || productEntity.getWeight() < 0 ||
                 productEntity.getCurrent_stock() < 0 || productEntity.getMin_stock() < 0) {
             throw new IllegalArgumentException("Product details must not contain negative values.");

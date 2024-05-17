@@ -38,9 +38,9 @@ class ProductServiceImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         productEntity = new ProductEntity();
-        productEntity.setId(productId);
+        productEntity.setId(1L);
         productEntity.setName("Example Product");
-        productEntity.setDescription("Example Product");
+        productEntity.setDescription("Description here");
         productEntity.setPrice(100.34);
         productEntity.setCategory_Id(10);
         productEntity.setWeight(10.5);
@@ -181,11 +181,8 @@ class ProductServiceImplTest {
         assertTrue(allProductEntities.contains(productEntity2), "The list should contain 'Product 2'");
     }
     @Test
-
     @DisplayName("Should return empty list when no products exist")
-
     void shouldReturnEmptyListWhenNoProductsExists(){
-
 
         when(productRepository.findAll()).thenReturn(Collections.emptyList());
 
@@ -194,16 +191,20 @@ class ProductServiceImplTest {
         assertNotNull(allProductEntities,"The product list shoul not be null");
         assertTrue(allProductEntities.isEmpty(),"The product list should be empty");
     }
+
     @Test
-    @DisplayName("Should handle exception when finding all products")
-    public void shouldHandleExceptionWhenFindingAllProducts() {
-        when(productRepository.findAll()).thenThrow(new RuntimeException("Database error"));
+    @DisplayName("Test findAllProducts handles DataAccessException")
+    void testFindAllProductsDataAccessException() {
+        // Given
+        when(productRepository.findAll()).thenThrow(new DataAccessException("Database access error") {});
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            productServiceImpl.findAllProducts();
-        });
+        // When & Then
+        Exception exception = assertThrows(RuntimeException.class, () -> productServiceImpl.findAllProducts(),
+                "Expected findAllProducts to throw, but it did not");
 
-        assertEquals("Database error", exception.getMessage(), "The exception message should be 'Database error'");
+        assertTrue(exception.getMessage().contains("Error accessing data from database"));
+        assertNotNull(exception.getCause(), "Cause should not be null");
+        assertTrue(exception.getCause() instanceof DataAccessException, "The cause should be a DataAccessException");
     }
     @Test
     @DisplayName("Add product")
@@ -243,8 +244,8 @@ class ProductServiceImplTest {
         assertEquals(25,result.getCurrent_stock(),"The current stock should be the saved value");
         assertEquals(10,result.getMin_stock(),"The min stock should be the saved value");
     }
-    @Test
 
+    @Test
     @DisplayName("Should handle exception when adding product")
     public void shouldHandleExceptionWhenAddingProduct() {
         ProductEntity newProductEntity = new ProductEntity();
@@ -498,6 +499,21 @@ class ProductServiceImplTest {
         assertEquals("Product not found with ID: "+ invalidProductId, exception.getMessage());
         verify(productRepository, never()).delete(any(ProductEntity.class));
     }
+    @Test
+    @DisplayName("Handles DataAccessException when deleting a product")
+    void testDeleteProduct_DataAccessException() {
+        long productId = 1L;
+        when(productRepository.findById(productId)).thenReturn(Optional.of(productEntity));
+        doThrow(new DataAccessException("Database failure") {}).when(productRepository).delete(productEntity);
+
+        Exception exception = assertThrows(RuntimeException.class, () -> productServiceImpl.deleteProduct(productId),
+                "Should throw a RuntimeException for a database failure");
+
+        assertTrue(exception.getMessage().contains("Failed to delete product with ID: " + productId),
+                "Exception message should indicate failure to delete due to database error");
+
+        verify(productRepository).delete(productEntity);
+    }
 
     @Test
     @DisplayName("Patch Price Product")
@@ -540,7 +556,22 @@ class ProductServiceImplTest {
 
         verify(productRepository, times(0)).save(product);
     }
+    @Test
+    @DisplayName("Handles DataAccessException when updating price")
+    void updateProductPrice_DataAccessException() {
+        long productId = 1L;
+        double newPrice = 150.0;
 
+        when(productRepository.findById(productId)).thenReturn(Optional.of(productEntity));
+        when(productRepository.save(any(ProductEntity.class))).thenThrow(new DataAccessException("Database failure") {});
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            productServiceImpl.updateProductPrice(productId, newPrice);
+        });
+
+        assertEquals("Failed to update product price for ID: " + productId, exception.getMessage());
+        verify(productRepository).save(productEntity);
+    }
 
 
 
