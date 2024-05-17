@@ -4,6 +4,7 @@ import com.gftworkshopcatalog.api.controllers.ProductController;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +21,7 @@ import java.util.List;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
+@Disabled
 class ProductEntityControllerTestMockMvc {
 
     

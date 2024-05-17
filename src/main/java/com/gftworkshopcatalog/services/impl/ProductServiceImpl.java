@@ -5,6 +5,7 @@ import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -29,14 +30,31 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public ProductEntity findProductById(long productId) {
-        return productRepository.findById(productId).orElseGet(() -> {
+        return productRepository.findById(productId).orElseThrow(() -> {
             log.error("Product not found with ID: {}", productId);
-            return null;
+            return new EntityNotFoundException("Product not found with ID: " + productId);
         });
     }
 
     public ProductEntity addProduct(ProductEntity productEntity) {
-        validateProductEntity(productEntity);
+        // Checks for negative values
+        if (productEntity.getPrice() != null && productEntity.getPrice() < 0 ||
+                productEntity.getWeight() != null && productEntity.getWeight() < 0 ||
+                productEntity.getCurrent_stock() != null && productEntity.getCurrent_stock() < 0 ||
+                productEntity.getMin_stock() != null && productEntity.getMin_stock() < 0) {
+            throw new IllegalArgumentException("Product details must not contain negative values");
+        }
+
+        // Checks for null values
+        if (productEntity.getName() == null ||
+                productEntity.getPrice() == null ||
+                productEntity.getCategory_Id() == null ||
+                productEntity.getWeight() == null ||
+                productEntity.getCurrent_stock() == null ||
+                productEntity.getMin_stock() == null) {
+            throw new IllegalArgumentException("Product details must not be null except description");
+        }
+
         try {
             return productRepository.save(productEntity);
         } catch (DataAccessException ex) {
@@ -46,10 +64,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public ProductEntity updateProduct(Long productId, ProductEntity productEntityDetails) {
-        ProductEntity productEntity = findProductById(productId);
-        validateProductEntity(productEntityDetails);
-        log.info("Updating product with ID: {}", productId);
+        if (productEntityDetails == null) {
+            throw new IllegalArgumentException("Product details must not be null.");
+        }
 
+        ProductEntity productEntity = findProductById(productId);
+        if (productEntity == null) {
+            throw new EntityNotFoundException("Product not found with ID: " + productId);
+        }
+
+        // Updating the product entity with new details from productEntityDetails
         productEntity.setName(productEntityDetails.getName());
         productEntity.setDescription(productEntityDetails.getDescription());
         productEntity.setPrice(productEntityDetails.getPrice());
@@ -62,7 +86,7 @@ public class ProductServiceImpl implements ProductService {
             return productRepository.save(productEntity);
         } catch (DataAccessException ex) {
             log.error("Failed to update the product with ID: {}", productId, ex);
-            throw new RuntimeException("Failed to update the product with ID: " + productId, ex);
+            throw new ServiceException("Failed to update the product with ID: " + productId, ex);
         }
     }
 
@@ -83,8 +107,10 @@ public class ProductServiceImpl implements ProductService {
         }
 
         ProductEntity productEntity = findProductById(productId);
+
         productEntity.setPrice(newPrice);
         log.info("Updating price for product with ID: {}", productId);
+
         try {
             return productRepository.save(productEntity);
         } catch (DataAccessException ex) {
@@ -93,14 +119,26 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    public ProductEntity updateProductStock(long productId, int newStock) {
-        if (newStock < 0) {
-            throw new IllegalArgumentException("Stock cannot be negative");
+    public ProductEntity updateProductStock(long productId, int quantity) {
+        ProductEntity productEntity = findProductById(productId);
+        validateProductEntity(productEntity, productId);
+
+        int newStock = productEntity.getCurrent_stock() + quantity;
+
+        if (newStock <= productEntity.getMin_stock()) {
+            log.info("Min stock reached. Product stock must be updated with ID: {}", productId);
         }
 
-        ProductEntity productEntity = findProductById(productId);
+        if (newStock < 0) {
+            log.info("Error updating stock for product with ID: {}, insufficient current stock", productId);
+            throw new IllegalArgumentException("Insufficient stock to decrement by " + quantity);
+        }
+
+
+
         productEntity.setCurrent_stock(newStock);
         log.info("Updating stock for product with ID: {}", productId);
+
         try {
             return productRepository.save(productEntity);
         } catch (DataAccessException ex) {
@@ -109,16 +147,13 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    private void validateProductEntity(ProductEntity productEntity) {
+    private void validateProductEntity(ProductEntity productEntity, long productId) {
         if (productEntity == null) {
+            log.error("Product not found with ID: {}", productId);
             throw new IllegalArgumentException("ProductEntity cannot be null.");
         }
 
-        if (productEntity.getName() == null || productEntity.getPrice() == null ||
-                productEntity.getCategory_Id() == null || productEntity.getWeight() == null ||
-                productEntity.getCurrent_stock() == null || productEntity.getMin_stock() == null) {
-            throw new IllegalArgumentException("Product details must not be null except description.");
-        }
+
 
         if (productEntity.getPrice() < 0 || productEntity.getWeight() < 0 ||
                 productEntity.getCurrent_stock() < 0 || productEntity.getMin_stock() < 0) {
