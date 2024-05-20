@@ -31,10 +31,22 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public ProductEntity findProductById(long productId) {
-        return productRepository.findById(productId).orElseThrow(() -> {
-            log.error("Product not found with ID: {}", productId);
-            return new EntityNotFoundException("Product not found with ID: " + productId);
-        });
+        if (productId < 0) {
+            log.error("Invalid product ID: {}", productId);
+            throw new RuntimeException("Internal server error: Invalid product ID " + productId);
+        }
+
+        try {
+            return productRepository.findById(productId).orElseThrow(() -> {
+                log.error("Product not found with ID: {}", productId);
+                return new EntityNotFoundException("Product not found with ID: " + productId);
+            });
+        } catch (EntityNotFoundException e) {
+            throw e; // Re-throwing the EntityNotFoundException to be handled by the controller
+        } catch (Exception e) {
+            log.error("Internal server error while retrieving product with ID: {}", productId, e);
+            throw new RuntimeException("Internal server error while retrieving product with ID: " + productId, e);
+        }
     }
 
     public ProductEntity addProduct(ProductEntity productEntity) {
@@ -71,24 +83,33 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Product details must not be null.");
         }
 
-        ProductEntity productEntity = findProductById(productId);
-        if (productEntity == null) {
-            throw new EntityNotFoundException("Product not found with ID: " + productId);
-        }
-
-        productEntity.setName(productEntityDetails.getName());
-        productEntity.setDescription(productEntityDetails.getDescription());
-        productEntity.setPrice(productEntityDetails.getPrice());
-        productEntity.setCategory_Id(productEntityDetails.getCategory_Id());
-        productEntity.setWeight(productEntityDetails.getWeight());
-        productEntity.setCurrent_stock(productEntityDetails.getCurrent_stock());
-        productEntity.setMin_stock(productEntityDetails.getMin_stock());
-
         try {
-           return productRepository.save(productEntity);
+            ProductEntity productEntity = findProductById(productId);
+            if (productEntity == null) {
+                throw new EntityNotFoundException("Product not found with ID: " + productId);
+            }
+
+            productEntity.setName(productEntityDetails.getName());
+            productEntity.setDescription(productEntityDetails.getDescription());
+            productEntity.setPrice(productEntityDetails.getPrice());
+            productEntity.setCategory_Id(productEntityDetails.getCategory_Id());
+            productEntity.setWeight(productEntityDetails.getWeight());
+            productEntity.setCurrent_stock(productEntityDetails.getCurrent_stock());
+            productEntity.setMin_stock(productEntityDetails.getMin_stock());
+
+            return productRepository.save(productEntity);
+        } catch (IllegalArgumentException ex) {
+            log.error("Illegal argument while updating the product with ID: {}", productId, ex);
+            throw ex;
+        } catch (EntityNotFoundException ex) {
+            log.error("Product not found while updating the product with ID: {}", productId, ex);
+            throw ex;
         } catch (DataAccessException ex) {
             log.error("Failed to update the product with ID: {}", productId, ex);
             throw new ServiceException("Failed to update the product with ID: " + productId, ex);
+        } catch (Exception ex) {
+            log.error("Unexpected error while updating the product with ID: {}", productId, ex);
+            throw new RuntimeException("Failed to update the product with ID: " + productId, ex);
         }
     }
 

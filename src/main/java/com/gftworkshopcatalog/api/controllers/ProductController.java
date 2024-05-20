@@ -116,10 +116,12 @@ public class ProductController {
         } catch (EntityNotFoundException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-        } catch (Exception  ex) {
+        } catch (IllegalArgumentException ex) {
+            ErrorResponse errorResponse = new ErrorResponse("Bad request", 400);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        } catch (Exception ex) {
             ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-
         }
 
     }
@@ -147,33 +149,6 @@ public class ProductController {
             ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 
-
-        }
-    }
-
-    @PatchMapping("/{productId}/price")
-    @Operation(summary = "Update the price of a product", description = "Partially updates the price of a specific product.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Price successfully updated",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
-            @ApiResponse(responseCode = "404", description = "Product not found",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
-            @ApiResponse(responseCode = "500", description = "Error response",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
-    })
-
-    public ResponseEntity<?> getRelatedProducts(
-            @Parameter(description = "Product ID", required = true)
-            @PathVariable("id") long productId) {
-        try {
-            return ResponseEntity.ok().build();
-
-        } catch (EntityNotFoundException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-        } catch (Exception  ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 
         }
     }

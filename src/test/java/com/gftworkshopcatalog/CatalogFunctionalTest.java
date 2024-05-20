@@ -1,19 +1,30 @@
 package com.gftworkshopcatalog;
 
 import com.gftworkshopcatalog.model.ProductEntity;
+import com.gftworkshopcatalog.repositories.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.util.Optional;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebTestClient
 class CatalogFunctionalTest {
 
+    @Autowired
     private WebTestClient webTestClient;
 
+    @Autowired
+    ProductRepository productRepository;
+
+/*
     @Value("${local.server.port}")
     private int port;
 
@@ -22,6 +33,7 @@ class CatalogFunctionalTest {
         webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:" + port + "/catalog").build();
     }
 
+ */
     @Test
     @DisplayName("Test ListAllProducts()")
     void testListAllProducts() {
@@ -101,7 +113,7 @@ class CatalogFunctionalTest {
         updatedProductEntity.setName("Updated Product Name");
         updatedProductEntity.setDescription("Updated Product Description");
         updatedProductEntity.setPrice(29.99);
-        updatedProductEntity.setCategory_Id(7);
+        updatedProductEntity.setCategory_Id(6);
         updatedProductEntity.setWeight(2.5);
         updatedProductEntity.setCurrent_stock(150);
         updatedProductEntity.setMin_stock(15);
@@ -117,7 +129,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.name").isEqualTo("Updated Product Name")
                 .jsonPath("$.description").isEqualTo("Updated Product Description")
                 .jsonPath("$.price").isEqualTo(29.99)
-                .jsonPath("$.category_Id").isEqualTo(7)
+                .jsonPath("$.category_Id").isEqualTo(6)
                 .jsonPath("$.weight").isEqualTo(2.5)
                 .jsonPath("$.current_stock").isEqualTo(150)
                 .jsonPath("$.min_stock").isEqualTo(15)
@@ -140,7 +152,13 @@ class CatalogFunctionalTest {
     @DisplayName("Test UpdateProductStock()")
     void testUpdateProductStock() {
         long productId = 1L;
-        long newStock = 200;
+        long newStock = 250;
+
+        ProductEntity productBase = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        long currentStock = productBase.getCurrent_stock();
+
 
         webTestClient.patch().uri("/products/{productId}/stock?newStock={newStock}", productId, newStock)
                 .exchange()
@@ -148,7 +166,7 @@ class CatalogFunctionalTest {
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .jsonPath("$.id").isEqualTo(productId)
-                .jsonPath("$.current_stock").isEqualTo(newStock)
+                .jsonPath("$.current_stock").isEqualTo(newStock + currentStock)
                 .jsonPath("$.errorCode").doesNotExist();
     }
 
@@ -157,7 +175,12 @@ class CatalogFunctionalTest {
     void testUpdateProductPrice() {
         long productId = 1L;
         long newPrice = 200;
+/*
+        ProductEntity productBase = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
 
+        double currentPrice = productBase.getPrice();
+*/
         webTestClient.patch().uri("/products/{productId}/price?newPrice={newPrice}", productId, newPrice)
                 .exchange()
                 .expectStatus().isOk()
