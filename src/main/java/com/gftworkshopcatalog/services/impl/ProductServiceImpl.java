@@ -1,5 +1,6 @@
 package com.gftworkshopcatalog.services.impl;
 
+import com.gftworkshopcatalog.exceptions.AddProductInvalidArgumentsExceptions;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.services.ProductService;
@@ -37,15 +38,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public ProductEntity addProduct(ProductEntity productEntity) {
-        // Checks for negative values
+
         if (productEntity.getPrice() != null && productEntity.getPrice() < 0 ||
                 productEntity.getWeight() != null && productEntity.getWeight() < 0 ||
                 productEntity.getCurrent_stock() != null && productEntity.getCurrent_stock() < 0 ||
                 productEntity.getMin_stock() != null && productEntity.getMin_stock() < 0) {
-            throw new IllegalArgumentException("Product details must not contain negative values");
+
+            throw new AddProductInvalidArgumentsExceptions("Product details must not contain negative values");
         }
 
-        // Checks for null values
+
         if (productEntity.getName() == null ||
                 productEntity.getPrice() == null ||
                 productEntity.getCategory_Id() == null ||
@@ -63,7 +65,8 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-  public ProductEntity updateProduct(Long productId, ProductEntity productEntityDetails) {
+
+    public ProductEntity updateProduct(Long productId, ProductEntity productEntityDetails) {
         if (productEntityDetails == null) {
             throw new IllegalArgumentException("Product details must not be null.");
         }
@@ -73,7 +76,6 @@ public class ProductServiceImpl implements ProductService {
             throw new EntityNotFoundException("Product not found with ID: " + productId);
         }
 
-        // Updating the product entity with new details from productEntityDetails
         productEntity.setName(productEntityDetails.getName());
         productEntity.setDescription(productEntityDetails.getDescription());
         productEntity.setPrice(productEntityDetails.getPrice());
@@ -105,10 +107,12 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Price cannot be negative");
         }
 
-     ProductEntity productEntity = findProductById(productId);
+
+        ProductEntity productEntity = findProductById(productId);
 
         productEntity.setPrice(newPrice);
         log.info("Updating price for product with ID: {}", productId);
+
 
      try {
             return productRepository.save(productEntity);
@@ -118,7 +122,9 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+
   public ProductEntity updateProductStock(long productId, int quantity) {
+
         ProductEntity productEntity = findProductById(productId);
         validateProductEntity(productEntity, productId);
 
@@ -126,9 +132,8 @@ public class ProductServiceImpl implements ProductService {
 
         if (newStock <= productEntity.getMin_stock()) {
             log.info("Min stock reached. Product stock must be updated with ID: {}", productId);
-        }
+        } else if(newStock < 0){
 
-    if (newStock < 0) {
             log.info("Error updating stock for product with ID: {}, insufficient current stock", productId);
             throw new IllegalArgumentException("Insufficient stock to decrement by " + quantity);
         }
@@ -149,8 +154,6 @@ public class ProductServiceImpl implements ProductService {
             log.error("Product not found with ID: {}", productId);
             throw new IllegalArgumentException("ProductEntity cannot be null.");
         }
-
-
 
         if (productEntity.getPrice() < 0 || productEntity.getWeight() < 0 ||
                 productEntity.getCurrent_stock() < 0 || productEntity.getMin_stock() < 0) {

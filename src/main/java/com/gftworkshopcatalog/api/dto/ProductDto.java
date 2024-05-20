@@ -12,10 +12,10 @@ public class ProductDto {
     private String name;
     private String description;
     private Double price;
-    private Integer category_Id;
+    private Integer categoryId;
     private Double weight;
-    private Integer current_stock;
-    private Integer min_stock;
+    private Integer currentStock;
+    private Integer minStock;
 
     @Override
     public String toString() {
@@ -24,10 +24,10 @@ public class ProductDto {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", price=" + price +
-                ", category_Id=" + category_Id +
+                ", category_Id=" + categoryId +
                 ", weight=" + weight +
-                ", current_stock=" + current_stock +
-                ", min_stock=" + min_stock +
+                ", current_stock=" + currentStock +
+                ", min_stock=" + minStock +
                 '}';
     }
 }

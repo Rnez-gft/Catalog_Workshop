@@ -1,10 +1,11 @@
 package com.gftworkshopcatalog.api.controllers;
 
+import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.gftworkshopcatalog.model.ProductEntity;
-import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
+
 import org.springframework.http.HttpStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -146,19 +147,21 @@ public class ProductController {
             ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 
+
         }
     }
 
-    @GetMapping("/{id}/recommendations")
-    @Operation(summary = "Get related products", description = "Returns a list of products related to a specific product.")
+    @PatchMapping("/{productId}/price")
+    @Operation(summary = "Update the price of a product", description = "Partially updates the price of a specific product.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of related products",
+            @ApiResponse(responseCode = "200", description = "Price successfully updated",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
+
     public ResponseEntity<?> getRelatedProducts(
             @Parameter(description = "Product ID", required = true)
             @PathVariable("id") long productId) {
@@ -174,6 +177,7 @@ public class ProductController {
 
         }
     }
+
     @PatchMapping("/{productId}/price")
     @Operation(summary = "Update the price of a product", description = "Partially updates the price of a specific product.")
     @ApiResponses(value = {

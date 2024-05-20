@@ -22,7 +22,7 @@ CREATE TABLE promotions (
     discount DECIMAL(4, 2) NOT NULL,
     promotion_type VARCHAR(50) NOT NULL,
     volume_threshold INT NOT NULL,
-    start_date DATE,
-    end_date DATE,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
     FOREIGN KEY (category_id) REFERENCES categories(category_id)
 );
