@@ -115,7 +115,8 @@ class ProductEntityControllerTest {
         assertEquals(updatedProductResultEntity.getWeight(), updatedProductInputEntity.getWeight());
         assertEquals(updatedProductResultEntity.getCurrent_stock(), updatedProductInputEntity.getCurrent_stock());
         assertEquals(updatedProductResultEntity.getMin_stock(), updatedProductInputEntity.getMin_stock());
-    }
+  }
+
     @DisplayName("Server Error updateProduct()")
     @Test
     void test_updateProduct_InternalServerError() {
@@ -126,7 +127,6 @@ class ProductEntityControllerTest {
         when(productService.updateProduct(productId, updatedProductInputEntity)).thenThrow(new ServiceException("Internal Server Error"));
 
         ResponseEntity<?> responseEntity = productController.updateProduct(productId, updatedProductResultEntity);
-
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
     }
     @Test

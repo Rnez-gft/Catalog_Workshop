@@ -63,7 +63,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    public ProductEntity updateProduct(Long productId, ProductEntity productEntityDetails) {
+  public ProductEntity updateProduct(Long productId, ProductEntity productEntityDetails) {
         if (productEntityDetails == null) {
             throw new IllegalArgumentException("Product details must not be null.");
         }
@@ -83,7 +83,7 @@ public class ProductServiceImpl implements ProductService {
         productEntity.setMin_stock(productEntityDetails.getMin_stock());
 
         try {
-            return productRepository.save(productEntity);
+           return productRepository.save(productEntity);
         } catch (DataAccessException ex) {
             log.error("Failed to update the product with ID: {}", productId, ex);
             throw new ServiceException("Failed to update the product with ID: " + productId, ex);
@@ -92,26 +92,25 @@ public class ProductServiceImpl implements ProductService {
 
     public void deleteProduct(long productId) {
         ProductEntity productEntity = findProductById(productId);
-        log.info("Deleting product with ID: {}", productId);
-        try {
+       log.info("Deleting product with ID: {}", productId);
+       try {
             productRepository.delete(productEntity);
         } catch (DataAccessException ex) {
             log.error("Failed to delete product with ID: {}", productId, ex);
             throw new RuntimeException("Failed to delete product with ID: " + productId, ex);
         }
     }
-
     public ProductEntity updateProductPrice(long productId, double newPrice) {
         if (newPrice < 0) {
             throw new IllegalArgumentException("Price cannot be negative");
         }
 
-        ProductEntity productEntity = findProductById(productId);
+     ProductEntity productEntity = findProductById(productId);
 
         productEntity.setPrice(newPrice);
         log.info("Updating price for product with ID: {}", productId);
 
-        try {
+     try {
             return productRepository.save(productEntity);
         } catch (DataAccessException ex) {
             log.error("Failed to update product price for ID: {}", productId, ex);
@@ -119,7 +118,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    public ProductEntity updateProductStock(long productId, int quantity) {
+  public ProductEntity updateProductStock(long productId, int quantity) {
         ProductEntity productEntity = findProductById(productId);
         validateProductEntity(productEntity, productId);
 
@@ -129,12 +128,10 @@ public class ProductServiceImpl implements ProductService {
             log.info("Min stock reached. Product stock must be updated with ID: {}", productId);
         }
 
-        if (newStock < 0) {
+    if (newStock < 0) {
             log.info("Error updating stock for product with ID: {}, insufficient current stock", productId);
             throw new IllegalArgumentException("Insufficient stock to decrement by " + quantity);
         }
-
-
 
         productEntity.setCurrent_stock(newStock);
         log.info("Updating stock for product with ID: {}", productId);
