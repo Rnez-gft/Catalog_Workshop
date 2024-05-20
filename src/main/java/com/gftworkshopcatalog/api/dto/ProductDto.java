@@ -1,7 +1,6 @@
 package com.gftworkshopcatalog.api.dto;
 
 import lombok.*;
-
 @Data
 @Builder
 @NoArgsConstructor

@@ -608,9 +608,11 @@ class ProductServiceImplTest {
     @DisplayName("Throw IllegalArgumentException for negative stock")
     void updateProductStock_NegativeStock_ThrowsIllegalArgumentException() {
         int initialStock = 10;
+        int minStock = 20;  // Setting minStock higher than initialStock to ensure `newStock < 0` is checked
         int adjustment = -15;
 
         productEntity.setCurrent_stock(initialStock);
+        productEntity.setMin_stock(minStock);
 
         when(productRepository.findById(productId)).thenReturn(Optional.of(productEntity));
 
@@ -618,7 +620,7 @@ class ProductServiceImplTest {
             productServiceImpl.updateProductStock(productId, adjustment);
         });
 
-        assertEquals("Insufficient stock to decrement by "+ adjustment, exception.getMessage(), "Expected error message about insufficient stock not found.");
+        assertEquals("Insufficient stock to decrement by " + adjustment, exception.getMessage(), "Expected error message about insufficient stock not found.");
         verify(productRepository, never()).save(any(ProductEntity.class));
     }
 

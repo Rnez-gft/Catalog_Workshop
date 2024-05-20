@@ -8,7 +8,6 @@ import lombok.*;
 @Builder
 @Generated
 public class ErrorResponse {
-    String message;
-    int errorCode;
+    private String message;
+    private int errorCode;
 }
-//Quitar de la pipeline

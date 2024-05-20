@@ -123,24 +123,22 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-  public ProductEntity updateProductStock(long productId, int quantity) {
-
+    public ProductEntity updateProductStock(long productId, int quantity) {
         ProductEntity productEntity = findProductById(productId);
         validateProductEntity(productEntity, productId);
 
         int newStock = productEntity.getCurrent_stock() + quantity;
+        log.debug("Checking stock levels: newStock={}, minStock={}", newStock, productEntity.getMin_stock());
 
         if (newStock <= productEntity.getMin_stock()) {
             log.info("Min stock reached. Product stock must be updated with ID: {}", productId);
-        } else if(newStock < 0){
-
+        } else if (newStock < 0) {
             log.info("Error updating stock for product with ID: {}, insufficient current stock", productId);
             throw new IllegalArgumentException("Insufficient stock to decrement by " + quantity);
         }
 
         productEntity.setCurrent_stock(newStock);
         log.info("Updating stock for product with ID: {}", productId);
-
         try {
             return productRepository.save(productEntity);
         } catch (DataAccessException ex) {

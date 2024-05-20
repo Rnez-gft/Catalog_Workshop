@@ -1,6 +1,7 @@
 package com.gftworkshopcatalog.controllers;
 
 import com.gftworkshopcatalog.api.controllers.ProductController;
+import com.gftworkshopcatalog.exceptions.ErrorResponse;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
@@ -89,9 +90,9 @@ class ProductEntityControllerTest {
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertInstanceOf(ProductController.ErrorResponse.class, response.getBody());
-        assertEquals(400, ((ProductController.ErrorResponse) response.getBody()).getErrorCode());
-        assertEquals("Bad request", ((ProductController.ErrorResponse) response.getBody()).getMessage());
+        assertInstanceOf(ErrorResponse.class, response.getBody());
+        assertEquals(400, ((ErrorResponse) response.getBody()).getErrorCode());
+        assertEquals("Bad request", ((ErrorResponse) response.getBody()).getMessage());
     }
     @Test
     @DisplayName("Add New Product - Internal Server Error")
@@ -103,9 +104,9 @@ class ProductEntityControllerTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertInstanceOf(ProductController.ErrorResponse.class, response.getBody());
-        assertEquals(500, ((ProductController.ErrorResponse) response.getBody()).getErrorCode());
-        assertEquals("Internal Server Error", ((ProductController.ErrorResponse) response.getBody()).getMessage());
+        assertInstanceOf(ErrorResponse.class, response.getBody());
+        assertEquals(500, ((ErrorResponse) response.getBody()).getErrorCode());
+        assertEquals("Internal Server Error", ((ErrorResponse) response.getBody()).getMessage());
     }
 
     @Test
@@ -131,9 +132,9 @@ class ProductEntityControllerTest {
         ResponseEntity<?> response = productController.getProductDetails(productId);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertInstanceOf(ProductController.ErrorResponse.class, response.getBody());
-        assertEquals("Product not found", ((ProductController.ErrorResponse) response.getBody()).getMessage());
-        assertEquals(404, ((ProductController.ErrorResponse) response.getBody()).getErrorCode());
+        assertInstanceOf(ErrorResponse.class, response.getBody());
+        assertEquals("Product not found", ((ErrorResponse) response.getBody()).getMessage());
+        assertEquals(404, ((ErrorResponse) response.getBody()).getErrorCode());
     }
 
     @DisplayName("Server Error getProductDetails()")
@@ -193,9 +194,9 @@ class ProductEntityControllerTest {
         ResponseEntity<?> response = productController.updateProduct(productId, productEntity);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertInstanceOf(ProductController.ErrorResponse.class, response.getBody());
-        assertEquals("Product not found", ((ProductController.ErrorResponse) response.getBody()).getMessage());
-        assertEquals(404, ((ProductController.ErrorResponse) response.getBody()).getErrorCode());
+        assertInstanceOf(ErrorResponse.class, response.getBody());
+        assertEquals("Product not found", ((ErrorResponse) response.getBody()).getMessage());
+        assertEquals(404, ((ErrorResponse) response.getBody()).getErrorCode());
     }
 
 
@@ -221,9 +222,9 @@ class ProductEntityControllerTest {
         ResponseEntity<?> response = productController.deleteProduct(productId);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertInstanceOf(ProductController.ErrorResponse.class, response.getBody());
-        assertEquals("Product not found", ((ProductController.ErrorResponse) response.getBody()).getMessage());
-        assertEquals(404, ((ProductController.ErrorResponse) response.getBody()).getErrorCode());
+        assertInstanceOf(ErrorResponse.class, response.getBody());
+        assertEquals("Product not found", ((ErrorResponse) response.getBody()).getMessage());
+        assertEquals(404, ((ErrorResponse) response.getBody()).getErrorCode());
     }
 
 
@@ -268,9 +269,9 @@ class ProductEntityControllerTest {
         ResponseEntity<?> response = productController.updateProductPrice(productId, newPrice);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertInstanceOf(ProductController.ErrorResponse.class, response.getBody());
-        assertEquals("Product not found", ((ProductController.ErrorResponse) response.getBody()).getMessage());
-        assertEquals(404, ((ProductController.ErrorResponse) response.getBody()).getErrorCode());
+        assertInstanceOf(ErrorResponse.class, response.getBody());
+        assertEquals("Product not found", ((ErrorResponse) response.getBody()).getMessage());
+        assertEquals(404, ((ErrorResponse) response.getBody()).getErrorCode());
     }
     @Test
     @DisplayName("Internal server error when updating product price")
@@ -313,9 +314,9 @@ class ProductEntityControllerTest {
         ResponseEntity<?> response = productController.updateProductStock(productId, newStock);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertInstanceOf(ProductController.ErrorResponse.class, response.getBody());
-        assertEquals("Product not found", ((ProductController.ErrorResponse) response.getBody()).getMessage());
-        assertEquals(404, ((ProductController.ErrorResponse) response.getBody()).getErrorCode());
+        assertInstanceOf(ErrorResponse.class, response.getBody());
+        assertEquals("Product not found", ((ErrorResponse) response.getBody()).getMessage());
+        assertEquals(404, ((ErrorResponse) response.getBody()).getErrorCode());
     }
     @Test
     @DisplayName("Internal server error when updating product stock")

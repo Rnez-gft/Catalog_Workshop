@@ -1,5 +1,6 @@
 package com.gftworkshopcatalog.api.controllers;
 
+import com.gftworkshopcatalog.exceptions.ErrorResponse;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
@@ -151,32 +152,6 @@ public class ProductController {
         }
     }
 
-    @PatchMapping("/{productId}/price")
-    @Operation(summary = "Update the price of a product", description = "Partially updates the price of a specific product.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Price successfully updated",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
-            @ApiResponse(responseCode = "404", description = "Product not found",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
-            @ApiResponse(responseCode = "500", description = "Error response",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
-    })
-
-    public ResponseEntity<?> getRelatedProducts(
-            @Parameter(description = "Product ID", required = true)
-            @PathVariable("id") long productId) {
-        try {
-            return ResponseEntity.ok().build();
-
-        } catch (EntityNotFoundException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-        } catch (Exception  ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-
-        }
-    }
 
     @PatchMapping("/{productId}/price")
     @Operation(summary = "Update the price of a product", description = "Partially updates the price of a specific product.")
@@ -222,32 +197,6 @@ public class ProductController {
         }
     }
 
-    public class ErrorResponse {
-        private String message;
-        private int errorCode;
-
-        public ErrorResponse(String message, int errorCode) {
-            this.message = message;
-            this.errorCode = errorCode;
-        }
-
-        // Getters y setters
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        public int getErrorCode() {
-            return errorCode;
-        }
-
-        public void setErrorCode(int errorCode) {
-            this.errorCode = errorCode;
-        }
-    }
 
     public class SuccessResponse {
         private String message;
