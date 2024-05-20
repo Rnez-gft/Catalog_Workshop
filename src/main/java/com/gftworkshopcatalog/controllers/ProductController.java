@@ -1,13 +1,12 @@
 package com.gftworkshopcatalog.controllers;
 
+import com.gftworkshopcatalog.exceptions.ErrorResponse;
+import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.gftworkshopcatalog.model.ProductEntity;
-import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
+
 import org.springframework.http.HttpStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,7 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Products", description = "Everything about the products")
 public class ProductController {
 
-    private final ProductServiceImpl productServiceImpl;
+    private ProductServiceImpl productServiceImpl;
 
     public ProductController(ProductServiceImpl productServiceImpl) {
         super();
@@ -52,6 +51,8 @@ public class ProductController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Product created",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
@@ -59,6 +60,9 @@ public class ProductController {
         try {
             ProductEntity createdProductEntity = productServiceImpl.addProduct(productEntity);
             return new ResponseEntity<>(createdProductEntity, HttpStatus.CREATED);
+        } catch (IllegalArgumentException ex) {
+            ErrorResponse errorResponse = new ErrorResponse("Bad request", 400);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         } catch (Exception  ex) {
             ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
@@ -85,9 +89,10 @@ public class ProductController {
         } catch (EntityNotFoundException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-        } catch (Exception  ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
+        } catch (Exception ex) {
+            ErrorResponse errorResponse = new ErrorResponse("Internal server error", 500);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+
         }
     }
 
@@ -143,35 +148,12 @@ public class ProductController {
             ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 
-        }
-    }
-
-    @GetMapping("/{id}/recommendations")
-    @Operation(summary = "Get related products", description = "Returns a list of products related to a specific product.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of related products",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
-            @ApiResponse(responseCode = "404", description = "Product not found",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
-            @ApiResponse(responseCode = "500", description = "Error response",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
-    })
-    public ResponseEntity<?> getRelatedProducts(
-            @Parameter(description = "Product ID", required = true)
-            @PathVariable("id") long productId) {
-        try {
-            return ResponseEntity.ok().build();
-
-        } catch (EntityNotFoundException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-        } catch (Exception  ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 
         }
     }
-    @PatchMapping("/{id}/{newPrice}")
+
+
+    @PatchMapping("/{productId}/price")
     @Operation(summary = "Update the price of a product", description = "Partially updates the price of a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Price successfully updated",
@@ -181,11 +163,7 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> updateProductPrice(
-            @Parameter(description = "Product ID", required = true)
-            @PathVariable("id") long productId,
-            @Parameter(description = "New price to update the current one", required = true)
-            @RequestParam("newPrice") double newPrice) {
+    public ResponseEntity<?> updateProductPrice(@PathVariable("productId") long productId, @RequestParam("newPrice") double newPrice) {
         try {
             ProductEntity updatedProductEntity = productServiceImpl.updateProductPrice(productId, newPrice);
             return ResponseEntity.ok(updatedProductEntity);
@@ -197,7 +175,7 @@ public class ProductController {
         }
     }
 
-    @PatchMapping("/{id}/{quantity}")
+    @PatchMapping("/{productId}/stock")
     @Operation(summary = "Update the stock of a product", description = "Partially updates the stock of a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Stock successfully updated",
@@ -207,13 +185,9 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> updateProductStock(
-            @Parameter(description = "Product ID", required = true)
-            @PathVariable("id") long productId,
-            @Parameter(description = "Quantity of the stock to change", required = true)
-            @RequestParam("quantity") int quantity) {
+    public ResponseEntity<?> updateProductStock(@PathVariable("productId") long productId, @RequestParam("newStock") int newStock) {
         try {
-            ProductEntity updatedProductEntity = productServiceImpl.updateProductStock(productId, quantity);
+            ProductEntity updatedProductEntity = productServiceImpl.updateProductStock(productId, newStock);
             return ResponseEntity.ok(updatedProductEntity);
         } catch (EntityNotFoundException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
@@ -223,21 +197,7 @@ public class ProductController {
         }
     }
 
-    @Data
-    public class ErrorResponse {
-        // Getters y setters
-        private String message;
-        private int errorCode;
 
-        public ErrorResponse(String message, int errorCode) {
-            this.message = message;
-            this.errorCode = errorCode;
-        }
-
-    }
-    @Setter
-    @Getter
-    @Data
     public class SuccessResponse {
         private String message;
 
@@ -245,6 +205,13 @@ public class ProductController {
             this.message = message;
         }
 
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
     }
 
 }

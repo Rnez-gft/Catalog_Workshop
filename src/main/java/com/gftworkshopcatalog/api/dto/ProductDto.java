@@ -1,7 +1,6 @@
 package com.gftworkshopcatalog.api.dto;
 
 import lombok.*;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -12,16 +11,22 @@ public class ProductDto {
     private String name;
     private String description;
     private Double price;
-    private Long stock;
-    private String category;
-    private Double discount;
+    private Integer categoryId;
     private Double weight;
-
-
+    private Integer currentStock;
+    private Integer minStock;
 
     @Override
     public String toString() {
-        return "ProductDTO [id=" + id + ", name=" + name + ", description=" + description + ", price=" + price +
-                ", stock=" + stock + ", category=" + category + ", discount=" + discount + ", weight=" + weight + "]";
+        return "ProductDto{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", category_Id=" + categoryId +
+                ", weight=" + weight +
+                ", current_stock=" + currentStock +
+                ", min_stock=" + minStock +
+                '}';
     }
 }
