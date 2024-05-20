@@ -1,5 +1,6 @@
 package com.gftworkshopcatalog.services.impl;
 
+import com.gftworkshopcatalog.exceptions.AddProductInvalidArgumentsExceptions;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.services.ProductService;
@@ -41,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
                 productEntity.getWeight() != null && productEntity.getWeight() < 0 ||
                 productEntity.getCurrent_stock() != null && productEntity.getCurrent_stock() < 0 ||
                 productEntity.getMin_stock() != null && productEntity.getMin_stock() < 0) {
-            throw new IllegalArgumentException("Product details must not contain negative values");
+            throw new AddProductInvalidArgumentsExceptions("Product details must not contain negative values");
         }
 
         if (productEntity.getName() == null ||
