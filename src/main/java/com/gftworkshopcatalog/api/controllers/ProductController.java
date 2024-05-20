@@ -100,6 +100,8 @@ public class ProductController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product updated",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
+            @ApiResponse(responseCode = "400", description = "Product updated",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "500", description = "Error response",
@@ -113,12 +115,12 @@ public class ProductController {
         try {
             ProductEntity updatedProductEntity = productServiceImpl.updateProduct(productId, productEntity);
             return ResponseEntity.ok(updatedProductEntity);
-        } catch (EntityNotFoundException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (IllegalArgumentException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Bad request", 400);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        } catch (EntityNotFoundException ex) {
+            ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (Exception ex) {
             ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);

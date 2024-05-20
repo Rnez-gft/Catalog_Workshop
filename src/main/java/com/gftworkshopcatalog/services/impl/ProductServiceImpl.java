@@ -42,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
                 return new EntityNotFoundException("Product not found with ID: " + productId);
             });
         } catch (EntityNotFoundException e) {
-            throw e; // Re-throwing the EntityNotFoundException to be handled by the controller
+            throw e;
         } catch (Exception e) {
             log.error("Internal server error while retrieving product with ID: {}", productId, e);
             throw new RuntimeException("Internal server error while retrieving product with ID: " + productId, e);

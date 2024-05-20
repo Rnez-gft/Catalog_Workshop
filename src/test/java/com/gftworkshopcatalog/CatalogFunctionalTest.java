@@ -2,11 +2,9 @@ package com.gftworkshopcatalog;
 
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.repositories.ProductRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -24,16 +22,6 @@ class CatalogFunctionalTest {
     @Autowired
     ProductRepository productRepository;
 
-/*
-    @Value("${local.server.port}")
-    private int port;
-
-    @BeforeEach
-    public void setup() {
-        webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:" + port + "/catalog").build();
-    }
-
- */
     @Test
     @DisplayName("Test ListAllProducts()")
     void testListAllProducts() {
@@ -101,7 +89,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.weight").isNumber()
                 .jsonPath("$.current_stock").isNumber()
                 .jsonPath("$.min_stock").isNumber()
-                .jsonPath("$.errorCode").doesNotExist(); //Ajustar el valor existente en la base de datos
+                .jsonPath("$.errorCode").doesNotExist();
     }
 
     @Test
