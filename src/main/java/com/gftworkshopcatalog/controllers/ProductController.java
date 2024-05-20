@@ -1,4 +1,4 @@
-package com.gftworkshopcatalog.api.dto.controllers;
+package com.gftworkshopcatalog.controllers;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.Data;

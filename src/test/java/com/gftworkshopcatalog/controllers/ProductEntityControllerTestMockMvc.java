@@ -1,6 +1,5 @@
 package com.gftworkshopcatalog.controllers;
 
-import com.gftworkshopcatalog.api.dto.controllers.ProductController;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
