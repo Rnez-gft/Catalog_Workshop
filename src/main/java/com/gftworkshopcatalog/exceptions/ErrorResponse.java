@@ -1,6 +1,7 @@
 package com.gftworkshopcatalog.exceptions;
 
 import lombok.*;
+import org.springframework.http.HttpStatus;
 
 @Data
 @AllArgsConstructor
@@ -9,5 +10,5 @@ import lombok.*;
 @Generated
 public class ErrorResponse {
     private String message;
-    private int errorCode;
+    private HttpStatus status;
 }

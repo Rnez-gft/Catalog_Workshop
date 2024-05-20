@@ -49,7 +49,6 @@ class ProductServiceImplTest {
     }
 
     @Test
-
     @DisplayName("Update product stock")
     void updateProductStock_Success() {
         int newStock = 10;

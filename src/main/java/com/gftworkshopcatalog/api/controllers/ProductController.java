@@ -40,9 +40,8 @@ public class ProductController {
         try {
             return ResponseEntity.ok(productServiceImpl.findAllProducts());
         } catch (Exception  ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
+            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-
         }
     }
 
@@ -61,10 +60,10 @@ public class ProductController {
             ProductEntity createdProductEntity = productServiceImpl.addProduct(productEntity);
             return new ResponseEntity<>(createdProductEntity, HttpStatus.CREATED);
         } catch (IllegalArgumentException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Bad request", 400);
+            ErrorResponse errorResponse = new ErrorResponse("Bad request", HttpStatus.BAD_REQUEST);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         } catch (Exception  ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
+            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 
         }
@@ -87,10 +86,10 @@ public class ProductController {
             ProductEntity productEntity = productServiceImpl.findProductById(productId);
             return ResponseEntity.ok(productEntity);
         } catch (EntityNotFoundException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
+            ErrorResponse errorResponse = new ErrorResponse("Product not found", HttpStatus.NOT_FOUND);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (Exception ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal server error", 500);
+            ErrorResponse errorResponse = new ErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 
         }
@@ -115,10 +114,10 @@ public class ProductController {
             ProductEntity updatedProductEntity = productServiceImpl.updateProduct(productId, productEntity);
             return ResponseEntity.ok(updatedProductEntity);
         } catch (EntityNotFoundException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
+            ErrorResponse errorResponse = new ErrorResponse("Product not found", HttpStatus.NOT_FOUND);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (Exception  ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
+            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 
         }
@@ -142,10 +141,10 @@ public class ProductController {
             productServiceImpl.deleteProduct(productId);
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
+            ErrorResponse errorResponse = new ErrorResponse("Product not found", HttpStatus.NOT_FOUND);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (Exception  ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
+            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 
 
@@ -168,7 +167,7 @@ public class ProductController {
             ProductEntity updatedProductEntity = productServiceImpl.updateProductPrice(productId, newPrice);
             return ResponseEntity.ok(updatedProductEntity);
         } catch (EntityNotFoundException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
+            ErrorResponse errorResponse = new ErrorResponse("Product not found", HttpStatus.NOT_FOUND);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating product price: " + e.getMessage());
@@ -190,7 +189,7 @@ public class ProductController {
             ProductEntity updatedProductEntity = productServiceImpl.updateProductStock(productId, newStock);
             return ResponseEntity.ok(updatedProductEntity);
         } catch (EntityNotFoundException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Product not found", 404);
+            ErrorResponse errorResponse = new ErrorResponse("Product not found", HttpStatus.NOT_FOUND);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating product price: " + e.getMessage());
