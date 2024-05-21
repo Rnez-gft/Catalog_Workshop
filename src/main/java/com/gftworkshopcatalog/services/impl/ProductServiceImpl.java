@@ -5,6 +5,7 @@ import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.dao.DataAccessException;
@@ -132,7 +133,8 @@ public class ProductServiceImpl implements ProductService {
 
         if (newStock <= productEntity.getMin_stock()) {
             log.info("Min stock reached. Product stock must be updated with ID: {}", productId);
-        } else if (newStock < 0) {
+        }
+        if (newStock < 0) {
             log.info("Error updating stock for product with ID: {}, insufficient current stock", productId);
             throw new IllegalArgumentException("Insufficient stock to decrement by " + quantity);
         }
@@ -147,6 +149,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+@Generated
     private void validateProductEntity(ProductEntity productEntity, long productId) {
         if (productEntity == null) {
             log.error("Product not found with ID: {}", productId);
