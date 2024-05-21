@@ -1,6 +1,5 @@
 package com.gftworkshopcatalog.controllers;
 
-import com.gftworkshopcatalog.api.controllers.ProductController;
 import com.gftworkshopcatalog.exceptions.ErrorResponse;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
@@ -363,7 +362,7 @@ class ProductEntityControllerTest {
         assertInstanceOf(ErrorResponse.class, responseEntity.getBody());
         ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
         assertEquals("One or more product IDs not found", errorResponse.getMessage());
-        assertEquals(404, errorResponse.getErrorCode());
+        assertEquals(HttpStatus.NOT_FOUND, errorResponse.getStatus());
     }
 
     @Test
@@ -380,7 +379,7 @@ class ProductEntityControllerTest {
         assertInstanceOf(ErrorResponse.class, responseEntity.getBody());
         ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
         assertEquals("Database error occurred while fetching products by IDs", errorResponse.getMessage());
-        assertEquals(500, errorResponse.getErrorCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, errorResponse.getStatus());
     }
 
 }

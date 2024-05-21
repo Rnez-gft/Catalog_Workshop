@@ -31,7 +31,7 @@ public class ProductEntity {
     @Column(nullable = false)
     private Double price;
 
-    @Column
+    @Column(nullable = false)
     private Integer category_Id;
 
     @Column(nullable = false)

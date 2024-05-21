@@ -249,7 +249,6 @@ class ProductServiceImplTest {
     @DisplayName("Find All Products")
     void test_findAllProducts(){
         ProductEntity productEntity1 = new ProductEntity();
-        productEntity1.setId(1L);
         productEntity1.setName("Product 1");
         productEntity1.setDescription("Product description");
         productEntity1.setPrice(50.00);
@@ -259,7 +258,6 @@ class ProductServiceImplTest {
         productEntity1.setMin_stock(10);
 
         ProductEntity productEntity2 = new ProductEntity();
-        productEntity2.setId(2L);
         productEntity2.setName("Product 2");
         productEntity2.setDescription("Product description");
         productEntity2.setPrice(60.00);
@@ -267,6 +265,8 @@ class ProductServiceImplTest {
         productEntity2.setWeight(25.00);
         productEntity2.setCurrent_stock(50);
         productEntity2.setMin_stock(15);
+
+
 
         List<ProductEntity> mockProductEntity = Arrays.asList(productEntity1, productEntity2);
 

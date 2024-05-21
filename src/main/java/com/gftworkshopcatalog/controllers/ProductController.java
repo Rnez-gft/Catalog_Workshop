@@ -1,4 +1,4 @@
-package com.gftworkshopcatalog.api.controllers;
+package com.gftworkshopcatalog.controllers;
 
 import com.gftworkshopcatalog.exceptions.ErrorResponse;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
