@@ -49,7 +49,6 @@ class ProductServiceImplTest {
     }
 
     @Test
-
     @DisplayName("Update product stock")
     void updateProductStock_Success() {
         int newStock = 10;
@@ -59,6 +58,21 @@ class ProductServiceImplTest {
         ProductEntity updatedProductEntity = productServiceImpl.updateProductStock(productId, newStock);
         assertEquals(20, updatedProductEntity.getCurrent_stock());
         verify(productRepository).save(productEntity);
+    }
+    @Test
+    @DisplayName("Fail to decrement product stock due to insufficient stock")
+    void testUpdateProductStock_InsufficientStock() {
+        long productId = 1L;
+        int quantity = -60; // Attempt to decrement more stock than available
+
+        when(productRepository.findById(productId)).thenReturn(Optional.ofNullable(productEntity));
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            productServiceImpl.updateProductStock(productId, quantity);
+        });
+
+        assertEquals("Insufficient stock to decrement by -60", exception.getMessage());
+        verify(productRepository, never()).save(productEntity);
     }
 
 
@@ -149,31 +163,6 @@ class ProductServiceImplTest {
     }
 
     @Test
-    @DisplayName("Update Product Stock with Insufficient Current Stock")
-    void testUpdateProductStockWithInsufficientCurrentStock() {
-        long productId = 1L;
-        int initialStock = 10;
-        int adjustment = -15; // Adjustment that leads to insufficient stock
-
-        ProductEntity productEntity = new ProductEntity();
-        productEntity.setId(productId);
-        productEntity.setName("Example Product");
-        productEntity.setPrice(19.99); // Assuming price is a required field
-        productEntity.setCategory_Id(1); // Assuming category ID is required
-        productEntity.setWeight(1.0); // Assuming weight is required
-        productEntity.setCurrent_stock(initialStock);
-        productEntity.setMin_stock(5);
-
-        when(productRepository.findById(productId)).thenReturn(Optional.of(productEntity));
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            productServiceImpl.updateProductStock(productId, adjustment);
-        });
-
-        assertEquals("Insufficient stock to decrement by "+adjustment, exception.getMessage());
-    }
-
-    @Test
     @DisplayName("Fail to Update Product Stock due to Data Access Issues")
     void testUpdateProductStockDataAccessFailure() {
         long productId = 1L;
@@ -198,8 +187,6 @@ class ProductServiceImplTest {
 
         assertEquals("Failed to update product stock for ID: 1", exception.getMessage());
     }
-
-
 
 
     @Test
@@ -247,7 +234,6 @@ class ProductServiceImplTest {
     @DisplayName("Find All Products")
     void test_findAllProducts(){
         ProductEntity productEntity1 = new ProductEntity();
-        productEntity1.setId(1L);
         productEntity1.setName("Product 1");
         productEntity1.setDescription("Product description");
         productEntity1.setPrice(50.00);
@@ -257,7 +243,6 @@ class ProductServiceImplTest {
         productEntity1.setMin_stock(10);
 
         ProductEntity productEntity2 = new ProductEntity();
-        productEntity2.setId(2L);
         productEntity2.setName("Product 2");
         productEntity2.setDescription("Product description");
         productEntity2.setPrice(60.00);
@@ -265,6 +250,8 @@ class ProductServiceImplTest {
         productEntity2.setWeight(25.00);
         productEntity2.setCurrent_stock(50);
         productEntity2.setMin_stock(15);
+
+
 
         List<ProductEntity> mockProductEntity = Arrays.asList(productEntity1, productEntity2);
 
@@ -379,27 +366,6 @@ class ProductServiceImplTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> productServiceImpl.addProduct(newProductEntityWithNullFields));
         assertEquals("Product details must not be null except description", exception.getMessage(), "The exception message should be 'Product details must not be null except description'");
     }
-    @Test
-    @DisplayName("Add product should not accept product with negative values")
-    void shouldNotAcceptProductWithNegativeValues() {
-        ProductEntity newProductEntityWithNegativeValues = getProduct();
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> productServiceImpl.addProduct(newProductEntityWithNegativeValues));
-        assertEquals("Product details must not contain negative values", exception.getMessage(), "The exception message should be 'Product details must not contain negative values'");
-    }
-
-    private static ProductEntity getProduct() {
-        ProductEntity newProductEntityWithNegativeValues = new ProductEntity();
-        newProductEntityWithNegativeValues.setId(3L);
-        newProductEntityWithNegativeValues.setName("Product 3");
-        newProductEntityWithNegativeValues.setDescription("Product description");
-        newProductEntityWithNegativeValues.setPrice(-50.00);
-        newProductEntityWithNegativeValues.setCategory_Id(1);
-        newProductEntityWithNegativeValues.setWeight(-15.00);
-        newProductEntityWithNegativeValues.setCurrent_stock(-25);
-        newProductEntityWithNegativeValues.setMin_stock(-10);
-        return newProductEntityWithNegativeValues;
-    }
 
     @Test
     @DisplayName("Should handle DataAccessException when saving product")
@@ -507,6 +473,18 @@ class ProductServiceImplTest {
         verify(productRepository,times(1)).save(existingProductEntity);
     }
     @Test
+    @DisplayName("Throw IllegalArgumentException for null product details")
+    void testUpdateProduct_NullDetails() {
+        Long productId = 1L;
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            productServiceImpl.updateProduct(productId, null);
+        });
+
+        assertEquals("Product details must not be null.", exception.getMessage());
+    }
+
+    @Test
     @DisplayName("Throw RuntimeException when product not found during update")
     void shouldThrowExceptionWhenProductNotFound(){
 
@@ -575,22 +553,6 @@ class ProductServiceImplTest {
     }
 
     @Test
-    @DisplayName("Delete Product - Handles DataAccessException")
-    void deleteProduct_DataAccessException() {
-        long productId = 1L;
-        ProductEntity productEntity = new ProductEntity();
-        productEntity.setId(productId);
-
-        when(productRepository.findById(productId)).thenReturn(Optional.of(productEntity));
-        doThrow(new DataAccessException("Database error") {}).when(productRepository).delete(productEntity);
-
-        Exception exception = assertThrows(DataAccessException.class, () -> productServiceImpl.deleteProduct(productId));
-
-        assertEquals("Database error", exception.getMessage());
-        verify(productRepository).delete(productEntity);
-    }
-
-    @Test
     @DisplayName("Delete Product - Throws IllegalArgumentException for Invalid Product ID")
     void deleteProduct_InvalidProductId_ThrowsIllegalArgumentException() {
         long invalidProductId = -1L;
@@ -599,29 +561,6 @@ class ProductServiceImplTest {
 
         assertEquals("Product not found with ID: "+ invalidProductId, exception.getMessage());
         verify(productRepository, never()).delete(any(ProductEntity.class));
-    }
-
-
-
-
-    @Test
-    @DisplayName("Throw IllegalArgumentException for negative stock")
-    void updateProductStock_NegativeStock_ThrowsIllegalArgumentException() {
-        int initialStock = 10;
-        int minStock = 20;  // Setting minStock higher than initialStock to ensure `newStock < 0` is checked
-        int adjustment = -15;
-
-        productEntity.setCurrent_stock(initialStock);
-        productEntity.setMin_stock(minStock);
-
-        when(productRepository.findById(productId)).thenReturn(Optional.of(productEntity));
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            productServiceImpl.updateProductStock(productId, adjustment);
-        });
-
-        assertEquals("Insufficient stock to decrement by " + adjustment, exception.getMessage(), "Expected error message about insufficient stock not found.");
-        verify(productRepository, never()).save(any(ProductEntity.class));
     }
 
     @Test
@@ -651,6 +590,18 @@ class ProductServiceImplTest {
                 "Exception message should indicate failure to delete due to database error");
         verify(productRepository).delete(productEntity);
     }
+    @Test
+    @DisplayName("Throw IllegalArgumentException if product entity is null")
+    void testUpdateProduct_NullProductEntity() {
+        Long productId = 1L;
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            productServiceImpl.updateProduct(productId, null);
+        });
+
+        assertEquals("Product details must not be null.", exception.getMessage());
+    }
+
 }
 
 

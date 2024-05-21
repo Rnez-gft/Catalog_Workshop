@@ -1,0 +1,31 @@
+<<<<<<< HEAD
+C:\Users\anop\IdeaProjects\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\controllers\ProductController.java
+C:\Users\anop\IdeaProjects\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\services\impl\PromotionServiceImpl.java
+C:\Users\anop\IdeaProjects\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\exceptions\ErrorResponse.java
+C:\Users\anop\IdeaProjects\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\CatalogServiceWorkshopApplication.java
+C:\Users\anop\IdeaProjects\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\services\PromotionService.java
+C:\Users\anop\IdeaProjects\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\repositories\PromotionRepository.java
+C:\Users\anop\IdeaProjects\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\api\dto\PromotionDTO.java
+C:\Users\anop\IdeaProjects\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\model\PromotionEntity.java
+C:\Users\anop\IdeaProjects\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\api\dto\ProductDto.java
+C:\Users\anop\IdeaProjects\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\model\ProductEntity.java
+C:\Users\anop\IdeaProjects\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\repositories\ProductRepository.java
+C:\Users\anop\IdeaProjects\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\services\impl\ProductServiceImpl.java
+C:\Users\anop\IdeaProjects\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\exceptions\AddProductInvalidArgumentsExceptions.java
+C:\Users\anop\IdeaProjects\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\services\ProductService.java
+=======
+C:\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\model\ProductEntity.java
+C:\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\model\PromotionEntity.java
+C:\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\services\impl\ProductServiceImpl.java
+C:\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\controllers\ProductController.java
+C:\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\exceptions\AddProductInvalidArgumentsExceptions.java
+C:\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\CatalogServiceWorkshopApplication.java
+C:\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\repositories\PromotionRepository.java
+C:\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\exceptions\ErrorResponse.java
+C:\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\services\PromotionService.java
+C:\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\api\dto\ProductDto.java
+C:\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\api\dto\PromotionDTO.java
+C:\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\repositories\ProductRepository.java
+C:\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\services\ProductService.java
+C:\Catalog_Workshop\src\main\java\com\gftworkshopcatalog\services\impl\PromotionServiceImpl.java
+>>>>>>> 2c95e9a3f5aa3817adce872a265fb8d6a3ac5220

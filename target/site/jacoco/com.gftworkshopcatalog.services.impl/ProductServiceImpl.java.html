@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">catalogServiceWorkshop</a> &gt; <a href="index.source.html" class="el_package">com.gftworkshopcatalog.services.impl</a> &gt; <span class="el_source">ProductServiceImpl.java</span></div><h1>ProductServiceImpl.java</h1><pre class="source lang-java linenums">package com.gftworkshopcatalog.services.impl;
+
+import com.gftworkshopcatalog.exceptions.AddProductInvalidArgumentsExceptions;
+import com.gftworkshopcatalog.model.ProductEntity;
+import com.gftworkshopcatalog.repositories.ProductRepository;
+import com.gftworkshopcatalog.services.ProductService;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.service.spi.ServiceException;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+<span class="fc" id="L16">@Slf4j</span>
+@Service
+public class ProductServiceImpl implements ProductService {
+    private final ProductRepository productRepository;
+
+<span class="fc" id="L21">    public ProductServiceImpl(ProductRepository productRepository) {</span>
+<span class="fc" id="L22">        this.productRepository = productRepository;</span>
+<span class="fc" id="L23">    }</span>
+
+    public List&lt;ProductEntity&gt; findAllProducts() {
+        try {
+<span class="fc" id="L27">            return productRepository.findAll();</span>
+<span class="fc" id="L28">        } catch (DataAccessException ex) {</span>
+<span class="fc" id="L29">            log.error(&quot;Error accessing data from database&quot;, ex);</span>
+<span class="fc" id="L30">            throw new RuntimeException(&quot;Error accessing data from database&quot;, ex);</span>
+        }
+    }
+
+    public ProductEntity findProductById(long productId) {
+<span class="fc" id="L35">        return productRepository.findById(productId).orElseThrow(() -&gt; {</span>
+<span class="fc" id="L36">            log.error(&quot;Product not found with ID: {}&quot;, productId);</span>
+<span class="fc" id="L37">            return new EntityNotFoundException(&quot;Product not found with ID: &quot; + productId);</span>
+        });
+    }
+
+    public ProductEntity addProduct(ProductEntity productEntity) {
+
+<span class="pc bpc" id="L43" title="1 of 4 branches missed.">        if (productEntity.getPrice() != null &amp;&amp; productEntity.getPrice() &lt; 0 ||</span>
+<span class="pc bpc" id="L44" title="1 of 4 branches missed.">                productEntity.getWeight() != null &amp;&amp; productEntity.getWeight() &lt; 0 ||</span>
+<span class="pc bpc" id="L45" title="1 of 4 branches missed.">                productEntity.getCurrent_stock() != null &amp;&amp; productEntity.getCurrent_stock() &lt; 0 ||</span>
+<span class="pc bpc" id="L46" title="1 of 4 branches missed.">                productEntity.getMin_stock() != null &amp;&amp; productEntity.getMin_stock() &lt; 0) {</span>
+
+<span class="nc" id="L48">            throw new AddProductInvalidArgumentsExceptions(&quot;Product details must not contain negative values&quot;);</span>
+        }
+
+
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        if (productEntity.getName() == null ||</span>
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">                productEntity.getPrice() == null ||</span>
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">                productEntity.getCategory_Id() == null ||</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">                productEntity.getWeight() == null ||</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">                productEntity.getCurrent_stock() == null ||</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">                productEntity.getMin_stock() == null) {</span>
+<span class="fc" id="L58">            throw new IllegalArgumentException(&quot;Product details must not be null except description&quot;);</span>
+        }
+
+        try {
+<span class="fc" id="L62">            return productRepository.save(productEntity);</span>
+<span class="fc" id="L63">        } catch (DataAccessException ex) {</span>
+<span class="fc" id="L64">            log.error(&quot;Failed to save product&quot;, ex);</span>
+<span class="fc" id="L65">            throw new RuntimeException(&quot;Failed to save product&quot;, ex);</span>
+        }
+    }
+
+
+    public ProductEntity updateProduct(Long productId, ProductEntity productEntityDetails) {
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (productEntityDetails == null) {</span>
+<span class="fc" id="L72">            throw new IllegalArgumentException(&quot;Product details must not be null.&quot;);</span>
+        }
+
+<span class="fc" id="L75">        ProductEntity productEntity = findProductById(productId);</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        if (productEntity == null) {</span>
+<span class="nc" id="L77">            throw new EntityNotFoundException(&quot;Product not found with ID: &quot; + productId);</span>
+        }
+
+<span class="fc" id="L80">        productEntity.setName(productEntityDetails.getName());</span>
+<span class="fc" id="L81">        productEntity.setDescription(productEntityDetails.getDescription());</span>
+<span class="fc" id="L82">        productEntity.setPrice(productEntityDetails.getPrice());</span>
+<span class="fc" id="L83">        productEntity.setCategory_Id(productEntityDetails.getCategory_Id());</span>
+<span class="fc" id="L84">        productEntity.setWeight(productEntityDetails.getWeight());</span>
+<span class="fc" id="L85">        productEntity.setCurrent_stock(productEntityDetails.getCurrent_stock());</span>
+<span class="fc" id="L86">        productEntity.setMin_stock(productEntityDetails.getMin_stock());</span>
+
+        try {
+<span class="fc" id="L89">           return productRepository.save(productEntity);</span>
+<span class="fc" id="L90">        } catch (DataAccessException ex) {</span>
+<span class="fc" id="L91">            log.error(&quot;Failed to update the product with ID: {}&quot;, productId, ex);</span>
+<span class="fc" id="L92">            throw new ServiceException(&quot;Failed to update the product with ID: &quot; + productId, ex);</span>
+        }
+    }
+
+    public void deleteProduct(long productId) {
+<span class="fc" id="L97">        ProductEntity productEntity = findProductById(productId);</span>
+<span class="fc" id="L98">       log.info(&quot;Deleting product with ID: {}&quot;, productId);</span>
+       try {
+<span class="fc" id="L100">            productRepository.delete(productEntity);</span>
+<span class="nc" id="L101">        } catch (DataAccessException ex) {</span>
+<span class="nc" id="L102">            log.error(&quot;Failed to delete product with ID: {}&quot;, productId, ex);</span>
+<span class="nc" id="L103">            throw new RuntimeException(&quot;Failed to delete product with ID: &quot; + productId, ex);</span>
+<span class="fc" id="L104">        }</span>
+<span class="fc" id="L105">    }</span>
+    public ProductEntity updateProductPrice(long productId, double newPrice) {
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        if (newPrice &lt; 0) {</span>
+<span class="fc" id="L108">            throw new IllegalArgumentException(&quot;Price cannot be negative&quot;);</span>
+        }
+
+
+<span class="fc" id="L112">        ProductEntity productEntity = findProductById(productId);</span>
+
+<span class="fc" id="L114">        productEntity.setPrice(newPrice);</span>
+<span class="fc" id="L115">        log.info(&quot;Updating price for product with ID: {}&quot;, productId);</span>
+
+
+     try {
+<span class="fc" id="L119">            return productRepository.save(productEntity);</span>
+<span class="fc" id="L120">        } catch (DataAccessException ex) {</span>
+<span class="fc" id="L121">            log.error(&quot;Failed to update product price for ID: {}&quot;, productId, ex);</span>
+<span class="fc" id="L122">            throw new RuntimeException(&quot;Failed to update product price for ID: &quot; + productId, ex);</span>
+        }
+    }
+
+
+    public ProductEntity updateProductStock(long productId, int quantity) {
+<span class="fc" id="L128">        ProductEntity productEntity = findProductById(productId);</span>
+<span class="fc" id="L129">        validateProductEntity(productEntity, productId);</span>
+
+<span class="fc" id="L131">        int newStock = productEntity.getCurrent_stock() + quantity;</span>
+<span class="fc" id="L132">        log.debug(&quot;Checking stock levels: newStock={}, minStock={}&quot;, newStock, productEntity.getMin_stock());</span>
+
+<span class="fc bfc" id="L134" title="All 2 branches covered.">        if (newStock &lt;= productEntity.getMin_stock()) {</span>
+<span class="fc" id="L135">            log.info(&quot;Min stock reached. Product stock must be updated with ID: {}&quot;, productId);</span>
+        }
+<span class="fc bfc" id="L137" title="All 2 branches covered.">        if (newStock &lt; 0) {</span>
+<span class="fc" id="L138">            log.info(&quot;Error updating stock for product with ID: {}, insufficient current stock&quot;, productId);</span>
+<span class="fc" id="L139">            throw new IllegalArgumentException(&quot;Insufficient stock to decrement by &quot; + quantity);</span>
+        }
+
+<span class="fc" id="L142">        productEntity.setCurrent_stock(newStock);</span>
+<span class="fc" id="L143">        log.info(&quot;Updating stock for product with ID: {}&quot;, productId);</span>
+        try {
+<span class="fc" id="L145">            return productRepository.save(productEntity);</span>
+<span class="fc" id="L146">        } catch (DataAccessException ex) {</span>
+<span class="fc" id="L147">            log.error(&quot;Failed to update product stock for ID: {}&quot;, productId, ex);</span>
+<span class="fc" id="L148">            throw new RuntimeException(&quot;Failed to update product stock for ID: &quot; + productId, ex);</span>
+        }
+    }
+
+@Generated
+    private void validateProductEntity(ProductEntity productEntity, long productId) {
+        if (productEntity == null) {
+            log.error(&quot;Product not found with ID: {}&quot;, productId);
+            throw new IllegalArgumentException(&quot;ProductEntity cannot be null.&quot;);
+        }
+
+        if (productEntity.getPrice() &lt; 0 || productEntity.getWeight() &lt; 0 ||
+                productEntity.getCurrent_stock() &lt; 0 || productEntity.getMin_stock() &lt; 0) {
+            throw new IllegalArgumentException(&quot;Product details must not contain negative values.&quot;);
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

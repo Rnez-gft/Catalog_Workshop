@@ -1,0 +1,8 @@
+-------------------------------------------------------------------------------
+Test set: com.gftworkshopcatalog.controllers.ProductEntityControllerTest
+-------------------------------------------------------------------------------
+<<<<<<< HEAD
+Tests run: 21, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.548 s -- in com.gftworkshopcatalog.controllers.ProductEntityControllerTest
+=======
+Tests run: 21, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.708 s -- in com.gftworkshopcatalog.controllers.ProductEntityControllerTest
+>>>>>>> 2c95e9a3f5aa3817adce872a265fb8d6a3ac5220
