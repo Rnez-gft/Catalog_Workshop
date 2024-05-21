@@ -2,7 +2,7 @@ name: pipeline
  
 on:
   push:
-    branches: [ main, develop, feature/CodeRefactorForPipeline ]
+    branches: [ main, develop ]
 
 jobs:
   build:
