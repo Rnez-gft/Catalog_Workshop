@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 C:\Users\anop\IdeaProjects\Catalog_Workshop\src\test\java\com\gftworkshopcatalog\CatalogServiceWorkshopApplicationTests.java
 C:\Users\anop\IdeaProjects\Catalog_Workshop\src\test\java\com\gftworkshopcatalog\services\ProductServiceImplTest.java
 C:\Users\anop\IdeaProjects\Catalog_Workshop\src\test\java\com\gftworkshopcatalog\CatalogFunctionalTest.java
 C:\Users\anop\IdeaProjects\Catalog_Workshop\src\test\java\com\gftworkshopcatalog\services\PromotionServiceImplTest.java
 C:\Users\anop\IdeaProjects\Catalog_Workshop\src\test\java\com\gftworkshopcatalog\controllers\ProductEntityControllerTest.java
+=======
+C:\Catalog_Workshop\src\test\java\com\gftworkshopcatalog\controllers\ProductEntityControllerTest.java
+C:\Catalog_Workshop\src\test\java\com\gftworkshopcatalog\services\ProductServiceImplTest.java
+C:\Catalog_Workshop\src\test\java\com\gftworkshopcatalog\services\PromotionServiceImplTest.java
+C:\Catalog_Workshop\src\test\java\com\gftworkshopcatalog\CatalogServiceWorkshopApplicationTests.java
+C:\Catalog_Workshop\src\test\java\com\gftworkshopcatalog\CatalogFunctionalTest.java
+>>>>>>> 2c95e9a3f5aa3817adce872a265fb8d6a3ac5220

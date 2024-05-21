@@ -32,7 +32,10 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     public PromotionEntity findPromotiontById(long promotionId) {
-        return null;
+        return promotionRepository.findById(promotionId).orElseThrow(() -> {
+            log.error("Promotion not found with ID: {}", promotionId);
+            return new EntityNotFoundException("Promotion not found with ID: " + promotionId);
+        });
     }
 
     public PromotionEntity addPromotion(PromotionEntity promotionEntity) {
@@ -70,5 +73,13 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     public void deletePromotion(long promotionId) {
+        PromotionEntity promotionEntity = findPromotiontById(promotionId);
+        log.info("Deleting promotion with ID: {}", promotionId);
+        try {
+            promotionRepository.delete(promotionEntity);
+        } catch (DataAccessException ex) {
+            log.error("Failed to delete promotion with ID: {}", promotionId, ex);
+            throw new EntityNotFoundException("Failed to delete promotion with ID: " + promotionId, ex);
+        }
     }
 }
