@@ -4,6 +4,7 @@ import com.gftworkshopcatalog.api.dto.PromotionDTO;
 import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.PromotionService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -30,10 +31,13 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     public PromotionEntity findPromotiontById(long promotionId) {
-        return null;
+        return promotionRepository.findById(promotionId).orElseThrow(() -> {
+            log.error("Promotion not found with ID: {}", promotionId);
+            return new EntityNotFoundException("Promotion not found with ID: " + promotionId);
+        });
     }
 
-    public PromotionEntity addProduct(PromotionEntity promotionEntity) {
+    public PromotionEntity addPromotion(PromotionEntity promotionEntity) {
         return null;
     }
 
@@ -42,5 +46,13 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     public void deletePromotion(long promotionId) {
+        PromotionEntity promotionEntity = findPromotiontById(promotionId);
+        log.info("Deleting promotion with ID: {}", promotionId);
+        try {
+            promotionRepository.delete(promotionEntity);
+        } catch (DataAccessException ex) {
+            log.error("Failed to delete promotion with ID: {}", promotionId, ex);
+            throw new EntityNotFoundException("Failed to delete promotion with ID: " + promotionId, ex);
+        }
     }
 }
