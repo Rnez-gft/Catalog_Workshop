@@ -17,6 +17,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("/products")
 @Tag(name = "Products", description = "Everything about the products")
@@ -197,6 +200,32 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating product price: " + e.getMessage());
         }
     }
+
+
+
+    @PostMapping("/byIds")
+    @Operation(summary = "Get products by IDs", description = "Returns a list of products for the given list of IDs.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Products found",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
+            @ApiResponse(responseCode = "500", description = "Error response",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
+    })
+    public ResponseEntity<?> listProductsById(@RequestBody List<Long> ids) {
+        try {
+            List<ProductEntity> products = productServiceImpl.findProductsByIds(ids);
+            return ResponseEntity.ok(products);
+        } catch (EntityNotFoundException ex) {
+            ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), 404);
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        } catch (Exception ex) {
+            ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), 500);
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 @Generated
     public class SuccessResponse {

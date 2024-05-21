@@ -1,9 +1,11 @@
 package com.gftworkshopcatalog.services;
 
+import com.gftworkshopcatalog.api.dto.ProductDto;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.Builder;
 import org.hibernate.service.spi.ServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,11 +15,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataAccessException;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import java.util.Optional;
+import java.sql.Array;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,26 +31,42 @@ class ProductServiceImplTest {
     private ProductServiceImpl productServiceImpl;
 
     private ProductEntity productEntity;
+    private ProductEntity productEntity2;
     private final long productId = 1L;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        productEntity = new ProductEntity();
-        productEntity.setId(1L);
-        productEntity.setName("Example Product");
-        productEntity.setDescription("Description here");
-        productEntity.setPrice(100.34);
-        productEntity.setCategory_Id(10);
-        productEntity.setWeight(10.5);
-        productEntity.setCurrent_stock(10);
-        productEntity.setMin_stock(10);
+        productEntity = ProductEntity.builder()
+                .id(1L)
+                .name("Product 1")
+                .description("Product 1 description")
+                .price(50.00)
+                .category_Id(1)
+                .weight(15.00)
+                .current_stock(25)
+                .min_stock(10)
+                .build();
+
+        productEntity2 = ProductEntity.builder()
+                .id(2L)
+                .name("Product 2")
+                .description("Product 2 description")
+                .price(60.00)
+                .category_Id(2)
+                .weight(25.00)
+                .current_stock(50)
+                .min_stock(15)
+                .build();
+
+
     }
 
     @Test
 
     @DisplayName("Update product stock")
     void updateProductStock_Success() {
+        productEntity.setCurrent_stock(10);
         int newStock = 10;
         when(productRepository.findById(productId)).thenReturn(Optional.of(productEntity));
         when(productRepository.save(any(ProductEntity.class))).thenReturn(productEntity);
@@ -290,7 +305,7 @@ class ProductServiceImplTest {
                 "Expected findAllProducts to throw, but it did not");
         assertTrue(exception.getMessage().contains("Error accessing data from database"));
         assertNotNull(exception.getCause(), "Cause should not be null");
-        assertTrue(exception.getCause() instanceof DataAccessException, "The cause should be a DataAccessException");
+        assertInstanceOf(DataAccessException.class, exception.getCause(), "The cause should be a DataAccessException");
     }
 
     @Test
@@ -578,6 +593,7 @@ class ProductServiceImplTest {
 
 
 
+    @Test
     @DisplayName("Handles DataAccessException when deleting a product")
     void testDeleteProduct_DataAccessException() {
         long productId = 1L;
@@ -603,6 +619,53 @@ class ProductServiceImplTest {
         assertEquals("Product details must not be null.", exception.getMessage());
     }
 
+    @Test
+    @DisplayName("List of products by id")
+    void testListProductsById() {
+        // Lista de IDs de productos
+        List<Long> listaIds = Arrays.asList(1L, 2L);
+
+        List<ProductEntity> mockProductEntities = Arrays.asList(productEntity, productEntity2);
+
+        when(productRepository.findAllById(listaIds)).thenReturn(mockProductEntities);
+
+        List<ProductEntity> listaDeProductos = productServiceImpl.findProductsByIds(listaIds);
+
+        assertNotNull(listaDeProductos, "La lista de productos no debe ser nula.");
+        assertEquals(mockProductEntities.size(), listaDeProductos.size(), "El tamaño de la lista de productos debe coincidir con el número de productos encontrados.");
+        assertTrue(listaDeProductos.contains(productEntity), "La lista debe contener 'Product 1'.");
+        assertTrue(listaDeProductos.contains(productEntity2), "La lista debe contener 'Product 2'.");
+    }
+
+    @Test
+    @DisplayName("Throw error when one or more IDs do not exist")
+    void testListProductsById_NotFound() {
+        List<Long> listaIds = Arrays.asList(1L, 2L, 3L, 4L);
+
+        List<ProductEntity> mockProductEntities = Arrays.asList(productEntity, productEntity2);
+
+        when(productRepository.findAllById(listaIds)).thenReturn(mockProductEntities);
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            productServiceImpl.findProductsByIds(listaIds);
+        });
+
+        assertEquals("One or more product IDs not found", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Throw error when database access error occurs")
+    void testListProductsById_DatabaseError() {
+        List<Long> listaIds = Arrays.asList(1L, 2L, 3L, 4L);
+
+        when(productRepository.findAllById(listaIds)).thenThrow(new DataAccessException("Database error") {});
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            productServiceImpl.findProductsByIds(listaIds);
+        });
+
+        assertEquals("Database error occurred while fetching products by IDs", exception.getMessage());
+    }
 }
 
 
