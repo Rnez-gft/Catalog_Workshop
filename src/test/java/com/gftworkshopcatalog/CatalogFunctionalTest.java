@@ -4,23 +4,26 @@ import com.gftworkshopcatalog.model.ProductEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+@AutoConfigureWebTestClient
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CatalogFunctionalTest {
 
+    @Autowired
     private WebTestClient webTestClient;
-
-    @Value("${local.server.port}")
+/*
+    @LocalServerPort
     private int port;
 
-    @BeforeEach
-    public void setup() {
-        webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:" + port + "/catalog").build();
-    }
+  */
+
 
     @Test
     @DisplayName("Test ListAllProducts()")

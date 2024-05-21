@@ -47,7 +47,6 @@ public class ProductServiceImpl implements ProductService {
             throw new AddProductInvalidArgumentsExceptions("Product details must not contain negative values");
         }
 
-
         if (productEntity.getName() == null ||
                 productEntity.getPrice() == null ||
                 productEntity.getCategory_Id() == null ||

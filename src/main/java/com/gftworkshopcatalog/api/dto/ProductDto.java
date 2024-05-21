@@ -1,6 +1,10 @@
 package com.gftworkshopcatalog.api.dto;
 
+import com.gftworkshopcatalog.model.CategoryEntity;
 import lombok.*;
+
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -15,6 +19,7 @@ public class ProductDto {
     private Double weight;
     private Integer currentStock;
     private Integer minStock;
+    private List<CategoryDto> category;
 
     @Override
     public String toString() {
