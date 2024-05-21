@@ -2,7 +2,7 @@ name: pipeline
  
 on:
   push:
-    branches: [ main, develop, feature/ControllerAngryPaths ]
+    branches: [ main, develop, feature/CodeRefactorForPipeline ]
 
 jobs:
   build:

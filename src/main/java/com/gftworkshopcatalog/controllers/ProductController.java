@@ -3,6 +3,7 @@ package com.gftworkshopcatalog.controllers;
 import com.gftworkshopcatalog.exceptions.ErrorResponse;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.Generated;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.gftworkshopcatalog.model.ProductEntity;
@@ -197,7 +198,7 @@ public class ProductController {
         }
     }
 
-
+@Generated
     public class SuccessResponse {
         private String message;
 

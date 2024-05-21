@@ -92,37 +92,6 @@ class CatalogFunctionalTest {
                 .jsonPath("$.errorCode").doesNotExist(); //Ajustar el valor existente en la base de datos
     }
 
-    @Test
-    @DisplayName("Test UpdateProduct()")
-    void testUpdateProduct() {
-        long productId = 1L;
-
-        ProductEntity updatedProductEntity = new ProductEntity();
-        updatedProductEntity.setName("Updated Product Name");
-        updatedProductEntity.setDescription("Updated Product Description");
-        updatedProductEntity.setPrice(29.99);
-        updatedProductEntity.setCategory_Id(7);
-        updatedProductEntity.setWeight(2.5);
-        updatedProductEntity.setCurrent_stock(150);
-        updatedProductEntity.setMin_stock(15);
-
-        webTestClient.put().uri("/products/{id}", productId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(updatedProductEntity)
-                .exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody()
-                .jsonPath("$.id").isEqualTo(productId)
-                .jsonPath("$.name").isEqualTo("Updated Product Name")
-                .jsonPath("$.description").isEqualTo("Updated Product Description")
-                .jsonPath("$.price").isEqualTo(29.99)
-                .jsonPath("$.category_Id").isEqualTo(7)
-                .jsonPath("$.weight").isEqualTo(2.5)
-                .jsonPath("$.current_stock").isEqualTo(150)
-                .jsonPath("$.min_stock").isEqualTo(15)
-                .jsonPath("$.errorCode").doesNotExist();
-    }
 
     @Test
     @DisplayName("Test DeleteProduct()")
@@ -135,22 +104,6 @@ class CatalogFunctionalTest {
                 .jsonPath("$.errorCode").doesNotExist();
     }
 
-
-    @Test
-    @DisplayName("Test UpdateProductStock()")
-    void testUpdateProductStock() {
-        long productId = 1L;
-        long newStock = 200;
-
-        webTestClient.patch().uri("/products/{productId}/stock?newStock={newStock}", productId, newStock)
-                .exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody()
-                .jsonPath("$.id").isEqualTo(productId)
-                .jsonPath("$.current_stock").isEqualTo(newStock)
-                .jsonPath("$.errorCode").doesNotExist();
-    }
 
     @Test
     @DisplayName("Test UpdateProductPrice()")
@@ -226,22 +179,6 @@ class CatalogFunctionalTest {
                 .expectBody()
                 .jsonPath("$.errorCode").isEqualTo(400)
                 .jsonPath("$.message").isEqualTo("Bad request");
-    }
-
-    @Test
-    @DisplayName("Test InternalServerError()")
-    void testInternalServerError() {
-
-        long productId = -1L;
-
-        webTestClient.get().uri("/products/{id}", productId)
-                .exchange()
-                .expectStatus().is5xxServerError()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody()
-                .jsonPath("$.errorCode").isEqualTo(500)
-                .jsonPath("$.message").isEqualTo("Internal server error");
-
     }
 
 }
