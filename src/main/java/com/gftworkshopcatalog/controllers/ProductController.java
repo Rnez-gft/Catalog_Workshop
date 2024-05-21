@@ -95,7 +95,6 @@ public class ProductController {
         } catch (Exception ex) {
             ErrorResponse errorResponse = new ErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-
         }
     }
 
