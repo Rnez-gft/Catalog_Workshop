@@ -1,0 +1,13 @@
+package com.gftworkshopcatalog.services;
+
+import com.gftworkshopcatalog.model.PromotionEntity;
+
+import java.util.List;
+
+public interface PromotionService {
+    public List<PromotionEntity> findAllPromotions();
+    public PromotionEntity findPromotiontById(long promotionId);
+    public PromotionEntity addPromotion(PromotionEntity promotionEntity);
+    public PromotionEntity updatePromotion(long promotionId, PromotionEntity promotionEntityDetails);
+    public void deletePromotion(long promotionId);
+}

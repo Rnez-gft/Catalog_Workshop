@@ -1,6 +1,5 @@
 package com.gftworkshopcatalog.controllers;
 
-import com.gftworkshopcatalog.api.controllers.ProductController;
 import com.gftworkshopcatalog.exceptions.ErrorResponse;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;

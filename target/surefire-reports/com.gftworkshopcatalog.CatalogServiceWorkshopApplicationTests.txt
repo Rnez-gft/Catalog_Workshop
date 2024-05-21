@@ -1,0 +1,8 @@
+-------------------------------------------------------------------------------
+Test set: com.gftworkshopcatalog.CatalogServiceWorkshopApplicationTests
+-------------------------------------------------------------------------------
+<<<<<<< HEAD
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s -- in com.gftworkshopcatalog.CatalogServiceWorkshopApplicationTests
+=======
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in com.gftworkshopcatalog.CatalogServiceWorkshopApplicationTests
+>>>>>>> 2c95e9a3f5aa3817adce872a265fb8d6a3ac5220
