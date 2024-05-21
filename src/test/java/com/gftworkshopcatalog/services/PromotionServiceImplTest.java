@@ -5,6 +5,7 @@ import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.impl.PromotionServiceImpl;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -21,6 +23,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class PromotionServiceImplTest {
@@ -30,7 +34,7 @@ class PromotionServiceImplTest {
     private PromotionServiceImpl promotionServiceImpl;
 
     private PromotionEntity promotionEntity;
-    private final int promotionId = 1;
+    private final long promotionId = 1L;
 
     @BeforeEach
     void setUp(){
@@ -43,6 +47,7 @@ class PromotionServiceImplTest {
         promotionEntity.setVolumeThreshold(10);
         promotionEntity.setStartDate(LocalDate.of(2024, 6,1));
         promotionEntity.setEndDate(LocalDate.of(2024, 8,1));
+
     }
 
     @Test
@@ -97,5 +102,110 @@ class PromotionServiceImplTest {
 
         PromotionEntity foundPromotionEntity = promotionServiceImpl.findPromotiontById(1L);
     }
+    @Test
+    @DisplayName("Add a new promotion successfully")
+    void addPromotion_Success(){
+        PromotionEntity validPromotion = PromotionEntity.builder()
+                .categoryId(1)
+                .discount(0.10)
+                .promotionType("Volume")
+                .volumeThreshold(10)
+                .startDate(LocalDate.now())
+                .endDate(LocalDate.now().plusMonths(1))
+                .build();
+        when(promotionRepository.save(any(PromotionEntity.class))).thenReturn(validPromotion);
 
+        PromotionEntity savedPromotion = promotionServiceImpl.addPromotion(validPromotion);
+
+        assertNotNull(savedPromotion);
+        assertEquals(0.10, savedPromotion.getDiscount());
+        verify(promotionRepository).save(validPromotion);
+    }
+    @Test
+    @DisplayName("Fail to add a promotion when promotion details are null")
+    void addPromotion_Failure_NullDetails() {
+        assertThrows(IllegalArgumentException.class, () -> promotionServiceImpl.addPromotion(null),
+                "Expected IllegalArgumentException for null promotion details");
+    }
+    @Test
+    @DisplayName("Handle DataAccessException when adding a promotion")
+    void addPromotion_Failure_DataAccessException() {
+        when(promotionRepository.save(any(PromotionEntity.class))).thenThrow(new DataIntegrityViolationException("Database error"));
+
+        PromotionEntity validPromotion = new PromotionEntity();
+        assertThrows(RuntimeException.class, () -> promotionServiceImpl.addPromotion(validPromotion),
+                "Expected RuntimeException when database error occurs");
+    }
+
+    @Test
+    @DisplayName("Update an existing promotion successfully")
+    void updatePromotion_Success(){
+        PromotionEntity existingPromotion = PromotionEntity.builder()
+                .id(promotionId)
+                .categoryId(1)
+                .discount(0.1)
+                .promotionType("Volume")
+                .volumeThreshold(10)
+                .startDate(LocalDate.of(2024, 6, 1))
+                .endDate(LocalDate.of(2024, 8, 1))
+                .build();
+        PromotionEntity updateDetails = PromotionEntity.builder()
+                .id(promotionId)
+                .categoryId(2)
+                .discount(0.15)
+                .promotionType("Seasonal")
+                .volumeThreshold(20)
+                .startDate(LocalDate.of(2024, 5,1))
+                .endDate(LocalDate.of(2024, 9,1))
+                .build();
+
+        when(promotionRepository.findById(promotionId)).thenReturn(Optional.of(existingPromotion));
+        when(promotionRepository.save(any(PromotionEntity.class))).thenReturn(updateDetails);
+
+        PromotionEntity result = promotionServiceImpl.updatePromotion(promotionId, updateDetails);
+        assertAll(
+                () -> assertEquals(0.15, result.getDiscount()),
+                () -> assertEquals(2, result.getCategoryId()),
+                () -> assertEquals("Seasonal", result.getPromotionType()),
+                () -> assertEquals(20, result.getVolumeThreshold()),
+                () -> assertEquals(LocalDate.of(2024, 5, 1), result.getStartDate()),
+                () -> assertEquals(LocalDate.of(2024, 9, 1), result.getEndDate())
+        );
+        verify(promotionRepository).save(existingPromotion);
+    }
+    @Test
+    @DisplayName("Throw EntityNotFoundException if promotion not found")
+    void updatePromotion_NotFound() {
+        PromotionEntity existingPromotion = PromotionEntity.builder()
+                .id(promotionId)
+                .categoryId(1)
+                .discount(0.1)
+                .promotionType("Volume")
+                .volumeThreshold(10)
+                .startDate(LocalDate.of(2024, 6, 1))
+                .endDate(LocalDate.of(2024, 8, 1))
+                .build();
+        when(promotionRepository.findById(promotionId)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class,
+                () -> promotionServiceImpl.updatePromotion(promotionId, existingPromotion));
+    }
+    @Test
+    @DisplayName("Handle data access exception during promotion update")
+    void updatePromotion_DataAccessException() {
+        PromotionEntity existingPromotion = PromotionEntity.builder()
+                .id(promotionId)
+                .categoryId(1)
+                .discount(0.1)
+                .promotionType("Volume")
+                .volumeThreshold(10)
+                .startDate(LocalDate.of(2024, 6, 1))
+                .endDate(LocalDate.of(2024, 8, 1))
+                .build();
+        when(promotionRepository.findById(promotionId)).thenReturn(Optional.of(existingPromotion));
+        when(promotionRepository.save(any(PromotionEntity.class))).thenThrow(new DataAccessException("Database failure") {});
+
+        assertThrows(RuntimeException.class,
+                () -> promotionServiceImpl.updatePromotion(promotionId, existingPromotion));
+    }
 }

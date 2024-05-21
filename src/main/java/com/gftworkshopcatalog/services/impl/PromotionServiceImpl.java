@@ -4,7 +4,9 @@ import com.gftworkshopcatalog.api.dto.PromotionDTO;
 import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.PromotionService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.DataException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -33,12 +35,38 @@ public class PromotionServiceImpl implements PromotionService {
         return null;
     }
 
-    public PromotionEntity addProduct(PromotionEntity promotionEntity) {
-        return null;
+    public PromotionEntity addPromotion(PromotionEntity promotionEntity) {
+        if (promotionEntity == null) {
+            throw new IllegalArgumentException("Promotion details must not be null");
+        }
+
+        try {
+            return promotionRepository.save(promotionEntity);
+        } catch (DataAccessException ex) {
+            throw new RuntimeException("Failed to add the promotion due to database error", ex);
+        }
     }
 
-    public PromotionEntity updaPromotion(long promotionId, PromotionEntity promotionEntityDetails) {
-        return null;
+    public PromotionEntity updatePromotion(long promotionId, PromotionEntity promotionEntityDetails) {
+        PromotionEntity existingPromotion = promotionRepository.findById(promotionId)
+                .orElseThrow(() -> new EntityNotFoundException("Promotion not found with ID: " + promotionId));
+        
+        updatePromotionEntity(existingPromotion, promotionEntityDetails);
+        
+        try{
+            return promotionRepository.save(existingPromotion);
+        } catch (DataException ex) {
+            throw new RuntimeException("Failed to update the promotion with ID: " + promotionId, ex);
+        }
+    }
+
+    private void updatePromotionEntity(PromotionEntity existingPromotion, PromotionEntity newDetails) {
+        existingPromotion.setCategoryId(newDetails.getCategoryId());
+        existingPromotion.setDiscount(newDetails.getDiscount());
+        existingPromotion.setPromotionType(newDetails.getPromotionType());
+        existingPromotion.setVolumeThreshold(newDetails.getVolumeThreshold());
+        existingPromotion.setStartDate(newDetails.getStartDate());
+        existingPromotion.setEndDate(newDetails.getEndDate());
     }
 
     public void deletePromotion(long promotionId) {
