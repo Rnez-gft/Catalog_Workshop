@@ -9,9 +9,14 @@ import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
@@ -149,7 +154,24 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-@Generated
+
+
+    public List<ProductEntity> findProductsByIds(List<Long> ids) {
+        List<ProductEntity> products;
+        try {
+            products = new ArrayList<>(productRepository.findAllById(ids));
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Database error occurred while fetching products by IDs", e);
+        }
+
+        if (products.size() != ids.size()) {
+            throw new EntityNotFoundException("One or more product IDs not found");
+        }
+
+        return products;
+    }
+
+    @Generated
     private void validateProductEntity(ProductEntity productEntity, long productId) {
         if (productEntity == null) {
             log.error("Product not found with ID: {}", productId);
@@ -161,4 +183,7 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Product details must not contain negative values.");
         }
     }
+
+
+
 }

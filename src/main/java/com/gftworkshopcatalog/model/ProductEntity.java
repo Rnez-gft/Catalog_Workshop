@@ -6,16 +6,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Generated;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Generated
 @Entity
+@Builder
 @Table(name = "products")
 public class ProductEntity {
 
@@ -33,7 +31,7 @@ public class ProductEntity {
     @Column(nullable = false)
     private Double price;
 
-    @Column
+    @Column(nullable = false)
     private Integer category_Id;
 
     @Column(nullable = false)
