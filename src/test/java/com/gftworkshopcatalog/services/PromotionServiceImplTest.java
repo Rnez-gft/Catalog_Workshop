@@ -97,4 +97,5 @@ class PromotionServiceImplTest {
 
         PromotionEntity foundPromotionEntity = promotionServiceImpl.findPromotiontById(1L);
     }
+
 }
