@@ -63,7 +63,6 @@ class ProductServiceImplTest {
     }
 
     @Test
-
     @DisplayName("Update product stock")
     void updateProductStock_Success() {
         productEntity.setCurrent_stock(10);
