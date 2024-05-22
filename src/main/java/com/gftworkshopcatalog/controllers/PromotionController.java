@@ -5,10 +5,9 @@ import com.gftworkshopcatalog.services.impl.PromotionServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/promotions")
@@ -20,9 +19,20 @@ public class PromotionController {
         super();
         this.promotionService = promotionService;
     }
+    @GetMapping
+    public ResponseEntity<List<PromotionEntity>> getAllPromotions() {
+        List<PromotionEntity> promotions = promotionService.findAllPromotions();
+        return ResponseEntity.ok(promotions);
+    }
     @PostMapping
     public ResponseEntity<?> addPromotion(@RequestBody PromotionEntity promotionEntity) {
         PromotionEntity createdPromotion = promotionService.addPromotion(promotionEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPromotion);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<PromotionEntity> updatePromotion(@PathVariable long id, @RequestBody PromotionEntity promotionDetails){
+        PromotionEntity updatedPromotion = promotionService.updatePromotion(id, promotionDetails);
+        return ResponseEntity.ok(updatedPromotion);
+    }
+
 }
