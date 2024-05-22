@@ -11,5 +11,5 @@ import java.util.List;
 @Generated
 @Repository
 public interface PromotionRepository extends JpaRepository<PromotionEntity, Long> {
-
+    PromotionEntity findActivePromotionByCategoryId(Long categoryId);
 }

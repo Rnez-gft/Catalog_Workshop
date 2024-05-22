@@ -99,7 +99,7 @@ public class PromotionServiceImpl implements PromotionService {
             List<PromotionEntity> promotions = promotionRepository.findAll();
             promotions.forEach(this::updateIsActiveStatus);
             applyActivePromotions(promotions.stream()
-                    .filter(PromotionEntity::getIsActive)
+                    .filter(promotion -> promotion.getIsActive() && promotion.getPromotionType().equals("SEASONAL"))
                     .collect(Collectors.toList()));
             return promotions.stream()
                     .filter(PromotionEntity::getIsActive)
@@ -121,7 +121,7 @@ public class PromotionServiceImpl implements PromotionService {
         activePromotions.forEach(promotion -> {
             List<ProductEntity> products = productRepository.findByCategoryId(promotion.getCategoryId());
             products.forEach(product -> {
-                double newPrice = product.getPrice() * (1 - promotion.getDiscount() / 100);
+                double newPrice = product.getPrice() * (1 - promotion.getDiscount());
                 product.setPrice(newPrice);
                 productRepository.save(product);
             });

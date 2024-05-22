@@ -4,7 +4,9 @@ import com.gftworkshopcatalog.exceptions.AddProductInvalidArgumentsExceptions;
 import com.gftworkshopcatalog.exceptions.NotFoundProduct;
 import com.gftworkshopcatalog.exceptions.ServiceException;
 import com.gftworkshopcatalog.model.ProductEntity;
+import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.repositories.ProductRepository;
+import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +20,14 @@ import java.util.List;
 @Slf4j
 @Service
 public class ProductServiceImpl implements ProductService {
+
+
+
+    private final PromotionRepository promotionRepository;
     private final ProductRepository productRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(PromotionRepository promotionRepository, ProductRepository productRepository) {
+        this.promotionRepository = promotionRepository;
         this.productRepository = productRepository;
     }
 
@@ -123,6 +130,27 @@ public class ProductServiceImpl implements ProductService {
         }
         return products;
     }
+
+
+        public double calculateDiscountedPrice(Long id, int quantity) {
+            ProductEntity product = productRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + id));
+
+            PromotionEntity promotion = promotionRepository.findActivePromotionByCategoryId(product.getCategoryId());
+
+            if (promotion != null && promotion.getIsActive() && "VOLUME".equalsIgnoreCase(promotion.getPromotionType())) {
+                return calculateNewPrice(product.getPrice(), promotion, quantity);
+            }
+
+            return product.getPrice();
+        }
+
+        private double calculateNewPrice(double originalPrice, PromotionEntity promotion, int quantity) {
+            if (quantity >= promotion.getVolumeThreshold()) {
+                return originalPrice * (1 - promotion.getDiscount());
+            }
+            return originalPrice;
+        }
 
     private void validateProductEntity(ProductEntity productEntity) {
         if (productEntity.getName() == null ||

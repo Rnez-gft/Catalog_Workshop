@@ -7,14 +7,14 @@ INSERT INTO categories (name) VALUES
 ('Others');
 
 INSERT INTO promotions
-    (category_id, discount, promotion_type, volume_threshold, start_date, end_date)
+    (category_id, discount, promotion_type, volume_threshold, start_date, end_date, is_active)
 VALUES
-    (1, 0.35, 'Clothing discount', 1, '2024-06-01', '2025-12-31'),
-    (2, 0.20, 'Toys discount', 1, '2024-01-06', '2025-12-31'),
-    (3, 0.05, 'Sports discount', 1, '2024-05-12', '2025-12-31'),
-    (4, 0.25, 'Food discount', 1, '2024-10-01', '2025-12-31'),
-    (5, 0.15, 'Books discount', 1, '2024-12-01', '2025-12-31'),
-    (6, 0.00, 'Others discount', 1, '2024-09-11', '2025-12-31');
+    (1, 0.35, 'SEASONAL', 1, '2024-01-01', '2025-12-31', true),
+    (2, 0.20, 'VOLUME', 5, '2024-01-06', '2025-12-31', true),
+    (3, 0.05, 'SEASONAL', 1, '2024-05-12', '2025-12-31', true),
+    (4, 0.25, 'VOLUME', 5, '2024-10-01', '2025-12-31', true),
+    (5, 0.15, 'SEASONAL', 1, '2024-12-01', '2025-12-31', true),
+    (6, 0.00, 'VOLUME', 5, '2024-09-11', '2025-12-31', true);
 
 INSERT INTO products
     (name, description, price, category_Id, weight, current_stock, min_stock)

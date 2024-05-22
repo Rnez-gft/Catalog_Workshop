@@ -25,4 +25,6 @@ public class PromotionController {
         PromotionEntity createdPromotion = promotionService.addPromotion(promotionEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPromotion);
     }
+
+
 }
