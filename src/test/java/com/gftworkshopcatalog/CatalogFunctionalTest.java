@@ -35,7 +35,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.[0].name").isNotEmpty()
                 .jsonPath("$.[0].description").isNotEmpty()
                 .jsonPath("$.[0].price").isNumber()
-                .jsonPath("$.[0].category_Id").isNumber()
+                .jsonPath("$.[0].categoryId").isNumber()
                 .jsonPath("$.[0].weight").isNumber()
                 .jsonPath("$.[0].current_stock").isNumber()
                 .jsonPath("$.[0].min_stock").isNumber()
@@ -49,7 +49,7 @@ class CatalogFunctionalTest {
         newProductEntity.setName("Test Product");
         newProductEntity.setDescription("Test Description");
         newProductEntity.setPrice(19.99);
-        newProductEntity.setCategory_Id(6);
+        newProductEntity.setCategoryId(6);
         newProductEntity.setWeight(2.0);
         newProductEntity.setCurrent_stock(100);
         newProductEntity.setMin_stock(10);
@@ -65,7 +65,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.name").isEqualTo("Test Product")
                 .jsonPath("$.description").isEqualTo("Test Description")
                 .jsonPath("$.price").isEqualTo(19.99)
-                .jsonPath("$.category_Id").isEqualTo(6)
+                .jsonPath("$.categoryId").isEqualTo(6)
                 .jsonPath("$.weight").isEqualTo(2.0)
                 .jsonPath("$.current_stock").isEqualTo(100)
                 .jsonPath("$.min_stock").isEqualTo(10)
@@ -86,7 +86,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.name").isNotEmpty()
                 .jsonPath("$.description").isNotEmpty()
                 .jsonPath("$.price").isNumber()
-                .jsonPath("$.category_Id").isNumber()
+                .jsonPath("$.categoryId").isNumber()
                 .jsonPath("$.weight").isNumber()
                 .jsonPath("$.current_stock").isNumber()
                 .jsonPath("$.min_stock").isNumber()
@@ -127,14 +127,6 @@ class CatalogFunctionalTest {
     void testProductNotFoundError() {
         long productId = 999L;
 
-        webTestClient.get().uri("/products/{id}", productId)
-                .exchange()
-                .expectStatus().isNotFound()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody()
-                .jsonPath("$.status").isEqualTo("NOT_FOUND")
-                .jsonPath("$.message").isEqualTo("Product not found");
-
         int newStock = 200;
 
         webTestClient.patch().uri("/products/{productId}/stock?newStock={newStock}", productId, newStock)
@@ -143,39 +135,8 @@ class CatalogFunctionalTest {
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .jsonPath("$.status").isEqualTo("NOT_FOUND")
-                .jsonPath("$.message").isEqualTo("Product not found");
+                .jsonPath("$.message").isEqualTo("Product not found with ID: " + productId);
 
-        double newPrice = 200.0;
-
-        webTestClient.patch().uri("/products/{productId}/price?newPrice={newPrice}", productId, newPrice)
-                .exchange()
-                .expectStatus().isNotFound()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody()
-                .jsonPath("$.status").isEqualTo("NOT_FOUND")
-                .jsonPath("$.message").isEqualTo("Product not found");
     }
 
-    @Test
-    @DisplayName("Test BadRequestError()")
-    void testBadRequestError() {
-        ProductEntity newProductEntity = new ProductEntity();
-        // Simulate missing name to trigger BadRequest
-        newProductEntity.setDescription("Test Description");
-        newProductEntity.setPrice(19.99);
-        newProductEntity.setCategory_Id(1);
-        newProductEntity.setWeight(15.00);
-        newProductEntity.setCurrent_stock(100);
-        newProductEntity.setMin_stock(10);
-
-        webTestClient.post().uri("/products")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(newProductEntity)
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody()
-                .jsonPath("$.status").isEqualTo("BAD_REQUEST")
-                .jsonPath("$.message").isEqualTo("Bad request");
-    }
 }

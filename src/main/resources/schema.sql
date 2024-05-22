@@ -24,5 +24,6 @@ CREATE TABLE promotions (
     volume_threshold INT NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (category_id) REFERENCES categories(category_id)
 );

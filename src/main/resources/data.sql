@@ -9,7 +9,7 @@ INSERT INTO categories (name) VALUES
 INSERT INTO promotions
     (category_id, discount, promotion_type, volume_threshold, start_date, end_date)
 VALUES
-    (1, 0.35, 'Clothing discount', 1, '2024-03-01', '2025-12-31'),
+    (1, 0.35, 'Clothing discount', 1, '2024-06-01', '2025-12-31'),
     (2, 0.20, 'Toys discount', 1, '2024-01-06', '2025-12-31'),
     (3, 0.05, 'Sports discount', 1, '2024-05-12', '2025-12-31'),
     (4, 0.25, 'Food discount', 1, '2024-10-01', '2025-12-31'),
@@ -19,9 +19,9 @@ VALUES
 INSERT INTO products
     (name, description, price, category_Id, weight, current_stock, min_stock)
 VALUES
-  ('Jacket', 'Something indicate large central measure watch provide.', 58.79, 1, 3.71, 26, 10),
-  ('Building Blocks', 'Agent word occur number chair.', 7.89, 2, 1.41, 25, 5),
-  ('Swimming Goggles', 'Walk range media doctor interest.', 30.53, 3, 2.51, 113, 15),
+  ('Jacket', 'Something indicate large central measure watch provide.', 100, 1, 3.71, 26, 10),
+  ('Building Blocks', 'Agent word occur number chair.', 100, 2, 1.41, 25, 5),
+  ('Swimming Goggles', 'Walk range media doctor interest.', 100, 3, 2.51, 113, 15),
   ('Football', 'Country expect price certain different bag everyone.', 21.93, 3, 3.86, 27, 10),
   ('Football', 'Speak value yard here station.', 46.7, 3, 2.99, 82, 20),
   ('Box of Cereal', 'Fear course mean stop practice allow.', 30.46, 4, 3.0, 128, 25),

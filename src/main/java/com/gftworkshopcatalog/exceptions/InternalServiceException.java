@@ -6,15 +6,11 @@ import org.springframework.http.HttpStatus;
 
 @Generated
 @Getter
-public class BadRequest extends RuntimeException {
+public class InternalServiceException extends RuntimeException {
     private final HttpStatus status;
 
-    public BadRequest(String message) {
+    public InternalServiceException(String message) {
         super(message);
-        this.status = HttpStatus.BAD_REQUEST;
-    }
-
-    public HttpStatus getStatus() {
-        return status;
+        this.status = HttpStatus.INTERNAL_SERVER_ERROR;
     }
 }

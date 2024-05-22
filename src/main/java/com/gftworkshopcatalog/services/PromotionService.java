@@ -10,4 +10,5 @@ public interface PromotionService {
     public PromotionEntity addPromotion(PromotionEntity promotionEntity);
     public PromotionEntity updatePromotion(long promotionId, PromotionEntity promotionEntityDetails);
     public void deletePromotion(long promotionId);
+    public List<PromotionEntity> getActivePromotions();
 }

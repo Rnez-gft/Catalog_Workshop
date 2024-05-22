@@ -6,15 +6,11 @@ import org.springframework.http.HttpStatus;
 
 @Generated
 @Getter
-public class BadRequest extends RuntimeException {
+public class NotFoundCategory extends RuntimeException {
     private final HttpStatus status;
 
-    public BadRequest(String message) {
+    public NotFoundCategory(String message) {
         super(message);
-        this.status = HttpStatus.BAD_REQUEST;
-    }
-
-    public HttpStatus getStatus() {
-        return status;
+        this.status = HttpStatus.NOT_FOUND;
     }
 }

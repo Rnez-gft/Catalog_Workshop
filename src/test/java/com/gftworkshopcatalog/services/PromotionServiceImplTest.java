@@ -1,6 +1,7 @@
 package com.gftworkshopcatalog.services;
 
 import com.gftworkshopcatalog.model.PromotionEntity;
+import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.impl.PromotionServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,6 +27,8 @@ import static org.mockito.Mockito.*;
 class PromotionServiceImplTest {
     @Mock
     private PromotionRepository promotionRepository;
+    @Mock
+    private ProductRepository productRepository;
     @InjectMocks
     private PromotionServiceImpl promotionServiceImpl;
 
@@ -37,7 +40,7 @@ class PromotionServiceImplTest {
 
         promotionEntity = PromotionEntity.builder()
                 .id(1L)
-                .categoryId(1)
+                .categoryId(1L)
                 .discount(0.1)
                 .promotionType("Volume")
                 .volumeThreshold(10)
@@ -51,7 +54,7 @@ class PromotionServiceImplTest {
     void findAllPromotions(){
         PromotionEntity promotion2 = PromotionEntity.builder()
                 .id(2L)
-                .categoryId(3)
+                .categoryId(3L)
                 .discount(0.15)
                 .promotionType("Volume")
                 .volumeThreshold(15)
@@ -150,7 +153,7 @@ class PromotionServiceImplTest {
     @DisplayName("Add a new promotion successfully")
     void addPromotion_Success(){
         PromotionEntity validPromotion = PromotionEntity.builder()
-                .categoryId(1)
+                .categoryId(1L)
                 .discount(0.10)
                 .promotionType("Volume")
                 .volumeThreshold(10)
@@ -186,7 +189,7 @@ class PromotionServiceImplTest {
     void updatePromotion_Success(){
         PromotionEntity updateDetails = PromotionEntity.builder()
                 .id(promotionEntity.getId())
-                .categoryId(2)
+                .categoryId(2L)
                 .discount(0.15)
                 .promotionType("Seasonal")
                 .volumeThreshold(20)
@@ -213,7 +216,7 @@ class PromotionServiceImplTest {
     void updatePromotion_NotFound() {
         PromotionEntity existingPromotion = PromotionEntity.builder()
                 .id(promotionEntity.getId())
-                .categoryId(1)
+                .categoryId(1L)
                 .discount(0.1)
                 .promotionType("Volume")
                 .volumeThreshold(10)
@@ -230,7 +233,7 @@ class PromotionServiceImplTest {
     void updatePromotion_DataAccessException() {
         PromotionEntity existingPromotion = PromotionEntity.builder()
                 .id(promotionEntity.getId())
-                .categoryId(1)
+                .categoryId(1L)
                 .discount(0.1)
                 .promotionType("Volume")
                 .volumeThreshold(10)
@@ -243,5 +246,26 @@ class PromotionServiceImplTest {
         assertThrows(RuntimeException.class,
                 () -> promotionServiceImpl.updatePromotion(promotionEntity.getId(), existingPromotion));
     }
+
+    @Test
+    public void testGetActivePromotions() {
+        PromotionEntity promo1 = new PromotionEntity();
+        promo1.setStartDate(LocalDate.now().minusDays(1));
+        promo1.setEndDate(LocalDate.now().plusDays(1));
+
+        PromotionEntity promo2 = new PromotionEntity();
+        promo2.setStartDate(LocalDate.now().minusDays(10));
+        promo2.setEndDate(LocalDate.now().minusDays(5));
+
+        List<PromotionEntity> promotions = Arrays.asList(promo1, promo2);
+
+        when(promotionRepository.findAll()).thenReturn(promotions);
+
+        List<PromotionEntity> activePromotions = promotionServiceImpl.getActivePromotions();
+
+        assertEquals(1, activePromotions.size());
+        assertEquals(promo1, activePromotions.get(0));
+    }
+
 }
 
