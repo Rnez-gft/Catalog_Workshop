@@ -1,6 +1,6 @@
 package com.gftworkshopcatalog.services.impl;
 
-import com.gftworkshopcatalog.api.dto.PromotionDTO;
+
 import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.PromotionService;
@@ -11,8 +11,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
 @Slf4j
 @Service
 public class PromotionServiceImpl implements PromotionService {
