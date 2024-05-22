@@ -3,7 +3,9 @@ package com.gftworkshopcatalog.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -12,7 +14,7 @@ import java.time.LocalDate;
 @Entity
 @Generated
 @Table(name= "promotions")
-public class PromotionEntity {
+public class PromotionEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

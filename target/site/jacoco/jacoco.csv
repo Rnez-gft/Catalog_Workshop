@@ -1,0 +1,4 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+catalogServiceWorkshop,com.gftworkshopcatalog.controllers,ProductController,0,212,0,0,0,53,0,8,0,8
+catalogServiceWorkshop,com.gftworkshopcatalog.services.impl,ProductServiceImpl,25,309,10,28,5,70,10,19,0,10
+catalogServiceWorkshop,com.gftworkshopcatalog.services.impl,PromotionServiceImpl,8,146,0,2,2,35,0,11,0,10

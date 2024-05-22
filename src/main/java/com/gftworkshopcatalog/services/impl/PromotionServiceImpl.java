@@ -1,6 +1,7 @@
 package com.gftworkshopcatalog.services.impl;
 
 import com.gftworkshopcatalog.model.ProductEntity;
+
 import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
