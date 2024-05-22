@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -124,7 +125,6 @@ class CatalogFunctionalTest {
     @Test
     @DisplayName("Test ProductNotFoundError()")
     void testProductNotFoundError() {
-
         long productId = 999L;
 
         webTestClient.get().uri("/products/{id}", productId)
@@ -132,37 +132,35 @@ class CatalogFunctionalTest {
                 .expectStatus().isNotFound()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
-                .jsonPath("$.errorCode").isEqualTo(404)
+                .jsonPath("$.status").isEqualTo("NOT_FOUND")
                 .jsonPath("$.message").isEqualTo("Product not found");
 
-        long newStock = 200;
+        int newStock = 200;
 
         webTestClient.patch().uri("/products/{productId}/stock?newStock={newStock}", productId, newStock)
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
-                .jsonPath("$.errorCode").isEqualTo(404)
+                .jsonPath("$.status").isEqualTo("NOT_FOUND")
                 .jsonPath("$.message").isEqualTo("Product not found");
 
-        long newPrice = 200;
+        double newPrice = 200.0;
 
         webTestClient.patch().uri("/products/{productId}/price?newPrice={newPrice}", productId, newPrice)
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
-                .jsonPath("$.errorCode").isEqualTo(404)
+                .jsonPath("$.status").isEqualTo("NOT_FOUND")
                 .jsonPath("$.message").isEqualTo("Product not found");
-
     }
 
     @Test
     @DisplayName("Test BadRequestError()")
     void testBadRequestError() {
-
         ProductEntity newProductEntity = new ProductEntity();
-
+        // Simulate missing name to trigger BadRequest
         newProductEntity.setDescription("Test Description");
         newProductEntity.setPrice(19.99);
         newProductEntity.setCategory_Id(1);
@@ -177,8 +175,7 @@ class CatalogFunctionalTest {
                 .expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
-                .jsonPath("$.errorCode").isEqualTo(400)
+                .jsonPath("$.status").isEqualTo("BAD_REQUEST")
                 .jsonPath("$.message").isEqualTo("Bad request");
     }
-
 }
