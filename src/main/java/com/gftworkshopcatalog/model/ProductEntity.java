@@ -32,7 +32,7 @@ public class ProductEntity {
     private Double price;
 
     @Column(nullable = false)
-    private Integer categoryId;
+    private Long categoryId;
 
     @Column(nullable = false)
     private Double weight;

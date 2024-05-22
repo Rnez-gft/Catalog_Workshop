@@ -5,6 +5,7 @@ import com.gftworkshopcatalog.exceptions.ErrorResponse;
 import com.gftworkshopcatalog.exceptions.InternalServerError;
 import com.gftworkshopcatalog.exceptions.NotFoundProduct;
 import com.gftworkshopcatalog.model.ProductEntity;
+import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -204,6 +205,29 @@ public class ProductController {
             return ResponseEntity.ok(products);
         } catch (EntityNotFoundException e) {
             ErrorResponse errorResponse = new ErrorResponse("One or more product IDs not found", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{id}/price-checkout")
+    @Operation(summary = "Get the product price at checkout", description = "Gets the product price based on volume promotions during checkout.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Price successfully retrieved",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Double.class)) }),
+            @ApiResponse(responseCode = "404", description = "Product not found",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
+    })
+    public ResponseEntity<?> getPriceProductCheckout(@PathVariable Long id, @RequestParam int quantity) {
+        try {
+            double discountedPrice = productServiceImpl.calculateDiscountedPrice(id, quantity);
+            return ResponseEntity.ok(discountedPrice);
+        } catch (NotFoundProduct e) {
+            ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);
             return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             ErrorResponse errorResponse = new ErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
