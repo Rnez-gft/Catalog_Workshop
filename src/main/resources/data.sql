@@ -17,7 +17,7 @@ VALUES
     (6, 0.00, 'Others discount', 1, '2024-09-11', '2025-12-31');
 
 INSERT INTO products
-    (name, description, price, category_Id, weight, current_stock, min_stock)
+    (name, description, price, category_id, weight, current_stock, min_stock)
 VALUES
   ('Jacket', 'Something indicate large central measure watch provide.', 58.79, 1, 3.71, 26, 10),
   ('Building Blocks', 'Agent word occur number chair.', 7.89, 2, 1.41, 25, 5),

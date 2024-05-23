@@ -118,7 +118,7 @@ class CategoryServiceImplTest {
         List<ProductEntity> expectedProducts = Arrays.asList(product1, product2);
 
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(categoryEntity));
-        when(productRepository.findByCategory_CategoryId(categoryId)).thenReturn(expectedProducts);
+        when(productRepository.findByCategoryId(categoryId)).thenReturn(expectedProducts);
 
         List<ProductEntity> actualProducts = categoryServiceImpl.findAllCategorized(categoryId);
 
@@ -146,7 +146,7 @@ class CategoryServiceImplTest {
         long categoryId = 1L;
 
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(categoryEntity));
-        when(productRepository.findByCategory_CategoryId(categoryId)).thenThrow(new DataAccessException("Database access error") {});
+        when(productRepository.findByCategoryId(categoryId)).thenThrow(new DataAccessException("Database access error") {});
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> categoryServiceImpl.findAllCategorized(categoryId));
 

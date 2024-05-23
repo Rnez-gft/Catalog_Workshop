@@ -46,11 +46,18 @@ public class CategoryServiceImpl implements CategoryService {
 
     public List<ProductEntity> findAllCategorized(long categoryId) {
         try {
+            // Verificar si la categoría existe
             CategoryEntity categoryEntity = categoryRepository.findById(categoryId)
                     .orElseThrow(() -> new EntityNotFoundException("Category with ID " + categoryId + " not found"));
 
-            return productRepository.findByCategory_CategoryId(categoryId);
+            // Obtener los productos asociados a la categoría
+            List<ProductEntity> products = productRepository.findByCategoryId(categoryId);
 
+            return products;
+
+        } catch (EntityNotFoundException ex) {
+            log.error("Category not found with ID: {}", categoryId);
+            throw ex;
         } catch (DataAccessException ex) {
             log.error("Error accessing data from database", ex);
             throw new RuntimeException("Error accessing data from database", ex);

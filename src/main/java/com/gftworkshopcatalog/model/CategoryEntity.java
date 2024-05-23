@@ -26,7 +26,7 @@ public class CategoryEntity {
     private String name;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "category",  fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductEntity> products = new ArrayList<>();
 
 

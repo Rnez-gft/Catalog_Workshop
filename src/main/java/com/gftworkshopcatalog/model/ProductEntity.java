@@ -29,7 +29,6 @@ public class ProductEntity {
     @Column(name = "category_id", nullable = false)
     private Long categoryId;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "category_id")
     private CategoryEntity category;
