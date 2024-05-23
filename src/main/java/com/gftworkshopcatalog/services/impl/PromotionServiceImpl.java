@@ -1,5 +1,6 @@
 package com.gftworkshopcatalog.services.impl;
 
+import com.gftworkshopcatalog.exceptions.NotFoundPromotion;
 import com.gftworkshopcatalog.model.ProductEntity;
 
 import com.gftworkshopcatalog.model.PromotionEntity;
@@ -45,7 +46,7 @@ public class PromotionServiceImpl implements PromotionService {
     public PromotionEntity findPromotiontById(long promotionId) {
         return promotionRepository.findById(promotionId).orElseThrow(() -> {
             log.error("Promotion not found with ID: {}", promotionId);
-            return new EntityNotFoundException("Promotion not found with ID: " + promotionId);
+            return new NotFoundPromotion("Promotion not found with ID: " + promotionId);
         });
     }
 
@@ -60,20 +61,11 @@ public class PromotionServiceImpl implements PromotionService {
             throw new RuntimeException("Failed to add the promotion due to database error", ex);
         }
     }
-
     public PromotionEntity updatePromotion(long promotionId, PromotionEntity promotionEntityDetails) {
-        PromotionEntity existingPromotion = promotionRepository.findById(promotionId)
-                .orElseThrow(() -> new EntityNotFoundException("Promotion not found with ID: " + promotionId));
-
+        PromotionEntity existingPromotion = findPromotiontById(promotionId);
         updatePromotionEntity(existingPromotion, promotionEntityDetails);
-
-        try{
-            return promotionRepository.save(existingPromotion);
-        } catch (DataException ex) {
-            throw new RuntimeException("Failed to update the promotion with ID: " + promotionId, ex);
-        }
+        return promotionRepository.save(existingPromotion);
     }
-
     private void updatePromotionEntity(PromotionEntity existingPromotion, PromotionEntity newDetails) {
         existingPromotion.setCategoryId(newDetails.getCategoryId());
         existingPromotion.setDiscount(newDetails.getDiscount());
@@ -84,14 +76,9 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     public void deletePromotion(long promotionId) {
-        PromotionEntity promotionEntity = findPromotiontById(promotionId);
-        log.info("Deleting promotion with ID: {}", promotionId);
-        try {
-            promotionRepository.delete(promotionEntity);
-        } catch (DataAccessException ex) {
-            log.error("Failed to delete promotion with ID: {}", promotionId, ex);
-            throw new EntityNotFoundException("Failed to delete promotion with ID: " + promotionId, ex);
-        }
+        PromotionEntity promotion = promotionRepository.findById(promotionId)
+                .orElseThrow(() -> new NotFoundPromotion("Promotion not found with ID: " + promotionId));
+        promotionRepository.delete(promotion);
     }
 
     public List<PromotionEntity> getActivePromotions() {

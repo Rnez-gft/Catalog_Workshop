@@ -34,6 +34,7 @@ class ProductEntityControllerTest {
         MockitoAnnotations.openMocks(this);
     }
     @Test
+    @DisplayName("Find all products - Success")
     void test_listAllProducts(){
         ProductEntity productEntity1 = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
         ProductEntity productEntity2 = new ProductEntity(2L,"Building Blocks", "Agent word occur number chair.", 7.89, 2L, 1.41, 25, 5);
@@ -44,10 +45,8 @@ class ProductEntityControllerTest {
         assertEquals(mockProductEntities, responseEntity.getBody());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
-
-
-    @DisplayName("Server Error listAllProducts()")
     @Test
+    @DisplayName("Find all products - InternalServerError")
     void test_listAllProducts_InternalServerError() {
         when(productServiceImpl.findAllProducts()).thenThrow(new InternalServerError("Internal Server Error"));
 
@@ -61,6 +60,7 @@ class ProductEntityControllerTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, errorResponse.getStatus());
     }
     @Test
+    @DisplayName("Add a new product - Success")
     void test_addNewProduct(){
         ProductEntity productEntityToAdd = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
         ProductEntity addedProductEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
@@ -72,10 +72,8 @@ class ProductEntityControllerTest {
         assertEquals(addedProductEntity, responseEntity.getBody());
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
     }
-
-
-    @DisplayName("Server Error addNewProduct()")
     @Test
+    @DisplayName("Add a new product - InternalServerError")
     void test_addNewProduct_InternalServerError() {
         ProductEntity product = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
 
@@ -85,23 +83,8 @@ class ProductEntityControllerTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
     }
-
     @Test
-    @DisplayName("Add New Product - Internal Server Error")
-    void testAddNewProduct_InternalServerError() {
-        ProductEntity productEntityToAdd = new ProductEntity(1L, "Jacket", "A warm winter jacket", 120.00, 1L, 2.5, 100, 10);
-        when(productServiceImpl.addProduct(productEntityToAdd)).thenThrow(new RuntimeException("Unexpected error"));
-
-        ResponseEntity<?> response = productController.addNewProduct(productEntityToAdd);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertInstanceOf(ErrorResponse.class, response.getBody());
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ((ErrorResponse) response.getBody()).getStatus());
-        assertEquals("Internal server error", ((ErrorResponse) response.getBody()).getMessage());
-    }
-
-    @Test
+    @DisplayName("Find product by ID - Success")
     void test_getProductDetails(){
         long productId = 1L;
         ProductEntity productEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
@@ -115,7 +98,7 @@ class ProductEntityControllerTest {
     }
 
     @Test
-    @DisplayName("Product not found when retrieving details")
+    @DisplayName("Find product by ID - NotFoundProduct")
     void testGetProductDetails_NotFound() {
         long productId = 1L;
 
@@ -128,9 +111,8 @@ class ProductEntityControllerTest {
         assertEquals("Product not found", ((ErrorResponse) response.getBody()).getMessage());
         assertEquals(HttpStatus.NOT_FOUND, ((ErrorResponse) response.getBody()).getStatus());
     }
-
-    @DisplayName("Server Error getProductDetails()")
     @Test
+    @DisplayName("Find product by ID - InternalServerError")
     void test_getProductDetails_InternalServerError() {
         long productId = 1L;
 
@@ -141,6 +123,7 @@ class ProductEntityControllerTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
     }
     @Test
+    @DisplayName("Update a product - Success")
     void test_updateProduct(){
         long productId = 1L;
         ProductEntity updatedProductInputEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
@@ -159,10 +142,9 @@ class ProductEntityControllerTest {
         assertEquals(updatedProductResultEntity.getWeight(), updatedProductInputEntity.getWeight());
         assertEquals(updatedProductResultEntity.getCurrent_stock(), updatedProductInputEntity.getCurrent_stock());
         assertEquals(updatedProductResultEntity.getMin_stock(), updatedProductInputEntity.getMin_stock());
-  }
-
-    @DisplayName("Server Error updateProduct()")
+    }
     @Test
+    @DisplayName("Update a product - InternalServerError")
     void test_updateProduct_InternalServerError() {
         long productId = 1L;
         ProductEntity updatedProductInputEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
@@ -175,7 +157,7 @@ class ProductEntityControllerTest {
     }
 
     @Test
-    @DisplayName("Product not found when updating details")
+    @DisplayName("Update a product - NotFoundProduct")
     void testUpdateProduct_NotFound() {
         Long productId = 1L;
         ProductEntity productEntity = new ProductEntity();
@@ -190,9 +172,8 @@ class ProductEntityControllerTest {
         assertEquals("Product not found", ((ErrorResponse) response.getBody()).getMessage());
         assertEquals(HttpStatus.NOT_FOUND, ((ErrorResponse) response.getBody()).getStatus());
     }
-
-
     @Test
+    @DisplayName("Delete product - Success")
     void test_deleteProduct(){
         long productId = 1L;
 
@@ -203,9 +184,8 @@ class ProductEntityControllerTest {
         verify(productServiceImpl, times(1)).deleteProduct(productId);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
-
     @Test
-    @DisplayName("Product not found when trying to delete")
+    @DisplayName("Delete product - NotFoundProduct")
     void testDeleteProduct_NotFound() {
         long productId = 1L;
 
@@ -218,11 +198,8 @@ class ProductEntityControllerTest {
         assertEquals("Product not found", ((ErrorResponse) response.getBody()).getMessage());
         assertEquals(HttpStatus.NOT_FOUND, ((ErrorResponse) response.getBody()).getStatus());
     }
-
-
-
     @Test
-    @DisplayName("Server Error deleteProduct()")
+    @DisplayName("Delete product - InternalServerError")
     void test_deleteProduct_InternalServerError() {
         long productId = 1L;
 
@@ -233,9 +210,8 @@ class ProductEntityControllerTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
     }
-
     @Test
-    @DisplayName("Successfully update product price")
+    @DisplayName("Update a product price - Success")
     void testUpdateProductPrice_Success() {
         long productId = 1L;
         double newPrice = 199.99;
@@ -251,7 +227,7 @@ class ProductEntityControllerTest {
         assertSame(updatedProductEntity, response.getBody());
     }
     @Test
-    @DisplayName("Product not found when updating price")
+    @DisplayName("Update a product price - NotFoundProduct")
     void testUpdateProductPrice_NotFound() {
         long productId = 1L;
         double newPrice = 199.99;
@@ -266,7 +242,7 @@ class ProductEntityControllerTest {
         assertEquals(HttpStatus.NOT_FOUND, ((ErrorResponse) response.getBody()).getStatus());
     }
     @Test
-    @DisplayName("Internal server error when updating product price")
+    @DisplayName("Update a product price - InternalServerError")
     void testUpdateProductPrice_InternalServerError() {
         long productId = 1L;
         double newPrice = 199.99;
@@ -282,7 +258,7 @@ class ProductEntityControllerTest {
         assertEquals("Internal server error", errorResponse.getMessage());
     }
     @Test
-    @DisplayName("Successfully update product stock")
+    @DisplayName("Update a product stock - Success")
     void testUpdateProductStock_Success() {
         long productId = 1L;
         int newStock = 150;
@@ -298,7 +274,7 @@ class ProductEntityControllerTest {
         assertSame(updatedProductEntity, response.getBody());
     }
     @Test
-    @DisplayName("Product not found when updating stock")
+    @DisplayName("Update a product stock - NotFoundProduct")
     void testUpdateProductStock_NotFound() {
         long productId = 230;
         int newStock = 150;
@@ -313,7 +289,7 @@ class ProductEntityControllerTest {
         assertEquals(HttpStatus.NOT_FOUND, ((ErrorResponse) response.getBody()).getStatus());
     }
     @Test
-    @DisplayName("Internal server error when updating product stock")
+    @DisplayName("Update a product stock - InternalServerError")
     void testUpdateProductStock_InternalServerError() {
         long productId = 1L;
         int newStock = 150;
@@ -326,9 +302,8 @@ class ProductEntityControllerTest {
         assertInstanceOf(ErrorResponse.class, response.getBody());
         assertTrue(((ErrorResponse) response.getBody()).getMessage().contains("Internal server error"));
     }
-
     @Test
-    @DisplayName("Successfully get products by IDs")
+    @DisplayName("Find products by IDs - Success")
     void test_listProductsById_Success() {
         List<Long> ids = Arrays.asList(1L, 2L);
         ProductEntity productEntity1 = new ProductEntity(1L, "Jacket", "A warm winter jacket", 58.79, 1L, 3.71, 26, 10);
@@ -342,9 +317,8 @@ class ProductEntityControllerTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(mockProductEntities, responseEntity.getBody());
     }
-
     @Test
-    @DisplayName("Get products by IDs - Not Found")
+    @DisplayName("Find products by IDs - NotFoundProduct")
     void test_listProductsById_NotFound() {
         List<Long> ids = Arrays.asList(1L, 2L, 3L);
 
@@ -359,9 +333,8 @@ class ProductEntityControllerTest {
         assertEquals("One or more product IDs not found", errorResponse.getMessage());
         assertEquals(HttpStatus.NOT_FOUND, errorResponse.getStatus());
     }
-
     @Test
-    @DisplayName("Get products by IDs - Internal Server Error")
+    @DisplayName("Find products by IDs - InternalServerError")
     void test_listProductsById_InternalServerError() {
         List<Long> ids = Arrays.asList(1L, 2L, 3L);
 
@@ -376,9 +349,8 @@ class ProductEntityControllerTest {
         assertEquals("Internal server error", errorResponse.getMessage());
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, errorResponse.getStatus());
     }
-
     @Test
-    @DisplayName("Get Price at Checkout - Success")
+    @DisplayName("Find Price at Checkout - Success")
     public void testGetPriceProductCheckout_Success() throws Exception {
         double discountedPrice = 80.0;
         when(productServiceImpl.calculateDiscountedPrice(1L, 5)).thenReturn(discountedPrice);
@@ -388,9 +360,8 @@ class ProductEntityControllerTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(discountedPrice, responseEntity.getBody());
     }
-
     @Test
-    @DisplayName("Get Price at Checkout - Product Not Found")
+    @DisplayName("Find Price at Checkout - NotFoundProduct")
     public void testGetPriceProductCheckout_ProductNotFound() throws Exception {
         when(productServiceImpl.calculateDiscountedPrice(1L, 5)).thenThrow(new NotFoundProduct("Product not found with ID: 1"));
 
@@ -403,9 +374,8 @@ class ProductEntityControllerTest {
         assertEquals("Product not found with ID: 1", errorResponse.getMessage());
         assertEquals(HttpStatus.NOT_FOUND, errorResponse.getStatus());
     }
-
     @Test
-    @DisplayName("Get Price at Checkout - Internal Server Error")
+    @DisplayName("Find Price at Checkout - InternalServerError")
     public void testGetPriceProductCheckout_InternalServerError() throws Exception {
         when(productServiceImpl.calculateDiscountedPrice(1L, 5)).thenThrow(new RuntimeException("Internal server error"));
 

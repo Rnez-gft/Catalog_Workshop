@@ -26,7 +26,7 @@ class CatalogFunctionalTest {
     }
 
     @Test
-    @DisplayName("Test ListAllProducts()")
+    @DisplayName("Find all products")
     void testListAllProducts() {
         webTestClient.get().uri("/products")
                 .exchange()
@@ -43,9 +43,8 @@ class CatalogFunctionalTest {
                 .jsonPath("$.[0].min_stock").isNumber()
                 .jsonPath("$.[0].error_code").doesNotExist();
     }
-
     @Test
-    @DisplayName("Test AddNewProduct()")
+    @DisplayName("Add new product")
     void testAddNewProduct() {
         ProductEntity newProductEntity = new ProductEntity();
         newProductEntity.setName("Test Product");
@@ -73,9 +72,8 @@ class CatalogFunctionalTest {
                 .jsonPath("$.min_stock").isEqualTo(10)
                 .jsonPath("$.errorCode").doesNotExist();
     }
-
     @Test
-    @DisplayName("Test GetProductDetails()")
+    @DisplayName("Find product by ID")
     void testGetProductDetails() {
         long productId = 1L;
 
@@ -94,22 +92,17 @@ class CatalogFunctionalTest {
                 .jsonPath("$.min_stock").isNumber()
                 .jsonPath("$.errorCode").doesNotExist(); //Ajustar el valor existente en la base de datos
     }
-
-
     @Test
-    @DisplayName("Test DeleteProduct()")
+    @DisplayName("Delete Product")
     void testDeleteProduct() {
-
         webTestClient.delete().uri("/products/{id}", 1L)
                 .exchange()
                 .expectStatus().isNoContent()
                 .expectBody()
                 .jsonPath("$.errorCode").doesNotExist();
     }
-
-
     @Test
-    @DisplayName("Test UpdateProductPrice()")
+    @DisplayName("Update Product Price")
     void testUpdateProductPrice() {
         long productId = 1L;
         long newPrice = 200;
@@ -123,9 +116,8 @@ class CatalogFunctionalTest {
                 .jsonPath("$.price").isEqualTo(newPrice)
                 .jsonPath("$.errorCode").doesNotExist();
     }
-
     @Test
-    @DisplayName("Test ProductNotFoundError()")
+    @DisplayName("Product Not Found Error")
     void testProductNotFoundError() {
         long productId = 999L;
 
@@ -140,5 +132,4 @@ class CatalogFunctionalTest {
                 .jsonPath("$.message").isEqualTo("Product not found with ID: " + productId);
 
     }
-
 }
