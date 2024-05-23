@@ -35,8 +35,8 @@ class CategoryControllerTest {
 
     @Test
     void test_listAllCategories() {
-        CategoryEntity categoryEntity1 = new CategoryEntity(1, "Electronics");
-        CategoryEntity categoryEntity2 = new CategoryEntity(2, "Clothing");
+        CategoryEntity categoryEntity1 = new CategoryEntity(1L, "Electronics");
+        CategoryEntity categoryEntity2 = new CategoryEntity(2L, "Clothing");
         List<CategoryEntity> mockCategoryEntities = Arrays.asList(categoryEntity1, categoryEntity2);
         when(categoryServiceImpl.getAllCategories()).thenReturn(mockCategoryEntities);
 

@@ -27,7 +27,7 @@ public class CategoryEntity {
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductEntity> products = new ArrayList<>();
+    private List<ProductEntity> products;
 
 
     @Override

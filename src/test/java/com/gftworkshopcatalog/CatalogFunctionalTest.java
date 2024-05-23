@@ -51,7 +51,7 @@ class CatalogFunctionalTest {
         newProductEntity.setName("Test Product");
         newProductEntity.setDescription("Test Description");
         newProductEntity.setPrice(19.99);
-        newProductEntity.setCategory_Id(6L);
+        newProductEntity.setCategoryId(6L);
         newProductEntity.setWeight(2.0);
         newProductEntity.setCurrent_stock(100);
         newProductEntity.setMin_stock(10);
@@ -168,7 +168,7 @@ class CatalogFunctionalTest {
 
         newProductEntity.setDescription("Test Description");
         newProductEntity.setPrice(19.99);
-        newProductEntity.setCategory_Id(1L);
+        newProductEntity.setCategoryId(1L);
         newProductEntity.setWeight(15.00);
         newProductEntity.setCurrent_stock(100);
         newProductEntity.setMin_stock(10);

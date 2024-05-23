@@ -26,6 +26,7 @@ public class ProductEntity {
     @Column(nullable = false)
     private Double price;
 
+
     @Column(name = "category_id", nullable = false)
     private Long categoryId;
 
@@ -51,7 +52,7 @@ public class ProductEntity {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", price=" + price +
-                ", category=" + categoryId +
+                ", categoryId=" + categoryId +
                 ", weight=" + weight +
                 ", current_stock=" + current_stock +
                 ", min_stock=" + min_stock +

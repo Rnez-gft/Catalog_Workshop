@@ -42,7 +42,7 @@ class ProductServiceImplTest {
         productEntity.setName("Example Product");
         productEntity.setDescription("Description here");
         productEntity.setPrice(100.34);
-        productEntity.setCategory_Id(10);
+        productEntity.setCategoryId(10L);
         productEntity.setWeight(10.5);
         productEntity.setCurrent_stock(10);
         productEntity.setMin_stock(10);
@@ -148,7 +148,7 @@ class ProductServiceImplTest {
         productEntity.setId(productId);
         productEntity.setName("Example Product");
         productEntity.setPrice(19.99);
-        productEntity.setCategory_Id(1);
+        productEntity.setCategoryId(1L);
         productEntity.setWeight(1.0);
         productEntity.setCurrent_stock(initialStock);
         productEntity.setMin_stock(5);
@@ -173,7 +173,7 @@ class ProductServiceImplTest {
         productEntity.setId(productId);
         productEntity.setName("Example Product");
         productEntity.setPrice(19.99);
-        productEntity.setCategory_Id(1);
+        productEntity.setCategoryId(1L);
         productEntity.setWeight(1.0);
         productEntity.setCurrent_stock(initialStock);
         productEntity.setMin_stock(5);
@@ -237,7 +237,7 @@ class ProductServiceImplTest {
         productEntity1.setName("Product 1");
         productEntity1.setDescription("Product description");
         productEntity1.setPrice(50.00);
-        productEntity1.setCategory_Id(1);
+        productEntity1.setCategoryId(1L);
         productEntity1.setWeight(15.00);
         productEntity1.setCurrent_stock(25);
         productEntity1.setMin_stock(10);
@@ -246,7 +246,7 @@ class ProductServiceImplTest {
         productEntity2.setName("Product 2");
         productEntity2.setDescription("Product description");
         productEntity2.setPrice(60.00);
-        productEntity2.setCategory_Id(2);
+        productEntity2.setCategoryId(2L);
         productEntity2.setWeight(25.00);
         productEntity2.setCurrent_stock(50);
         productEntity2.setMin_stock(15);
@@ -301,7 +301,7 @@ class ProductServiceImplTest {
         newProductEntity.setName("Product 1");
         newProductEntity.setDescription("Product description");
         newProductEntity.setPrice(50.00);
-        newProductEntity.setCategory_Id(1);
+        newProductEntity.setCategoryId(1L);
         newProductEntity.setWeight(15.00);
         newProductEntity.setCurrent_stock(25);
         newProductEntity.setMin_stock(10);
@@ -311,7 +311,7 @@ class ProductServiceImplTest {
         savedProductEntity.setName("Product 1");
         savedProductEntity.setDescription("Product description");
         savedProductEntity.setPrice(50.00);
-        savedProductEntity.setCategory_Id(1);
+        savedProductEntity.setCategoryId(1L);
         savedProductEntity.setWeight(15.00);
         savedProductEntity.setCurrent_stock(25);
         savedProductEntity.setMin_stock(10);
@@ -325,7 +325,7 @@ class ProductServiceImplTest {
         assertEquals("Product 1", result.getName(), "The product name should be 'Product 1'");
         assertEquals("Product description",result.getDescription(),"The product description should be 'Product description' ");
         assertEquals(50.00, result.getPrice(), 0.01, "The price should match the saved value");
-        assertEquals(1,result.getCategory_Id(),"The category should be 1");
+        assertEquals(1,result.getCategoryId(),"The category should be 1");
         assertEquals(15.00,result.getWeight(),"The weight should be the saved value");
         assertEquals(25,result.getCurrent_stock(),"The current stock should be the saved value");
         assertEquals(10,result.getMin_stock(),"The min stock should be the saved value");
@@ -339,7 +339,7 @@ class ProductServiceImplTest {
         newProductEntity.setName("Product 1");
         newProductEntity.setDescription("Product description");
         newProductEntity.setPrice(50.00);
-        newProductEntity.setCategory_Id(1);
+        newProductEntity.setCategoryId(1L);
         newProductEntity.setWeight(15.00);
         newProductEntity.setCurrent_stock(25);
         newProductEntity.setMin_stock(10);
@@ -358,7 +358,7 @@ class ProductServiceImplTest {
         newProductEntityWithNullFields.setName(null);
         newProductEntityWithNullFields.setDescription("Product description");
         newProductEntityWithNullFields.setPrice(null);
-        newProductEntityWithNullFields.setCategory_Id(null);
+        newProductEntityWithNullFields.setCategoryId(null);
         newProductEntityWithNullFields.setWeight(null);
         newProductEntityWithNullFields.setCurrent_stock(null);
         newProductEntityWithNullFields.setMin_stock(null);
@@ -375,7 +375,7 @@ class ProductServiceImplTest {
         newProductEntity.setName("Product 2");
         newProductEntity.setDescription("Product description");
         newProductEntity.setPrice(50.00);
-        newProductEntity.setCategory_Id(1);
+        newProductEntity.setCategoryId(1);
         newProductEntity.setWeight(15.00);
         newProductEntity.setCurrent_stock(25);
         newProductEntity.setMin_stock(10);
@@ -402,7 +402,7 @@ class ProductServiceImplTest {
         productEntity.setName("Product 1");
         productEntity.setDescription("Product description");
         productEntity.setPrice(50.00);
-        productEntity.setCategory_Id(1);
+        productEntity.setCategoryId(1);
         productEntity.setWeight(15.00);
         productEntity.setCurrent_stock(25);
         productEntity.setMin_stock(10);
@@ -415,7 +415,7 @@ class ProductServiceImplTest {
         assertEquals(productId, foundProductEntity.getId());
         assertEquals("Product description", foundProductEntity.getDescription());
         assertEquals(50.00, foundProductEntity.getPrice());
-        assertEquals(1, foundProductEntity.getCategory_Id());
+        assertEquals(1, foundProductEntity.getCategoryId());
         assertEquals(15.00, foundProductEntity.getWeight());
         assertEquals(25, foundProductEntity.getCurrent_stock());
         assertEquals(10, foundProductEntity.getMin_stock());
@@ -441,7 +441,7 @@ class ProductServiceImplTest {
         existingProductEntity.setName("Product 1");
         existingProductEntity.setDescription("Product description");
         existingProductEntity.setPrice(50.00);
-        existingProductEntity.setCategory_Id(1);
+        existingProductEntity.setCategoryId(1L);
         existingProductEntity.setWeight(15.00);
         existingProductEntity.setCurrent_stock(25);
         existingProductEntity.setMin_stock(10);
@@ -451,7 +451,7 @@ class ProductServiceImplTest {
         updatedProductEntityDetails.setName("Product 2");
         updatedProductEntityDetails.setDescription("Product description");
         updatedProductEntityDetails.setPrice(60.00);
-        updatedProductEntityDetails.setCategory_Id(2);
+        updatedProductEntityDetails.setCategoryId(2L);
         updatedProductEntityDetails.setWeight(25.00);
         updatedProductEntityDetails.setCurrent_stock(50);
         updatedProductEntityDetails.setMin_stock(15);
@@ -464,7 +464,7 @@ class ProductServiceImplTest {
         assertEquals(updatedProductEntityDetails.getName(), updatedProductEntity.getName());
         assertEquals(updatedProductEntityDetails.getDescription(), updatedProductEntity.getDescription());
         assertEquals(updatedProductEntityDetails.getPrice(), updatedProductEntity.getPrice());
-        assertEquals(updatedProductEntityDetails.getCategory_Id(), updatedProductEntity.getCategory_Id());
+        assertEquals(updatedProductEntityDetails.getCategoryId(), updatedProductEntity.getCategoryId());
         assertEquals(updatedProductEntityDetails.getWeight(), updatedProductEntity.getWeight());
         assertEquals(updatedProductEntityDetails.getCurrent_stock(), updatedProductEntity.getCurrent_stock());
         assertEquals(updatedProductEntityDetails.getMin_stock(), updatedProductEntity.getMin_stock());
