@@ -1,6 +1,7 @@
 server:
   servlet:
     context-path: /catalog
+  port: ${PORT:8080}
 spring:
   application:
     name: catalogServiceWorkshop
