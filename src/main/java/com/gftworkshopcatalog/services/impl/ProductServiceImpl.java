@@ -46,18 +46,12 @@ public class ProductServiceImpl implements ProductService {
 
     public ProductEntity addProduct(ProductEntity productEntity) {
         ProductValidationUtils.validateProductEntity(productEntity);
-        try {
-            return productRepository.save(productEntity);
-        } catch (DataAccessException ex) {
-            throw new ServiceException("Failed to save the product with ID: " + productEntity.getId(), ex, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return productRepository.save(productEntity);
     }
 
 
     public ProductEntity updateProduct(Long productId, ProductEntity productEntityDetails) {
-        if (productEntityDetails == null) {
-            throw new AddProductInvalidArgumentsExceptions("Product details must not be null.");
-        }
+        ProductValidationUtils.validateProductEntity(productEntityDetails);
 
         ProductEntity productEntity = findProductById(productId);
 

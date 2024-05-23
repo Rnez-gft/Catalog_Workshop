@@ -379,7 +379,7 @@ class ProductEntityControllerTest {
 
     @Test
     @DisplayName("Get Price at Checkout - Success")
-    public void testGetPriceProductCheckout_Success() throws Exception {
+     void testGetPriceProductCheckout_Success() throws Exception {
         double discountedPrice = 80.0;
         when(productServiceImpl.calculateDiscountedPrice(1L, 5)).thenReturn(discountedPrice);
 
@@ -391,7 +391,7 @@ class ProductEntityControllerTest {
 
     @Test
     @DisplayName("Get Price at Checkout - Product Not Found")
-    public void testGetPriceProductCheckout_ProductNotFound() throws Exception {
+     void testGetPriceProductCheckout_ProductNotFound() throws Exception {
         when(productServiceImpl.calculateDiscountedPrice(1L, 5)).thenThrow(new NotFoundProduct("Product not found with ID: 1"));
 
         ResponseEntity<?> responseEntity = productController.getPriceProductCheckout(1L, 5);
@@ -406,7 +406,7 @@ class ProductEntityControllerTest {
 
     @Test
     @DisplayName("Get Price at Checkout - Internal Server Error")
-    public void testGetPriceProductCheckout_InternalServerError() throws Exception {
+     void testGetPriceProductCheckout_InternalServerError() throws Exception {
         when(productServiceImpl.calculateDiscountedPrice(1L, 5)).thenThrow(new RuntimeException("Internal server error"));
 
         ResponseEntity<?> responseEntity = productController.getPriceProductCheckout(1L, 5);
