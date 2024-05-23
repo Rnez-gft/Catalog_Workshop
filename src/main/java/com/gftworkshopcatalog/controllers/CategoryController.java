@@ -3,6 +3,7 @@ package com.gftworkshopcatalog.controllers;
 import com.gftworkshopcatalog.exceptions.ErrorResponse;
 import com.gftworkshopcatalog.model.CategoryEntity;
 import com.gftworkshopcatalog.model.ProductEntity;
+import com.gftworkshopcatalog.services.CategoryService;
 import com.gftworkshopcatalog.services.impl.CategoryServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,10 +24,11 @@ import java.util.List;
 @Tag(name = "Categories", description = "Everything about the categories")
 public class CategoryController {
 
-    private final CategoryServiceImpl categoryServiceImpl;
+    private final CategoryService categoryService;
 
-    public CategoryController(CategoryServiceImpl categoryServiceImpl) {
-        this.categoryServiceImpl = categoryServiceImpl;
+    public CategoryController(CategoryService categoryService) {
+        super();
+        this.categoryService = categoryService;
     }
 
     @GetMapping
@@ -37,9 +39,9 @@ public class CategoryController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> getAllCategories() {
+    public ResponseEntity<?> findAllCategories() {
         try {
-            List<CategoryEntity> categories = categoryServiceImpl.getAllCategories();
+            List<CategoryEntity> categories = categoryService.getAllCategories();
             return ResponseEntity.ok(categories);
         } catch (Exception ex) {
             ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
@@ -59,7 +61,7 @@ public class CategoryController {
     })
     public ResponseEntity<?> addNewCategory(@RequestBody CategoryEntity categoryEntity) {
         try {
-            CategoryEntity createdCategoryEntity = categoryServiceImpl.addCategory(categoryEntity);
+            CategoryEntity createdCategoryEntity = categoryService.addCategory(categoryEntity);
             return new ResponseEntity<>(createdCategoryEntity, HttpStatus.CREATED);
         } catch (IllegalArgumentException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Bad request", 400);
@@ -70,7 +72,7 @@ public class CategoryController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{categoryId}")
     @Operation(summary = "Get category details", description = "Returns details of a specific category.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Category details",
@@ -82,9 +84,9 @@ public class CategoryController {
     })
     public ResponseEntity<?> findAllCategorized(
             @Parameter(description = "Category ID", required = true)
-            @PathVariable("id") int id) {
+            @PathVariable("CategoryId") long categoryId) {
         try {
-            List<ProductEntity> products = categoryServiceImpl.findAllCategorized(id);
+            List<ProductEntity> products = categoryService.findAllCategorized(categoryId);
             return ResponseEntity.ok(products);
         } catch (EntityNotFoundException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Category not found", 404);
@@ -95,7 +97,7 @@ public class CategoryController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{category_Id}")
     @Operation(summary = "Delete a category", description = "Deletes a specific category.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Category deleted"),
@@ -104,9 +106,9 @@ public class CategoryController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> deleteCategoryById(@Parameter(description = "Category ID") @PathVariable("id") int id) {
+    public ResponseEntity<?> deleteCategoryById(@Parameter(description = "Category ID") @PathVariable("category_Id") long category_Id) {
         try {
-            categoryServiceImpl.deleteCategoryById(id);
+            categoryService.deleteCategoryById(category_Id);
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Category not found", 404);

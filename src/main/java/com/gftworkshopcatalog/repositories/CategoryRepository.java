@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 
 @Generated
 @Repository
-public interface CategoryRepository extends JpaRepository<CategoryEntity, Integer> {
+public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
 }

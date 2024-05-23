@@ -1,6 +1,7 @@
 package com.gftworkshopcatalog.controllers;
 
 import com.gftworkshopcatalog.exceptions.ErrorResponse;
+import com.gftworkshopcatalog.model.CategoryEntity;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import jakarta.persistence.EntityNotFoundException;

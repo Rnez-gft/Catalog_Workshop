@@ -8,9 +8,11 @@ import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.services.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.service.spi.ServiceException;
+
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+
 
 import java.util.*;
 
@@ -27,17 +29,28 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     public List<CategoryEntity> getAllCategories() {
-        return categoryRepository.findAll();
+        try {
+            return categoryRepository.findAll();
+        } catch (DataAccessException ex) {
+            log.error("Error accessing data from database", ex);
+            throw new RuntimeException("Error accessing data from database", ex);
+        }
     }
 
-    public List<ProductEntity> findAllCategorized(int categoryId) {
+    public CategoryEntity findCategoryById(long categoryId) {
+        return categoryRepository.findById(categoryId).orElseThrow(() -> {
+            log.error("Category not found with ID: {}", categoryId);
+            return new EntityNotFoundException("Category not found with ID: " + categoryId);
+        });
+    }
+
+    public List<ProductEntity> findAllCategorized(long categoryId) {
         try {
-            Optional<CategoryEntity> categoryEntity = categoryRepository.findById(categoryId);
-            if (categoryEntity.isPresent()) {
-                return productRepository.findByCategoryId(categoryId);
-            } else {
-                throw new EntityNotFoundException("Category with ID " + categoryId + " not found");
-            }
+            CategoryEntity categoryEntity = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new EntityNotFoundException("Category with ID " + categoryId + " not found"));
+
+            return productRepository.findByCategory_CategoryId(categoryId);
+
         } catch (DataAccessException ex) {
             log.error("Error accessing data from database", ex);
             throw new RuntimeException("Error accessing data from database", ex);
@@ -59,11 +72,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
 
-    public void deleteCategoryById(int id) {
-        if (!categoryRepository.existsById(id)) {
-            throw new EntityNotFoundException("Category not found with ID: " + id);
+    public void deleteCategoryById(long categoryId) {
+        CategoryEntity categoryEntity = findCategoryById(categoryId);
+        try {
+            categoryRepository.delete(categoryEntity);
+            log.info("Deleting category with ID: {}", categoryId);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new EntityNotFoundException("Category with ID: " + categoryId + " not found");
+        } catch (DataAccessException ex) {
+            log.error("Error accessing data from database", ex);
+            throw new RuntimeException("Error accessing data from database", ex);
         }
-        categoryRepository.deleteById(id);
     }
 
 

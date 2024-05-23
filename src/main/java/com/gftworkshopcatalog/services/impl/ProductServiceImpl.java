@@ -50,7 +50,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (productEntity.getName() == null ||
                 productEntity.getPrice() == null ||
-                productEntity.getCategory_Id() == null ||
+                productEntity.getCategory() == null ||
                 productEntity.getWeight() == null ||
                 productEntity.getCurrent_stock() == null ||
                 productEntity.getMin_stock() == null) {
@@ -79,7 +79,7 @@ public class ProductServiceImpl implements ProductService {
         productEntity.setName(productEntityDetails.getName());
         productEntity.setDescription(productEntityDetails.getDescription());
         productEntity.setPrice(productEntityDetails.getPrice());
-        productEntity.setCategory_Id(productEntityDetails.getCategory_Id());
+        productEntity.setCategory(productEntityDetails.getCategory());
         productEntity.setWeight(productEntityDetails.getWeight());
         productEntity.setCurrent_stock(productEntityDetails.getCurrent_stock());
         productEntity.setMin_stock(productEntityDetails.getMin_stock());

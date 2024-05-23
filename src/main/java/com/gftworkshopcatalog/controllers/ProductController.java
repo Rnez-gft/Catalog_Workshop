@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Products", description = "Everything about the products")
 public class ProductController {
 
-    private ProductServiceImpl productServiceImpl;
+    private final ProductServiceImpl productServiceImpl;
 
     public ProductController(ProductServiceImpl productServiceImpl) {
         super();

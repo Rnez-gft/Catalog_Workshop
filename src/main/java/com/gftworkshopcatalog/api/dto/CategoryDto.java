@@ -11,7 +11,7 @@ import java.util.List;
 @Generated
 public class CategoryDto {
 
-    private Integer category_Id;
+    private Long category_Id;
     private String name;
     private List<ProductDto> products;
 

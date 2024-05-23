@@ -15,11 +15,11 @@ public class ProductDto {
     private String name;
     private String description;
     private Double price;
-    private Integer categoryId;
+    private Long categoryId;
+    private CategoryEntity categoryEntity;
     private Double weight;
     private Integer currentStock;
     private Integer minStock;
-    private List<CategoryDto> category;
 
     @Override
     public String toString() {

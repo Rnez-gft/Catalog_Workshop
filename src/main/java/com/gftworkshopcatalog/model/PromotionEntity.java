@@ -18,7 +18,7 @@ public class PromotionEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "category_id", nullable = false)
     private Integer categoryId;
 
     @Column(nullable = false)
@@ -40,7 +40,7 @@ public class PromotionEntity {
     public String toString() {
         return "PromotionEntity{" +
                 "id=" + id +
-                ", categoryId=" + categoryId +
+                ", category_Id=" + categoryId +
                 ", discount=" + discount +
                 ", promotionType='" + promotionType + '\'' +
                 ", volumeThreshold=" + volumeThreshold +

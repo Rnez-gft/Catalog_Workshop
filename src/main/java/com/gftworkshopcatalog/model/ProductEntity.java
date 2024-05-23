@@ -1,15 +1,13 @@
 package com.gftworkshopcatalog.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Generated;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Generated
+@Builder
 @Entity
 @Table(name = "products")
 public class ProductEntity {
@@ -28,8 +26,9 @@ public class ProductEntity {
     @Column(nullable = false)
     private Double price;
 
-    @Column(nullable = false)
-    private Integer category_Id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", referencedColumnName = "category_id", nullable = false)
+    private CategoryEntity category;
 
     @Column(nullable = false)
     private Double weight;
@@ -40,9 +39,7 @@ public class ProductEntity {
     @Column(nullable = false)
     private Integer min_stock;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private CategoryEntity category;
+
 
     @Override
     public String toString() {
@@ -51,7 +48,7 @@ public class ProductEntity {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", price=" + price +
-                ", category_Id=" + category_Id +
+                ", category=" + category +
                 ", weight=" + weight +
                 ", current_stock=" + current_stock +
                 ", min_stock=" + min_stock +
