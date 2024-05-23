@@ -140,8 +140,8 @@ class ProductEntityControllerTest {
         assertEquals(updatedProductResultEntity.getPrice(), updatedProductInputEntity.getPrice());
         assertEquals(updatedProductResultEntity.getCategoryId(), updatedProductInputEntity.getCategoryId());
         assertEquals(updatedProductResultEntity.getWeight(), updatedProductInputEntity.getWeight());
-        assertEquals(updatedProductResultEntity.getCurrent_stock(), updatedProductInputEntity.getCurrent_stock());
-        assertEquals(updatedProductResultEntity.getMin_stock(), updatedProductInputEntity.getMin_stock());
+        assertEquals(updatedProductResultEntity.getCurrentStock(), updatedProductInputEntity.getCurrentStock());
+        assertEquals(updatedProductResultEntity.getMinStock(), updatedProductInputEntity.getMinStock());
     }
     @Test
     @DisplayName("Update a product - InternalServerError")
@@ -264,7 +264,7 @@ class ProductEntityControllerTest {
         int newStock = 150;
         ProductEntity updatedProductEntity = new ProductEntity();
         updatedProductEntity.setId(productId);
-        updatedProductEntity.setCurrent_stock(newStock);
+        updatedProductEntity.setCurrentStock(newStock);
 
         when(productServiceImpl.updateProductStock(productId, newStock)).thenReturn(updatedProductEntity);
 
@@ -351,7 +351,7 @@ class ProductEntityControllerTest {
     }
     @Test
     @DisplayName("Find Price at Checkout - Success")
-    public void testGetPriceProductCheckout_Success() throws Exception {
+    void testGetPriceProductCheckout_Success() throws Exception {
         double discountedPrice = 80.0;
         when(productServiceImpl.calculateDiscountedPrice(1L, 5)).thenReturn(discountedPrice);
 
@@ -362,7 +362,7 @@ class ProductEntityControllerTest {
     }
     @Test
     @DisplayName("Find Price at Checkout - NotFoundProduct")
-    public void testGetPriceProductCheckout_ProductNotFound() throws Exception {
+    void testGetPriceProductCheckout_ProductNotFound() throws Exception {
         when(productServiceImpl.calculateDiscountedPrice(1L, 5)).thenThrow(new NotFoundProduct("Product not found with ID: 1"));
 
         ResponseEntity<?> responseEntity = productController.getPriceProductCheckout(1L, 5);
@@ -376,7 +376,7 @@ class ProductEntityControllerTest {
     }
     @Test
     @DisplayName("Find Price at Checkout - InternalServerError")
-    public void testGetPriceProductCheckout_InternalServerError() throws Exception {
+    void testGetPriceProductCheckout_InternalServerError() throws Exception {
         when(productServiceImpl.calculateDiscountedPrice(1L, 5)).thenThrow(new RuntimeException("Internal server error"));
 
         ResponseEntity<?> responseEntity = productController.getPriceProductCheckout(1L, 5);

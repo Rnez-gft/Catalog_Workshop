@@ -1,13 +1,11 @@
 package com.gftworkshopcatalog;
 
 import com.gftworkshopcatalog.model.ProductEntity;
-import lombok.Generated;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -52,8 +50,8 @@ class CatalogFunctionalTest {
         newProductEntity.setPrice(19.99);
         newProductEntity.setCategoryId(6L);
         newProductEntity.setWeight(2.0);
-        newProductEntity.setCurrent_stock(100);
-        newProductEntity.setMin_stock(10);
+        newProductEntity.setCurrentStock(100);
+        newProductEntity.setMinStock(10);
 
         webTestClient.post().uri("/products")
                 .contentType(MediaType.APPLICATION_JSON)

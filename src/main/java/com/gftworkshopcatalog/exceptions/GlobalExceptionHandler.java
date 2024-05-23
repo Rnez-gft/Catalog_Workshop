@@ -100,9 +100,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
     @ExceptionHandler(DataAccessException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponse> handleDataAccessException(DataAccessException ex) {
-        ErrorResponse errorResponse = new ErrorResponse("Error accessing data from the database", HttpStatus.INTERNAL_SERVER_ERROR);
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        ErrorResponse response = ErrorResponse.builder()
+                .message("Error accessing data from database")
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .build();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
-
 }
