@@ -1,6 +1,9 @@
 package com.gftworkshopcatalog.controllers;
 
+import com.gftworkshopcatalog.exceptions.BadRequest;
 import com.gftworkshopcatalog.exceptions.ErrorResponse;
+import com.gftworkshopcatalog.exceptions.InternalServerError;
+import com.gftworkshopcatalog.exceptions.NotFoundCategory;
 import com.gftworkshopcatalog.model.CategoryEntity;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.services.impl.CategoryServiceImpl;
@@ -15,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,12 +35,17 @@ class CategoryControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        CategoryEntity categoryEntity = CategoryEntity.builder()
+                .categoryId(1L)
+                .name("Category 1")
+                .build();
     }
 
     @Test
     void test_listAllCategories() {
-        CategoryEntity categoryEntity1 = new CategoryEntity(1L, "Electronics");
-        CategoryEntity categoryEntity2 = new CategoryEntity(2L, "Clothing");
+        CategoryEntity categoryEntity1 = new CategoryEntity(1L, "Electronics", new ArrayList<>());
+        CategoryEntity categoryEntity2 = new CategoryEntity(2L, "Clothing", new ArrayList<>());
         List<CategoryEntity> mockCategoryEntities = Arrays.asList(categoryEntity1, categoryEntity2);
         when(categoryServiceImpl.getAllCategories()).thenReturn(mockCategoryEntities);
 
@@ -58,8 +67,8 @@ class CategoryControllerTest {
 
     @Test
     void test_addNewCategory() {
-        CategoryEntity categoryEntityToAdd = new CategoryEntity(1, "Electronics");
-        CategoryEntity addedCategoryEntity = new CategoryEntity(1, "Electronics");
+        CategoryEntity categoryEntityToAdd = new CategoryEntity(1L, "Electronics", new ArrayList<>());
+        CategoryEntity addedCategoryEntity = new CategoryEntity(1L, "Electronics", new ArrayList<>());
 
         when(categoryServiceImpl.addCategory(categoryEntityToAdd)).thenReturn(addedCategoryEntity);
 
@@ -72,7 +81,7 @@ class CategoryControllerTest {
     @DisplayName("Server Error addNewCategory()")
     @Test
     void test_addNewCategory_InternalServerError() {
-        CategoryEntity categoryEntity = new CategoryEntity(1, "Electronics");
+        CategoryEntity categoryEntity = new CategoryEntity(1L, "Electronics", new ArrayList<>());
 
         when(categoryServiceImpl.addCategory(categoryEntity)).thenThrow(new ServiceException("Internal Server Error"));
 
@@ -84,23 +93,24 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Add New Category - Bad Request on Invalid Input")
     void testAddNewCategory_BadRequest() {
-        CategoryEntity categoryEntityToAdd = new CategoryEntity(1, ""); // Assume empty name is invalid
-        when(categoryServiceImpl.addCategory(categoryEntityToAdd)).thenThrow(new IllegalArgumentException("Invalid category details"));
+        CategoryEntity categoryEntityToAdd = new CategoryEntity(1L, "", new ArrayList<>()); // Assume empty name is invalid
+        when(categoryServiceImpl.addCategory(categoryEntityToAdd)).thenThrow(new BadRequest("Invalid category details"));
 
         ResponseEntity<?> response = categoryController.addNewCategory(categoryEntityToAdd);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
         assertInstanceOf(ErrorResponse.class, response.getBody());
-        assertEquals(400, ((ErrorResponse) response.getBody()).getErrorCode());
-        assertEquals("Bad request", ((ErrorResponse) response.getBody()).getMessage());
+        assertEquals(400, ((ErrorResponse) response.getBody()).getStatus());
+        assertEquals("Invalid category details", ((ErrorResponse) response.getBody()).getMessage());
     }
 
     @Test
     void test_findAllCategorized() {
-        int categoryId = 1;
-        ProductEntity productEntity1 = new ProductEntity(1L, "Laptop", "Powerful computing device", 999.99, categoryId, 3.0, 10, 2);
-        ProductEntity productEntity2 = new ProductEntity(2L, "Smartphone", "Mobile communication device", 599.99, categoryId, 0.5, 20, 5);
+        long categoryId = 1L;
+        CategoryEntity category = new CategoryEntity(1L, "Electronics", new ArrayList<>());
+        ProductEntity productEntity1 = new ProductEntity(1L, "Laptop", "Powerful computing device", 999.99, categoryId, category, 3.0, 10, 2);
+        ProductEntity productEntity2 = new ProductEntity(2L, "Smartphone", "Mobile communication device", 599.99, categoryId, category, 0.5, 20, 5);
         List<ProductEntity> mockProductEntities = Arrays.asList(productEntity1, productEntity2);
         when(categoryServiceImpl.findAllCategorized(categoryId)).thenReturn(mockProductEntities);
 
@@ -113,22 +123,22 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Category not found when retrieving categorized products")
     void testFindAllCategorized_NotFound() {
-        int categoryId = 1;
+        long categoryId = 1L;
 
-        when(categoryServiceImpl.findAllCategorized(categoryId)).thenThrow(new EntityNotFoundException("Category not found"));
+        when(categoryServiceImpl.findAllCategorized(categoryId)).thenThrow(new NotFoundCategory("Category not found"));
 
         ResponseEntity<?> response = categoryController.findAllCategorized(categoryId);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertInstanceOf(ErrorResponse.class, response.getBody());
-        assertEquals("Category not found", ((ErrorResponse) response.getBody()).getMessage());
-        assertEquals(404, ((ErrorResponse) response.getBody()).getErrorCode());
+        assertInstanceOf(NotFoundCategory.class, response.getBody());
+        assertEquals("Category not found", ((NotFoundCategory) response.getBody()).getMessage());
+        assertEquals(404, ((NotFoundCategory) response.getBody()).getStatus());
     }
 
     @DisplayName("Server Error findAllCategorized()")
     @Test
     void test_findAllCategorized_InternalServerError() {
-        int categoryId = 1;
+        long categoryId = 1L;
 
         when(categoryServiceImpl.findAllCategorized(categoryId)).thenThrow(new ServiceException("Internal Server Error"));
 
@@ -139,7 +149,7 @@ class CategoryControllerTest {
 
     @Test
     void test_deleteCategoryById() {
-        int categoryId = 1;
+        long categoryId = 1L;
 
         doNothing().when(categoryServiceImpl).deleteCategoryById(categoryId);
 
@@ -152,22 +162,22 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Category not found when trying to delete")
     void testDeleteCategoryById_NotFound() {
-        int categoryId = 1;
+        long categoryId = 1L;
 
-        doThrow(new EntityNotFoundException("Category not found")).when(categoryServiceImpl).deleteCategoryById(categoryId);
+        doThrow(new NotFoundCategory("Category not found")).when(categoryServiceImpl).deleteCategoryById(categoryId);
 
         ResponseEntity<?> response = categoryController.deleteCategoryById(categoryId);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertInstanceOf(ErrorResponse.class, response.getBody());
         assertEquals("Category not found", ((ErrorResponse) response.getBody()).getMessage());
-        assertEquals(404, ((ErrorResponse) response.getBody()).getErrorCode());
+        assertEquals(404, ((NotFoundCategory) response.getBody()).getStatus());
     }
 
     @Test
     @DisplayName("Server Error deleteCategoryById()")
     void test_deleteCategoryById_InternalServerError() {
-        int categoryId = 1;
+        long categoryId = 1L;
 
         doThrow(new ServiceException("Internal Server Error")).when(categoryServiceImpl).deleteCategoryById(categoryId);
 

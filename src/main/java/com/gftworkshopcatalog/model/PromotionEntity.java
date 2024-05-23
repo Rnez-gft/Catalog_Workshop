@@ -3,7 +3,9 @@ package com.gftworkshopcatalog.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -12,14 +14,15 @@ import java.time.LocalDate;
 @Entity
 @Generated
 @Table(name= "promotions")
-public class PromotionEntity {
+public class PromotionEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "category_id", nullable = false)
-    private Integer categoryId;
+
+    @Column(nullable = false)
+    private Long categoryId;
 
     @Column(nullable = false)
     private Double discount;
@@ -36,6 +39,9 @@ public class PromotionEntity {
     @Column(nullable = false)
     private LocalDate endDate;
 
+    @Column(nullable = false)
+    private Boolean isActive;
+
     @Override
     public String toString() {
         return "PromotionEntity{" +
@@ -46,6 +52,9 @@ public class PromotionEntity {
                 ", volumeThreshold=" + volumeThreshold +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
+                ", isActive=" + isActive +
                 '}';
     }
+
+
 }

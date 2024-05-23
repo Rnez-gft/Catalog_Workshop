@@ -1,15 +1,19 @@
 package com.gftworkshopcatalog.services.impl;
 
-import com.gftworkshopcatalog.api.dto.PromotionDTO;
+import com.gftworkshopcatalog.model.ProductEntity;
+
 import com.gftworkshopcatalog.model.PromotionEntity;
+import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.PromotionService;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.DataException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,9 +21,16 @@ import java.util.stream.Collectors;
 @Service
 public class PromotionServiceImpl implements PromotionService {
     private final PromotionRepository promotionRepository;
+    private final ProductRepository productRepository;
 
-    public PromotionServiceImpl(PromotionRepository promotionRepository) {
+    public PromotionServiceImpl(PromotionRepository promotionRepository, ProductRepository productRepository) {
         this.promotionRepository = promotionRepository;
+        this.productRepository = productRepository;
+    }
+
+    @PostConstruct
+    public void init() {
+        getActivePromotions();
     }
 
     public List<PromotionEntity> findAllPromotions() {
@@ -53,9 +64,9 @@ public class PromotionServiceImpl implements PromotionService {
     public PromotionEntity updatePromotion(long promotionId, PromotionEntity promotionEntityDetails) {
         PromotionEntity existingPromotion = promotionRepository.findById(promotionId)
                 .orElseThrow(() -> new EntityNotFoundException("Promotion not found with ID: " + promotionId));
-        
+
         updatePromotionEntity(existingPromotion, promotionEntityDetails);
-        
+
         try{
             return promotionRepository.save(existingPromotion);
         } catch (DataException ex) {
@@ -81,5 +92,39 @@ public class PromotionServiceImpl implements PromotionService {
             log.error("Failed to delete promotion with ID: {}", promotionId, ex);
             throw new EntityNotFoundException("Failed to delete promotion with ID: " + promotionId, ex);
         }
+    }
+
+    public List<PromotionEntity> getActivePromotions() {
+        try {
+            List<PromotionEntity> promotions = promotionRepository.findAll();
+            promotions.forEach(this::updateIsActiveStatus);
+            applyActivePromotions(promotions.stream()
+                    .filter(promotion -> promotion.getIsActive() && promotion.getPromotionType().equals("SEASONAL"))
+                    .collect(Collectors.toList()));
+            return promotions.stream()
+                    .filter(PromotionEntity::getIsActive)
+                    .collect(Collectors.toList());
+        } catch (DataAccessException ex) {
+            log.error("Error accessing data from database", ex);
+            throw new RuntimeException("Error accessing data from database", ex);
+        }
+    }
+
+    private void updateIsActiveStatus(PromotionEntity promotion) {
+        LocalDate now = LocalDate.now();
+        boolean isActive = (now.isEqual(promotion.getStartDate()) || now.isAfter(promotion.getStartDate())) &&
+                (now.isEqual(promotion.getEndDate()) || now.isBefore(promotion.getEndDate()));
+        promotion.setIsActive(isActive);
+    }
+
+    private void applyActivePromotions(List<PromotionEntity> activePromotions) {
+        activePromotions.forEach(promotion -> {
+            List<ProductEntity> products = productRepository.findByCategoryId(promotion.getCategoryId());
+            products.forEach(product -> {
+                double newPrice = product.getPrice() * (1 - promotion.getDiscount());
+                product.setPrice(newPrice);
+                productRepository.save(product);
+            });
+        });
     }
 }

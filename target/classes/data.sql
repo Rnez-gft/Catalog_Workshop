@@ -7,21 +7,21 @@ INSERT INTO categories (name) VALUES
 ('Others');
 
 INSERT INTO promotions
-    (category_id, discount, promotion_type, volume_threshold, start_date, end_date)
+    (category_id, discount, promotion_type, volume_threshold, start_date, end_date, is_active)
 VALUES
-    (1, 0.35, 'Clothing discount', 1, '2024-03-01', '2025-12-31'),
-    (2, 0.20, 'Toys discount', 1, '2024-01-06', '2025-12-31'),
-    (3, 0.05, 'Sports discount', 1, '2024-05-12', '2025-12-31'),
-    (4, 0.25, 'Food discount', 1, '2024-10-01', '2025-12-31'),
-    (5, 0.15, 'Books discount', 1, '2024-12-01', '2025-12-31'),
-    (6, 0.00, 'Others discount', 1, '2024-09-11', '2025-12-31');
+    (1, 0.35, 'SEASONAL', 1, '2024-01-01', '2025-12-31', true),
+    (2, 0.20, 'VOLUME', 5, '2024-01-06', '2025-12-31', true),
+    (3, 0.05, 'SEASONAL', 1, '2024-05-12', '2025-12-31', true),
+    (4, 0.25, 'VOLUME', 5, '2024-10-01', '2025-12-31', true),
+    (5, 0.15, 'SEASONAL', 1, '2024-12-01', '2025-12-31', true),
+    (6, 0.00, 'VOLUME', 5, '2024-09-11', '2025-12-31', true);
 
 INSERT INTO products
     (name, description, price, category_id, weight, current_stock, min_stock)
 VALUES
-  ('Jacket', 'Something indicate large central measure watch provide.', 58.79, 1, 3.71, 26, 10),
-  ('Building Blocks', 'Agent word occur number chair.', 7.89, 2, 1.41, 25, 5),
-  ('Swimming Goggles', 'Walk range media doctor interest.', 30.53, 3, 2.51, 113, 15),
+  ('Jacket', 'Something indicate large central measure watch provide.', 100, 1, 3.71, 26, 10),
+  ('Building Blocks', 'Agent word occur number chair.', 100, 2, 1.41, 25, 5),
+  ('Swimming Goggles', 'Walk range media doctor interest.', 100, 3, 2.51, 113, 15),
   ('Football', 'Country expect price certain different bag everyone.', 21.93, 3, 3.86, 27, 10),
   ('Football', 'Speak value yard here station.', 46.7, 3, 2.99, 82, 20),
   ('Box of Cereal', 'Fear course mean stop practice allow.', 30.46, 4, 3.0, 128, 25),

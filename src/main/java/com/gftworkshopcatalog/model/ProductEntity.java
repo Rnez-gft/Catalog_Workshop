@@ -1,14 +1,15 @@
 package com.gftworkshopcatalog.model;
 
 import jakarta.persistence.*;
+
 import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Generated
-@Builder
 @Entity
+@Builder
 @Table(name = "products")
 public class ProductEntity {
 
@@ -26,12 +27,11 @@ public class ProductEntity {
     @Column(nullable = false)
     private Double price;
 
-
     @Column(name = "category_id", nullable = false)
     private Long categoryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(referencedColumnName = "category_id")
+    @JoinColumn(referencedColumnName = "category_id", insertable = false)
     private CategoryEntity category;
 
     @Column(nullable = false)

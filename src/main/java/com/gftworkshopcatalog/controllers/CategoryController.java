@@ -32,90 +32,31 @@ public class CategoryController {
     }
 
     @GetMapping
-    @Operation(summary = "List all categories", description = "Returns a list of all categories.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Category list",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryEntity.class)) }),
-            @ApiResponse(responseCode = "500", description = "Error response",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
-    })
-    public ResponseEntity<?> findAllCategories() {
-        try {
-            List<CategoryEntity> categories = categoryService.getAllCategories();
-            return ResponseEntity.ok(categories);
-        } catch (Exception ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
+    public ResponseEntity<List<CategoryEntity>> findAllCategories() {
+        List<CategoryEntity> categories = categoryService.getAllCategories();
+        return ResponseEntity.ok(categories);
     }
 
     @PostMapping
-    @Operation(summary = "Add a new category", description = "Creates a new category.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Category created",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryEntity.class)) }),
-            @ApiResponse(responseCode = "400", description = "Bad request",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
-            @ApiResponse(responseCode = "500", description = "Error response",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
-    })
-    public ResponseEntity<?> addNewCategory(@RequestBody CategoryEntity categoryEntity) {
-        try {
-            CategoryEntity createdCategoryEntity = categoryService.addCategory(categoryEntity);
-            return new ResponseEntity<>(createdCategoryEntity, HttpStatus.CREATED);
-        } catch (IllegalArgumentException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Bad request", 400);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        } catch (Exception ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
+    public ResponseEntity<CategoryEntity> addNewCategory(@RequestBody CategoryEntity categoryEntity) {
+        CategoryEntity createdCategory = categoryService.addCategory(categoryEntity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
 
-    @GetMapping("/{categoryId}")
-    @Operation(summary = "Get category details", description = "Returns details of a specific category.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Category details",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryEntity.class)) }),
-            @ApiResponse(responseCode = "404", description = "Category not found",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
-            @ApiResponse(responseCode = "500", description = "Error response",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
-    })
-    public ResponseEntity<?> findAllCategorized(
-            @Parameter(description = "Category ID", required = true)
-            @PathVariable("categoryId") long categoryId) {
-        try {
-            List<ProductEntity> products = categoryService.findAllCategorized(categoryId);
-            return ResponseEntity.ok(products);
-        } catch (EntityNotFoundException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Category not found", 404);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-        } catch (Exception ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoryEntity> findAllCategorized(@PathVariable Long id) {
+        List<ProductEntity> products = categoryService.findAllCategorized(id);
+        return ResponseEntity.ok((CategoryEntity) products);
     }
 
-    @DeleteMapping("/{category_Id}")
-    @Operation(summary = "Delete a category", description = "Deletes a specific category.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Category deleted"),
-            @ApiResponse(responseCode = "404", description = "Category not found",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
-            @ApiResponse(responseCode = "500", description = "Error response",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
-    })
-    public ResponseEntity<?> deleteCategoryById(@Parameter(description = "Category ID") @PathVariable("category_Id") long category_Id) {
-        try {
-            categoryService.deleteCategoryById(category_Id);
-            return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Category not found", 404);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-        } catch (Exception ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", 500);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
+
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategoryById(@PathVariable Long id) {
+        categoryService.deleteCategoryById(id);
+        return ResponseEntity.noContent().build();
     }
 }
