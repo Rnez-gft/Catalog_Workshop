@@ -26,8 +26,12 @@ public class ProductEntity {
     @Column(nullable = false)
     private Double price;
 
+    @Column(name = "category_id", nullable = false)
+    private Long categoryId;
+
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", referencedColumnName = "category_id", nullable = false)
+    @JoinColumn(referencedColumnName = "category_id")
     private CategoryEntity category;
 
     @Column(nullable = false)
@@ -48,7 +52,7 @@ public class ProductEntity {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", price=" + price +
-                ", category=" + category +
+                ", category=" + categoryId +
                 ", weight=" + weight +
                 ", current_stock=" + current_stock +
                 ", min_stock=" + min_stock +

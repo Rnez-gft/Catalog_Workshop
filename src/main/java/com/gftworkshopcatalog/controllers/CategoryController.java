@@ -84,7 +84,7 @@ public class CategoryController {
     })
     public ResponseEntity<?> findAllCategorized(
             @Parameter(description = "Category ID", required = true)
-            @PathVariable("CategoryId") long categoryId) {
+            @PathVariable("categoryId") long categoryId) {
         try {
             List<ProductEntity> products = categoryService.findAllCategorized(categoryId);
             return ResponseEntity.ok(products);

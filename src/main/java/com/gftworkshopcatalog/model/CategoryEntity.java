@@ -1,5 +1,6 @@
 package com.gftworkshopcatalog.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,7 +25,8 @@ public class CategoryEntity {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(mappedBy = "category",  fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductEntity> products = new ArrayList<>();
 
 
