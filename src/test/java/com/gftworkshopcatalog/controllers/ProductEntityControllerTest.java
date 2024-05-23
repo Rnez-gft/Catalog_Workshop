@@ -35,8 +35,8 @@ class ProductEntityControllerTest {
     }
     @Test
     void test_listAllProducts(){
-        ProductEntity productEntity1 = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1, 3.71, 26, 10);
-        ProductEntity productEntity2 = new ProductEntity(2L,"Building Blocks", "Agent word occur number chair.", 7.89, 2, 1.41, 25, 5);
+        ProductEntity productEntity1 = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
+        ProductEntity productEntity2 = new ProductEntity(2L,"Building Blocks", "Agent word occur number chair.", 7.89, 2L, 1.41, 25, 5);
         List<ProductEntity> mockProductEntities = Arrays.asList(productEntity1, productEntity2);
         when(productServiceImpl.findAllProducts()).thenReturn(mockProductEntities);
         ResponseEntity<?> responseEntity = productController.listAllProducts();
@@ -62,8 +62,8 @@ class ProductEntityControllerTest {
     }
     @Test
     void test_addNewProduct(){
-        ProductEntity productEntityToAdd = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1, 3.71, 26, 10);
-        ProductEntity addedProductEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1, 3.71, 26, 10);
+        ProductEntity productEntityToAdd = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
+        ProductEntity addedProductEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
 
         when(productServiceImpl.addProduct(productEntityToAdd)).thenReturn(addedProductEntity);
 
@@ -77,7 +77,7 @@ class ProductEntityControllerTest {
     @DisplayName("Server Error addNewProduct()")
     @Test
     void test_addNewProduct_InternalServerError() {
-        ProductEntity product = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1, 3.71, 26, 10);
+        ProductEntity product = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
 
         when(productServiceImpl.addProduct(product)).thenThrow(new InternalServerError("Internal Server Error"));
 
@@ -89,7 +89,7 @@ class ProductEntityControllerTest {
     @Test
     @DisplayName("Add New Product - Internal Server Error")
     void testAddNewProduct_InternalServerError() {
-        ProductEntity productEntityToAdd = new ProductEntity(1L, "Jacket", "A warm winter jacket", 120.00, 1, 2.5, 100, 10);
+        ProductEntity productEntityToAdd = new ProductEntity(1L, "Jacket", "A warm winter jacket", 120.00, 1L, 2.5, 100, 10);
         when(productServiceImpl.addProduct(productEntityToAdd)).thenThrow(new RuntimeException("Unexpected error"));
 
         ResponseEntity<?> response = productController.addNewProduct(productEntityToAdd);
@@ -104,7 +104,7 @@ class ProductEntityControllerTest {
     @Test
     void test_getProductDetails(){
         long productId = 1L;
-        ProductEntity productEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1, 3.71, 26, 10);
+        ProductEntity productEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
 
         when(productServiceImpl.findProductById(anyLong())).thenReturn(productEntity);
 
@@ -143,8 +143,8 @@ class ProductEntityControllerTest {
     @Test
     void test_updateProduct(){
         long productId = 1L;
-        ProductEntity updatedProductInputEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1, 3.71, 26, 10);
-        ProductEntity updatedProductResultEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1, 3.71, 26, 10);
+        ProductEntity updatedProductInputEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
+        ProductEntity updatedProductResultEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
 
         when(productServiceImpl.updateProduct(anyLong(),eq(updatedProductInputEntity))).thenReturn(updatedProductResultEntity);
 
@@ -165,8 +165,8 @@ class ProductEntityControllerTest {
     @Test
     void test_updateProduct_InternalServerError() {
         long productId = 1L;
-        ProductEntity updatedProductInputEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1, 3.71, 26, 10);
-        ProductEntity updatedProductResultEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1, 3.71, 26, 10);
+        ProductEntity updatedProductInputEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
+        ProductEntity updatedProductResultEntity = new ProductEntity(1L, "Jacket","Something indicate large central measure watch provide.", 58.79, 1L, 3.71, 26, 10);
 
         when(productServiceImpl.updateProduct(productId, updatedProductInputEntity)).thenThrow(new ServiceException("Internal Server Error"));
 
@@ -331,8 +331,8 @@ class ProductEntityControllerTest {
     @DisplayName("Successfully get products by IDs")
     void test_listProductsById_Success() {
         List<Long> ids = Arrays.asList(1L, 2L);
-        ProductEntity productEntity1 = new ProductEntity(1L, "Jacket", "A warm winter jacket", 58.79, 1, 3.71, 26, 10);
-        ProductEntity productEntity2 = new ProductEntity(2L, "Building Blocks", "Colorful building blocks", 7.89, 2, 1.41, 25, 5);
+        ProductEntity productEntity1 = new ProductEntity(1L, "Jacket", "A warm winter jacket", 58.79, 1L, 3.71, 26, 10);
+        ProductEntity productEntity2 = new ProductEntity(2L, "Building Blocks", "Colorful building blocks", 7.89, 2L, 1.41, 25, 5);
         List<ProductEntity> mockProductEntities = Arrays.asList(productEntity1, productEntity2);
 
         when(productServiceImpl.findProductsByIds(ids)).thenReturn(mockProductEntities);
@@ -376,5 +376,50 @@ class ProductEntityControllerTest {
         assertEquals("Internal server error", errorResponse.getMessage());
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, errorResponse.getStatus());
     }
+
+    @Test
+    @DisplayName("Get Price at Checkout - Success")
+    public void testGetPriceProductCheckout_Success() throws Exception {
+        double discountedPrice = 80.0;
+        when(productServiceImpl.calculateDiscountedPrice(1L, 5)).thenReturn(discountedPrice);
+
+        ResponseEntity<?> responseEntity = productController.getPriceProductCheckout(1L, 5);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(discountedPrice, responseEntity.getBody());
+    }
+
+    @Test
+    @DisplayName("Get Price at Checkout - Product Not Found")
+    public void testGetPriceProductCheckout_ProductNotFound() throws Exception {
+        when(productServiceImpl.calculateDiscountedPrice(1L, 5)).thenThrow(new NotFoundProduct("Product not found with ID: 1"));
+
+        ResponseEntity<?> responseEntity = productController.getPriceProductCheckout(1L, 5);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+        assertInstanceOf(ErrorResponse.class, responseEntity.getBody());
+        ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
+        assertEquals("Product not found with ID: 1", errorResponse.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, errorResponse.getStatus());
+    }
+
+    @Test
+    @DisplayName("Get Price at Checkout - Internal Server Error")
+    public void testGetPriceProductCheckout_InternalServerError() throws Exception {
+        when(productServiceImpl.calculateDiscountedPrice(1L, 5)).thenThrow(new RuntimeException("Internal server error"));
+
+        ResponseEntity<?> responseEntity = productController.getPriceProductCheckout(1L, 5);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+        assertInstanceOf(ErrorResponse.class, responseEntity.getBody());
+        ErrorResponse errorResponse = (ErrorResponse) responseEntity.getBody();
+        assertEquals("Internal server error", errorResponse.getMessage());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, errorResponse.getStatus());
+    }
+
+
+
 
 }

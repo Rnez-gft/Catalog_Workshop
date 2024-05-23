@@ -5,15 +5,18 @@ import com.gftworkshopcatalog.exceptions.NotFoundProduct;
 import com.gftworkshopcatalog.exceptions.ServiceException;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.repositories.ProductRepository;
+import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.Builder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
 
 import java.util.Arrays;
@@ -24,6 +27,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+
 
 class ProductServiceImplTest {
 
@@ -45,7 +49,7 @@ class ProductServiceImplTest {
                 .name("Product 1")
                 .description("Product 1 description")
                 .price(50.00)
-                .categoryId(1)
+                .categoryId(1L)
                 .weight(15.00)
                 .current_stock(25)
                 .min_stock(10)
@@ -56,7 +60,7 @@ class ProductServiceImplTest {
                 .name("Product 2")
                 .description("Product 2 description")
                 .price(60.00)
-                .categoryId(2)
+                .categoryId(2L)
                 .weight(25.00)
                 .current_stock(50)
                 .min_stock(15)
@@ -162,7 +166,7 @@ class ProductServiceImplTest {
         productEntity.setId(productId);
         productEntity.setName("Example Product");
         productEntity.setPrice(19.99);
-        productEntity.setCategoryId(1);
+        productEntity.setCategoryId(1L);
         productEntity.setWeight(1.0);
         productEntity.setCurrent_stock(initialStock);
         productEntity.setMin_stock(5);
@@ -187,7 +191,7 @@ class ProductServiceImplTest {
         productEntity.setId(productId);
         productEntity.setName("Example Product");
         productEntity.setPrice(19.99);
-        productEntity.setCategoryId(1);
+        productEntity.setCategoryId(1L);
         productEntity.setWeight(1.0);
         productEntity.setCurrent_stock(initialStock);
         productEntity.setMin_stock(5);
@@ -251,7 +255,7 @@ class ProductServiceImplTest {
         productEntity1.setName("Product 1");
         productEntity1.setDescription("Product description");
         productEntity1.setPrice(50.00);
-        productEntity1.setCategoryId(1);
+        productEntity1.setCategoryId(1L);
         productEntity1.setWeight(15.00);
         productEntity1.setCurrent_stock(25);
         productEntity1.setMin_stock(10);
@@ -260,7 +264,7 @@ class ProductServiceImplTest {
         productEntity2.setName("Product 2");
         productEntity2.setDescription("Product description");
         productEntity2.setPrice(60.00);
-        productEntity2.setCategoryId(2);
+        productEntity2.setCategoryId(2L);
         productEntity2.setWeight(25.00);
         productEntity2.setCurrent_stock(50);
         productEntity2.setMin_stock(15);
@@ -310,7 +314,7 @@ class ProductServiceImplTest {
         newProductEntity.setName("Product 1");
         newProductEntity.setDescription("Product description");
         newProductEntity.setPrice(50.00);
-        newProductEntity.setCategoryId(1);
+        newProductEntity.setCategoryId(1L);
         newProductEntity.setWeight(15.00);
         newProductEntity.setCurrent_stock(25);
         newProductEntity.setMin_stock(10);
@@ -320,7 +324,7 @@ class ProductServiceImplTest {
         savedProductEntity.setName("Product 1");
         savedProductEntity.setDescription("Product description");
         savedProductEntity.setPrice(50.00);
-        savedProductEntity.setCategoryId(1);
+        savedProductEntity.setCategoryId(1L);
         savedProductEntity.setWeight(15.00);
         savedProductEntity.setCurrent_stock(25);
         savedProductEntity.setMin_stock(10);
@@ -348,7 +352,7 @@ class ProductServiceImplTest {
         newProductEntity.setName("Product 1");
         newProductEntity.setDescription("Product description");
         newProductEntity.setPrice(50.00);
-        newProductEntity.setCategoryId(1);
+        newProductEntity.setCategoryId(1L);
         newProductEntity.setWeight(15.00);
         newProductEntity.setCurrent_stock(25);
         newProductEntity.setMin_stock(10);
@@ -385,7 +389,7 @@ class ProductServiceImplTest {
         newProductEntity.setName("Product 2");
         newProductEntity.setDescription("Product description");
         newProductEntity.setPrice(50.00);
-        newProductEntity.setCategoryId(1);
+        newProductEntity.setCategoryId(1L);
         newProductEntity.setWeight(15.00);
         newProductEntity.setCurrent_stock(25);
         newProductEntity.setMin_stock(10);
@@ -410,7 +414,7 @@ class ProductServiceImplTest {
         productEntity.setName("Product 1");
         productEntity.setDescription("Product description");
         productEntity.setPrice(50.00);
-        productEntity.setCategoryId(1);
+        productEntity.setCategoryId(1L);
         productEntity.setWeight(15.00);
         productEntity.setCurrent_stock(25);
         productEntity.setMin_stock(10);
@@ -449,7 +453,7 @@ class ProductServiceImplTest {
         existingProductEntity.setName("Product 1");
         existingProductEntity.setDescription("Product description");
         existingProductEntity.setPrice(50.00);
-        existingProductEntity.setCategoryId(1);
+        existingProductEntity.setCategoryId(1L);
         existingProductEntity.setWeight(15.00);
         existingProductEntity.setCurrent_stock(25);
         existingProductEntity.setMin_stock(10);
@@ -459,7 +463,7 @@ class ProductServiceImplTest {
         updatedProductEntityDetails.setName("Product 2");
         updatedProductEntityDetails.setDescription("Product description");
         updatedProductEntityDetails.setPrice(60.00);
-        updatedProductEntityDetails.setCategoryId(2);
+        updatedProductEntityDetails.setCategoryId(2L);
         updatedProductEntityDetails.setWeight(25.00);
         updatedProductEntityDetails.setCurrent_stock(50);
         updatedProductEntityDetails.setMin_stock(15);
@@ -510,8 +514,6 @@ class ProductServiceImplTest {
     @DisplayName("Throw IllegalArgumentException when product details are null during update")
     void shouldThrowExceptionWhenProductDetailsAreNull() {
         long productId = 1L;
-
-        when(productRepository.findById(productId)).thenReturn(Optional.of(new ProductEntity()));
 
         AddProductInvalidArgumentsExceptions exception = assertThrows(AddProductInvalidArgumentsExceptions.class, () -> productServiceImpl.updateProduct(productId, null));
 
