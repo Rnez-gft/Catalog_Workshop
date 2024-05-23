@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PromotionServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">catalogServiceWorkshop</a> &gt; <a href="index.source.html" class="el_package">com.gftworkshopcatalog.services.impl</a> &gt; <span class="el_source">PromotionServiceImpl.java</span></div><h1>PromotionServiceImpl.java</h1><pre class="source lang-java linenums">package com.gftworkshopcatalog.services.impl;
+
+import com.gftworkshopcatalog.api.dto.PromotionDTO;
+import com.gftworkshopcatalog.model.PromotionEntity;
+import com.gftworkshopcatalog.repositories.PromotionRepository;
+import com.gftworkshopcatalog.services.PromotionService;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.DataException;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+<span class="fc" id="L16">@Slf4j</span>
+@Service
+public class PromotionServiceImpl implements PromotionService {
+    private final PromotionRepository promotionRepository;
+
+<span class="fc" id="L21">    public PromotionServiceImpl(PromotionRepository promotionRepository) {</span>
+<span class="fc" id="L22">        this.promotionRepository = promotionRepository;</span>
+<span class="fc" id="L23">    }</span>
+
+    public List&lt;PromotionEntity&gt; findAllPromotions() {
+        try {
+<span class="fc" id="L27">            return promotionRepository.findAll();</span>
+<span class="fc" id="L28">        } catch (DataAccessException ex) {</span>
+<span class="fc" id="L29">            log.error(&quot;Error accessing data from database&quot;, ex);</span>
+<span class="fc" id="L30">            throw new RuntimeException(&quot;Error accessing data from database&quot;, ex);</span>
+        }
+    }
+
+    public PromotionEntity findPromotiontById(long promotionId) {
+<span class="fc" id="L35">        return promotionRepository.findById(promotionId).orElseThrow(() -&gt; {</span>
+<span class="fc" id="L36">            log.error(&quot;Promotion not found with ID: {}&quot;, promotionId);</span>
+<span class="fc" id="L37">            return new EntityNotFoundException(&quot;Promotion not found with ID: &quot; + promotionId);</span>
+        });
+    }
+
+    public PromotionEntity addPromotion(PromotionEntity promotionEntity) {
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (promotionEntity == null) {</span>
+<span class="fc" id="L43">            throw new IllegalArgumentException(&quot;Promotion details must not be null&quot;);</span>
+        }
+
+        try {
+<span class="fc" id="L47">            return promotionRepository.save(promotionEntity);</span>
+<span class="fc" id="L48">        } catch (DataAccessException ex) {</span>
+<span class="fc" id="L49">            throw new RuntimeException(&quot;Failed to add the promotion due to database error&quot;, ex);</span>
+        }
+    }
+
+    public PromotionEntity updatePromotion(long promotionId, PromotionEntity promotionEntityDetails) {
+<span class="fc" id="L54">        PromotionEntity existingPromotion = promotionRepository.findById(promotionId)</span>
+<span class="fc" id="L55">                .orElseThrow(() -&gt; new EntityNotFoundException(&quot;Promotion not found with ID: &quot; + promotionId));</span>
+        
+<span class="fc" id="L57">        updatePromotionEntity(existingPromotion, promotionEntityDetails);</span>
+        
+        try{
+<span class="fc" id="L60">            return promotionRepository.save(existingPromotion);</span>
+<span class="nc" id="L61">        } catch (DataException ex) {</span>
+<span class="nc" id="L62">            throw new RuntimeException(&quot;Failed to update the promotion with ID: &quot; + promotionId, ex);</span>
+        }
+    }
+
+    private void updatePromotionEntity(PromotionEntity existingPromotion, PromotionEntity newDetails) {
+<span class="fc" id="L67">        existingPromotion.setCategoryId(newDetails.getCategoryId());</span>
+<span class="fc" id="L68">        existingPromotion.setDiscount(newDetails.getDiscount());</span>
+<span class="fc" id="L69">        existingPromotion.setPromotionType(newDetails.getPromotionType());</span>
+<span class="fc" id="L70">        existingPromotion.setVolumeThreshold(newDetails.getVolumeThreshold());</span>
+<span class="fc" id="L71">        existingPromotion.setStartDate(newDetails.getStartDate());</span>
+<span class="fc" id="L72">        existingPromotion.setEndDate(newDetails.getEndDate());</span>
+<span class="fc" id="L73">    }</span>
+
+    public void deletePromotion(long promotionId) {
+<span class="fc" id="L76">        PromotionEntity promotionEntity = findPromotiontById(promotionId);</span>
+<span class="fc" id="L77">        log.info(&quot;Deleting promotion with ID: {}&quot;, promotionId);</span>
+        try {
+<span class="fc" id="L79">            promotionRepository.delete(promotionEntity);</span>
+<span class="fc" id="L80">        } catch (DataAccessException ex) {</span>
+<span class="fc" id="L81">            log.error(&quot;Failed to delete promotion with ID: {}&quot;, promotionId, ex);</span>
+<span class="fc" id="L82">            throw new EntityNotFoundException(&quot;Failed to delete promotion with ID: &quot; + promotionId, ex);</span>
+<span class="fc" id="L83">        }</span>
+<span class="fc" id="L84">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

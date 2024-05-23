@@ -62,7 +62,7 @@ public class PromotionEntityControllerTest {
     void whenPostPromotion_thenReturnCreatedPromotion() throws Exception {
         LocalDate startDate = LocalDate.of(2024,5,22);
         LocalDate endDate = startDate.plusDays(10);
-        PromotionEntity promotion = new PromotionEntity(1L, 1, 10.0, "Volume", 5, startDate, endDate);
+        PromotionEntity promotion = new PromotionEntity(1L, 1L, 10.0, "Volume", 5, startDate, endDate, true);
         when(promotionService.addPromotion(any(PromotionEntity.class))).thenReturn(promotion);
 
         mockMvc.perform(post("/promotions")

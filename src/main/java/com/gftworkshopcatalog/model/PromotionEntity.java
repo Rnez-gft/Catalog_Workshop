@@ -21,7 +21,7 @@ public class PromotionEntity implements Serializable {
     private Long id;
 
     @Column(nullable = false)
-    private Integer categoryId;
+    private Long categoryId;
 
     @Column(nullable = false)
     private Double discount;
@@ -38,6 +38,9 @@ public class PromotionEntity implements Serializable {
     @Column(nullable = false)
     private LocalDate endDate;
 
+    @Column(nullable = false)
+    private Boolean isActive;
+
     @Override
     public String toString() {
         return "PromotionEntity{" +
@@ -48,6 +51,9 @@ public class PromotionEntity implements Serializable {
                 ", volumeThreshold=" + volumeThreshold +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
+                ", isActive=" + isActive +
                 '}';
     }
+
+
 }

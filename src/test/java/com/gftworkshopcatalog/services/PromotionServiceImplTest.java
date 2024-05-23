@@ -1,7 +1,11 @@
 package com.gftworkshopcatalog.services;
 
+import com.gftworkshopcatalog.exceptions.NotFoundProduct;
+import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.model.PromotionEntity;
+import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
+import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import com.gftworkshopcatalog.services.impl.PromotionServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,23 +30,35 @@ import static org.mockito.Mockito.*;
 class PromotionServiceImplTest {
     @Mock
     private PromotionRepository promotionRepository;
+    @Mock
+    private ProductRepository productRepository;
     @InjectMocks
     private PromotionServiceImpl promotionServiceImpl;
 
+    @InjectMocks
+    private ProductServiceImpl productServiceImpl;
+
+    private ProductEntity product;
     private PromotionEntity promotionEntity;
 
     @BeforeEach
     void setUp(){
         MockitoAnnotations.openMocks(this);
 
+        product = new ProductEntity();
+        product.setId(1L);
+        product.setPrice(100.0);
+        product.setCategoryId(1L);
+
         promotionEntity = PromotionEntity.builder()
                 .id(1L)
-                .categoryId(1)
-                .discount(0.1)
+                .categoryId(1L)
+                .discount(0.2)
                 .promotionType("Volume")
-                .volumeThreshold(10)
-                .startDate(LocalDate.of(2024, 6,1))
+                .volumeThreshold(5)
+                .startDate(LocalDate.of(2024, 1,1))
                 .endDate(LocalDate.of(2024, 8,1))
+                .isActive(true)
                 .build();
     }
 
@@ -51,7 +67,7 @@ class PromotionServiceImplTest {
     void findAllPromotions(){
         PromotionEntity promotion2 = PromotionEntity.builder()
                 .id(2L)
-                .categoryId(3)
+                .categoryId(3L)
                 .discount(0.15)
                 .promotionType("Volume")
                 .volumeThreshold(15)
@@ -150,8 +166,8 @@ class PromotionServiceImplTest {
     @DisplayName("Add a new promotion successfully")
     void addPromotion_Success(){
         PromotionEntity validPromotion = PromotionEntity.builder()
-                .categoryId(1)
-                .discount(0.10)
+                .categoryId(1L)
+                .discount(0.20)
                 .promotionType("Volume")
                 .volumeThreshold(10)
                 .startDate(LocalDate.now())
@@ -162,7 +178,7 @@ class PromotionServiceImplTest {
         PromotionEntity savedPromotion = promotionServiceImpl.addPromotion(validPromotion);
 
         assertNotNull(savedPromotion);
-        assertEquals(0.10, savedPromotion.getDiscount());
+        assertEquals(0.20, savedPromotion.getDiscount());
         verify(promotionRepository).save(validPromotion);
     }
     @Test
@@ -186,7 +202,7 @@ class PromotionServiceImplTest {
     void updatePromotion_Success(){
         PromotionEntity updateDetails = PromotionEntity.builder()
                 .id(promotionEntity.getId())
-                .categoryId(2)
+                .categoryId(2L)
                 .discount(0.15)
                 .promotionType("Seasonal")
                 .volumeThreshold(20)
@@ -213,7 +229,7 @@ class PromotionServiceImplTest {
     void updatePromotion_NotFound() {
         PromotionEntity existingPromotion = PromotionEntity.builder()
                 .id(promotionEntity.getId())
-                .categoryId(1)
+                .categoryId(1L)
                 .discount(0.1)
                 .promotionType("Volume")
                 .volumeThreshold(10)
@@ -230,7 +246,7 @@ class PromotionServiceImplTest {
     void updatePromotion_DataAccessException() {
         PromotionEntity existingPromotion = PromotionEntity.builder()
                 .id(promotionEntity.getId())
-                .categoryId(1)
+                .categoryId(1L)
                 .discount(0.1)
                 .promotionType("Volume")
                 .volumeThreshold(10)
@@ -243,5 +259,78 @@ class PromotionServiceImplTest {
         assertThrows(RuntimeException.class,
                 () -> promotionServiceImpl.updatePromotion(promotionEntity.getId(), existingPromotion));
     }
+
+    @Test
+    public void testGetActivePromotions() {
+        PromotionEntity promo1 = new PromotionEntity();
+        promo1.setStartDate(LocalDate.now().minusDays(1));
+        promo1.setEndDate(LocalDate.now().plusDays(1));
+        promo1.setPromotionType("SEASONAL"); // Asegúrate de inicializar promotionType
+
+        PromotionEntity promo2 = new PromotionEntity();
+        promo2.setStartDate(LocalDate.now().minusDays(10));
+        promo2.setEndDate(LocalDate.now().minusDays(5));
+        promo2.setPromotionType("SEASONAL"); // Asegúrate de inicializar promotionType
+
+        List<PromotionEntity> promotions = Arrays.asList(promo1, promo2);
+
+        when(promotionRepository.findAll()).thenReturn(promotions);
+
+        List<PromotionEntity> activePromotions = promotionServiceImpl.getActivePromotions();
+
+        assertEquals(1, activePromotions.size());
+        assertEquals(promo1, activePromotions.get(0));
+    }
+
+    @Test
+    public void testCalculateDiscountedPrice_ProductNotFound() {
+        when(productRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundProduct.class, () -> productServiceImpl.calculateDiscountedPrice(1L, 5));
+    }
+
+    @Test
+    public void testCalculateDiscountedPrice_NoActivePromotion() {
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(promotionRepository.findActivePromotionByCategoryId(1L)).thenReturn(null);
+
+        double price = productServiceImpl.calculateDiscountedPrice(1L, 5);
+
+        assertEquals(100.0, price);
+    }
+
+    @Test
+    public void testCalculateDiscountedPrice_ActivePromotionButNotVolume() {
+        promotionEntity.setPromotionType("SEASONAL");
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(promotionRepository.findActivePromotionByCategoryId(1L)).thenReturn(promotionEntity);
+
+        double price = productServiceImpl.calculateDiscountedPrice(1L, 5);
+
+        assertEquals(100.0, price);
+    }
+
+    @Test
+    public void testCalculateDiscountedPrice_VolumePromotionButThresholdNotMet() {
+        promotionEntity.setIsActive(true);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(promotionRepository.findActivePromotionByCategoryId(1L)).thenReturn(promotionEntity);
+
+        double price = productServiceImpl.calculateDiscountedPrice(1L, 3);
+
+        assertEquals(100.0, price);
+    }
+
+    @Test
+    public void testCalculateDiscountedPrice_VolumePromotionThresholdMet() {
+        promotionEntity.setIsActive(true);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(promotionRepository.findActivePromotionByCategoryId(1L)).thenReturn(promotionEntity);
+
+        double price = productServiceImpl.calculateDiscountedPrice(1L, 5);
+
+        assertEquals(80.0, price);
+    }
+
 }
 

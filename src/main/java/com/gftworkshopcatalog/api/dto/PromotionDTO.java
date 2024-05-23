@@ -16,6 +16,7 @@ public class PromotionDTO {
     private Integer volumeThreshold;
     private LocalDate startDate;
     private LocalDate endDate;
+    private Boolean isActive;
 
     @Override
     public String toString() {
@@ -27,6 +28,7 @@ public class PromotionDTO {
                 ", volumeThreshold=" + volumeThreshold +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
+                ", isActive=" + isActive +
                 '}';
     }
 }

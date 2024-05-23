@@ -1,11 +1,20 @@
 package com.gftworkshopcatalog.exceptions;
 
 import lombok.Generated;
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Generated
-public class AddProductInvalidArgumentsExceptions extends RuntimeException{
+@Getter
+public class AddProductInvalidArgumentsExceptions extends RuntimeException {
+    private final HttpStatus status;
 
-    public AddProductInvalidArgumentsExceptions(String message){
+    public AddProductInvalidArgumentsExceptions(String message) {
         super(message);
+        this.status = HttpStatus.BAD_REQUEST;
+    }
+
+    public HttpStatus getStatus() {
+        return status;
     }
 }
