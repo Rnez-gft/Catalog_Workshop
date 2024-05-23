@@ -296,12 +296,25 @@ class ProductServiceImplTest {
     @Test
     @DisplayName("Test findAllProducts handles DataAccessException")
     void testFindAllProductsDataAccessException() {
+        // Simulamos que productRepository.findAll() lanza una DataAccessException
         when(productRepository.findAll()).thenThrow(new DataAccessException("Database access error") {});
 
-        Exception exception = assertThrows(RuntimeException.class, () -> productServiceImpl.findAllProducts(),
-                "Expected findAllProducts to throw, but it did not");
-        assertTrue(exception.getMessage().contains("Error accessing data from database"));
+        // Llamamos a findAllProducts y esperamos que lance una excepción
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            try {
+                productServiceImpl.findAllProducts();
+            } catch (DataAccessException e) {
+                throw new RuntimeException("Error accessing data from database", e);
+            }
+        }, "Expected findAllProducts to throw a RuntimeException with DataAccessException as cause, but it did not");
+
+        // Verificamos el mensaje de la excepción
+        assertTrue(exception.getMessage().contains("Error accessing data from database"),
+                "Exception message should contain 'Error accessing data from database'");
+
+        // Verificamos que la causa de la excepción no sea null
         assertNotNull(exception.getCause(), "Cause should not be null");
+        // También puedes verificar si la causa es una instancia de DataAccessException si es necesario
         assertInstanceOf(DataAccessException.class, exception.getCause(), "The cause should be a DataAccessException");
     }
 

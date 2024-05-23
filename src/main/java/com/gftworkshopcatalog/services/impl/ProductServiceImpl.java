@@ -5,6 +5,7 @@ import com.gftworkshopcatalog.exceptions.NotFoundProduct;
 import com.gftworkshopcatalog.exceptions.ServiceException;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.model.PromotionEntity;
+import com.gftworkshopcatalog.utils.ProductValidationUtils;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.ProductService;
@@ -33,11 +34,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     public List<ProductEntity> findAllProducts() {
-        try {
             return productRepository.findAll();
-        } catch (DataAccessException ex) {
-            throw new ServiceException("Error accessing data from database", ex, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     public ProductEntity findProductById(long productId) {
@@ -49,7 +46,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     public ProductEntity addProduct(ProductEntity productEntity) {
-        validateProductEntity(productEntity);
+        ProductValidationUtils.validateProductEntity(productEntity);
         try {
             return productRepository.save(productEntity);
         } catch (DataAccessException ex) {
@@ -151,15 +148,4 @@ public class ProductServiceImpl implements ProductService {
             }
             return originalPrice;
         }
-
-    private void validateProductEntity(ProductEntity productEntity) {
-        if (productEntity.getName() == null ||
-                productEntity.getPrice() == null || productEntity.getPrice() < 0 ||
-                productEntity.getCategoryId() == null ||
-                productEntity.getWeight() == null || productEntity.getWeight() < 0 ||
-                productEntity.getCurrent_stock() == null || productEntity.getCurrent_stock() < 0 ||
-                productEntity.getMin_stock() == null || productEntity.getMin_stock() < 0) {
-            throw new AddProductInvalidArgumentsExceptions("Product details must not be null except description");
-        }
-    }
 }

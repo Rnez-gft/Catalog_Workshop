@@ -1,6 +1,7 @@
 package com.gftworkshopcatalog.exceptions;
 
 import lombok.Generated;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -97,5 +98,15 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<ErrorResponse> handleDataAccessException(DataAccessException ex) {
+        ErrorResponse response = ErrorResponse.builder()
+                .message("Error accessing data from database")
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .build();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }
