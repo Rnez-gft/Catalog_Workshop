@@ -157,8 +157,8 @@ class ProductEntityControllerTest {
         assertEquals(updatedProductResultEntity.getPrice(), updatedProductInputEntity.getPrice());
         assertEquals(updatedProductResultEntity.getCategoryId(), updatedProductInputEntity.getCategoryId());
         assertEquals(updatedProductResultEntity.getWeight(), updatedProductInputEntity.getWeight());
-        assertEquals(updatedProductResultEntity.getCurrent_stock(), updatedProductInputEntity.getCurrent_stock());
-        assertEquals(updatedProductResultEntity.getMin_stock(), updatedProductInputEntity.getMin_stock());
+        assertEquals(updatedProductResultEntity.getCurrentStock(), updatedProductInputEntity.getCurrentStock());
+        assertEquals(updatedProductResultEntity.getMinStock(), updatedProductInputEntity.getMinStock());
   }
 
     @DisplayName("Server Error updateProduct()")
@@ -288,7 +288,7 @@ class ProductEntityControllerTest {
         int newStock = 150;
         ProductEntity updatedProductEntity = new ProductEntity();
         updatedProductEntity.setId(productId);
-        updatedProductEntity.setCurrent_stock(newStock);
+        updatedProductEntity.setCurrentStock(newStock);
 
         when(productServiceImpl.updateProductStock(productId, newStock)).thenReturn(updatedProductEntity);
 

@@ -38,10 +38,10 @@ public class ProductEntity {
     private Double weight;
 
     @Column(nullable = false)
-    private Integer current_stock;
+    private Integer currentStock;
 
     @Column(nullable = false)
-    private Integer min_stock;
+    private Integer minStock;
 
 
     @Override
@@ -53,8 +53,8 @@ public class ProductEntity {
                 ", price=" + price +
                 ", category_Id=" + categoryId +
                 ", weight=" + weight +
-                ", current_stock=" + current_stock +
-                ", min_stock=" + min_stock +
+                ", current_stock=" + currentStock +
+                ", min_stock=" + minStock +
                 '}';
     }
 }

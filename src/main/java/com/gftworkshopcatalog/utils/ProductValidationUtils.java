@@ -10,8 +10,8 @@ public class ProductValidationUtils {
                 productEntity.getPrice() == null || productEntity.getPrice() < 0 ||
                 productEntity.getCategoryId() == null ||
                 productEntity.getWeight() == null || productEntity.getWeight() < 0 ||
-                productEntity.getCurrent_stock() == null || productEntity.getCurrent_stock() < 0 ||
-                productEntity.getMin_stock() == null || productEntity.getMin_stock() < 0) {
+                productEntity.getCurrentStock() == null || productEntity.getCurrentStock() < 0 ||
+                productEntity.getMinStock() == null || productEntity.getMinStock() < 0) {
             throw new AddProductInvalidArgumentsExceptions("Product details must not be null except description");
         }
     }
