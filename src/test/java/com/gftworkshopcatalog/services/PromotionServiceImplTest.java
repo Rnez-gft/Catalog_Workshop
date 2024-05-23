@@ -1,5 +1,6 @@
 package com.gftworkshopcatalog.services;
 
+import com.gftworkshopcatalog.exceptions.DatabaseException;
 import com.gftworkshopcatalog.exceptions.InternalServiceException;
 import com.gftworkshopcatalog.exceptions.NotFoundProduct;
 import com.gftworkshopcatalog.exceptions.NotFoundPromotion;
@@ -262,7 +263,7 @@ class PromotionServiceImplTest {
 
     @Test
     @DisplayName("Get active promotion")
-    public void testGetActivePromotions() {
+     void testGetActivePromotions() {
         PromotionEntity promo1 = new PromotionEntity();
         promo1.setStartDate(LocalDate.now().minusDays(1));
         promo1.setEndDate(LocalDate.now().plusDays(1));
@@ -285,7 +286,7 @@ class PromotionServiceImplTest {
 
     @Test
     @DisplayName("Calculate Discounted Price - NotFoundProduct")
-    public void testCalculateDiscountedPrice_ProductNotFound() {
+    void testCalculateDiscountedPrice_ProductNotFound() {
         when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundProduct.class, () -> productServiceImpl.calculateDiscountedPrice(1L, 5));
@@ -293,7 +294,7 @@ class PromotionServiceImplTest {
 
     @Test
     @DisplayName("Calculate Discounted Price - No Active Promotion")
-    public void testCalculateDiscountedPrice_NoActivePromotion() {
+    void testCalculateDiscountedPrice_NoActivePromotion() {
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(promotionRepository.findActivePromotionByCategoryId(1L)).thenReturn(null);
 
@@ -304,7 +305,7 @@ class PromotionServiceImplTest {
 
     @Test
     @DisplayName("Calculate Discounted Price - Active Promotion But Not Volume")
-    public void testCalculateDiscountedPrice_ActivePromotionButNotVolume() {
+    void testCalculateDiscountedPrice_ActivePromotionButNotVolume() {
         promotionEntity.setPromotionType("SEASONAL");
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(promotionRepository.findActivePromotionByCategoryId(1L)).thenReturn(promotionEntity);
@@ -316,7 +317,7 @@ class PromotionServiceImplTest {
 
     @Test
     @DisplayName("Calculate Discounted Price - Volume Promotion But Threshold Not Met")
-    public void testCalculateDiscountedPrice_VolumePromotionButThresholdNotMet() {
+    void testCalculateDiscountedPrice_VolumePromotionButThresholdNotMet() {
         promotionEntity.setIsActive(true);
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(promotionRepository.findActivePromotionByCategoryId(1L)).thenReturn(promotionEntity);
@@ -328,7 +329,7 @@ class PromotionServiceImplTest {
 
     @Test
     @DisplayName("Calculate Discounted Price - Volume Promotion And Threshold Met")
-    public void testCalculateDiscountedPrice_VolumePromotionThresholdMet() {
+    void testCalculateDiscountedPrice_VolumePromotionThresholdMet() {
         promotionEntity.setIsActive(true);
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(promotionRepository.findActivePromotionByCategoryId(1L)).thenReturn(promotionEntity);
