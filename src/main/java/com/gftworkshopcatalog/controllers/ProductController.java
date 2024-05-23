@@ -189,7 +189,7 @@ public class ProductController {
     }
 
 
-    @PostMapping("/ids")
+    @PostMapping("/byIds")
     @Operation(summary = "Get products by IDs", description = "Returns a list of products for the given list of IDs.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Products found",
