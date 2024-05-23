@@ -213,7 +213,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/{id}/price-checkout")
+    @GetMapping("/{id}/{quantity}")
     @Operation(summary = "Get the product price at checkout", description = "Gets the product price based on volume promotions during checkout.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Price successfully retrieved",
