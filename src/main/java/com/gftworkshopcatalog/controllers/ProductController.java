@@ -8,6 +8,7 @@ import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -80,7 +81,7 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> getProductDetails(@PathVariable long id) {
+    public ResponseEntity<?> getProductDetails(@Parameter(description = "Product ID")@PathVariable long id) {
         try {
             ProductEntity productEntity = productServiceImpl.findProductById(id);
             return ResponseEntity.ok(productEntity);
@@ -103,7 +104,7 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody ProductEntity productEntity) {
+    public ResponseEntity<?> updateProduct(@Parameter(description = "Product ID")@PathVariable Long id, @RequestBody ProductEntity productEntity) {
         try {
             ProductEntity updatedProductEntity = productServiceImpl.updateProduct(id, productEntity);
             return ResponseEntity.ok(updatedProductEntity);
@@ -126,7 +127,7 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> deleteProduct(@PathVariable long id) {
+    public ResponseEntity<?> deleteProduct(@Parameter(description = "Product ID")@PathVariable long id) {
         try {
             productServiceImpl.deleteProduct(id);
             return ResponseEntity.noContent().build();
@@ -139,7 +140,7 @@ public class ProductController {
         }
     }
 
-    @PatchMapping("/{id}/price")
+    @PatchMapping("/{id}/{newPrice}")
     @Operation(summary = "Update the price of a product", description = "Partially updates the price of a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Price successfully updated",
@@ -149,7 +150,7 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> updateProductPrice(@PathVariable long id, @RequestParam double newPrice) {
+    public ResponseEntity<?> updateProductPrice(@Parameter(description = "Product ID")@PathVariable long id, @Parameter(description = "New price to update the current one")@RequestParam double newPrice) {
         try {
             ProductEntity updatedProductEntity = productServiceImpl.updateProductPrice(id, newPrice);
             return ResponseEntity.ok(updatedProductEntity);
@@ -165,7 +166,7 @@ public class ProductController {
         }
     }
 
-    @PatchMapping("/{id}/stock")
+    @PatchMapping("/{id}/{quantity}")
     @Operation(summary = "Update the stock of a product", description = "Partially updates the stock of a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Stock successfully updated",
@@ -175,9 +176,9 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> updateProductStock(@PathVariable long id, @RequestParam int newStock) {
+    public ResponseEntity<?> updateProductStock(@Parameter(description = "Product ID")@PathVariable long id, @Parameter(description = "Quantity of the stock to change")@RequestParam int quantity) {
         try {
-            ProductEntity updatedProductEntity = productServiceImpl.updateProductStock(id, newStock);
+            ProductEntity updatedProductEntity = productServiceImpl.updateProductStock(id, quantity);
             return ResponseEntity.ok(updatedProductEntity);
         } catch (NotFoundProduct e) {
             ErrorResponse errorResponse = new ErrorResponse("Product not found with ID: " + id, HttpStatus.NOT_FOUND);
@@ -189,7 +190,7 @@ public class ProductController {
     }
 
 
-    @PostMapping("/ids")
+    @PostMapping("/byIds")
     @Operation(summary = "Get products by IDs", description = "Returns a list of products for the given list of IDs.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Products found",
@@ -222,7 +223,7 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> getPriceProductCheckout(@PathVariable Long id, @RequestParam int quantity) {
+    public ResponseEntity<?> getPriceProductCheckout(@Parameter(description = "Product ID")@PathVariable Long id, @Parameter(description = "Quantity of a product")@RequestParam int quantity) {
         try {
             double discountedPrice = productServiceImpl.calculateDiscountedPrice(id, quantity);
             return ResponseEntity.ok(discountedPrice);
