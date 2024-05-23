@@ -52,7 +52,7 @@ public class PromotionEntityControllerTest {
                 .build();
     }
     @Test
-    public void testLocalDateSerialization() throws JsonProcessingException {
+    void testLocalDateSerialization() throws JsonProcessingException {
         LocalDate date = LocalDate.of(2024, 5, 22);
         String json = objectMapper.writeValueAsString(date);
         assertEquals("\"2024-05-22\"", json);
