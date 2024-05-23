@@ -37,8 +37,8 @@ class CatalogFunctionalTest {
                 .jsonPath("$.[0].price").isNumber()
                 .jsonPath("$.[0].categoryId").isNumber()
                 .jsonPath("$.[0].weight").isNumber()
-                .jsonPath("$.[0].current_stock").isNumber()
-                .jsonPath("$.[0].min_stock").isNumber()
+                .jsonPath("$.[0].currentStock").isNumber()
+                .jsonPath("$.[0].minStock").isNumber()
                 .jsonPath("$.[0].error_code").doesNotExist();
     }
     @Test
@@ -66,8 +66,8 @@ class CatalogFunctionalTest {
                 .jsonPath("$.price").isEqualTo(19.99)
                 .jsonPath("$.categoryId").isEqualTo(6)
                 .jsonPath("$.weight").isEqualTo(2.0)
-                .jsonPath("$.current_stock").isEqualTo(100)
-                .jsonPath("$.min_stock").isEqualTo(10)
+                .jsonPath("$.currentStock").isEqualTo(100)
+                .jsonPath("$.minStock").isEqualTo(10)
                 .jsonPath("$.errorCode").doesNotExist();
     }
     @Test
@@ -86,8 +86,8 @@ class CatalogFunctionalTest {
                 .jsonPath("$.price").isNumber()
                 .jsonPath("$.categoryId").isNumber()
                 .jsonPath("$.weight").isNumber()
-                .jsonPath("$.current_stock").isNumber()
-                .jsonPath("$.min_stock").isNumber()
+                .jsonPath("$.currentStock").isNumber()
+                .jsonPath("$.minStock").isNumber()
                 .jsonPath("$.errorCode").doesNotExist(); //Ajustar el valor existente en la base de datos
     }
     @Test
