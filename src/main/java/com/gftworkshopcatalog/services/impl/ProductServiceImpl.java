@@ -1,6 +1,7 @@
 package com.gftworkshopcatalog.services.impl;
 
 import com.gftworkshopcatalog.exceptions.AddProductInvalidArgumentsExceptions;
+import com.gftworkshopcatalog.exceptions.BadRequest;
 import com.gftworkshopcatalog.exceptions.NotFoundProduct;
 import com.gftworkshopcatalog.exceptions.ServiceException;
 import com.gftworkshopcatalog.model.ProductEntity;
@@ -33,30 +34,18 @@ public class ProductServiceImpl implements ProductService {
 
 
     public List<ProductEntity> findAllProducts() {
-        try {
-            return productRepository.findAll();
-        } catch (DataAccessException ex) {
-            throw new ServiceException("Error accessing data from database", ex, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return productRepository.findAll();
     }
 
     public ProductEntity findProductById(long productId) {
-        return productRepository.findById(productId).orElseThrow(() -> {
-            log.error("Product not found with ID: {}", productId);
-            return new NotFoundProduct("Product not found with ID: " + productId);
-        });
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + productId));
     }
-
 
     public ProductEntity addProduct(ProductEntity productEntity) {
         validateProductEntity(productEntity);
-        try {
-            return productRepository.save(productEntity);
-        } catch (DataAccessException ex) {
-            throw new ServiceException("Failed to save the product with ID: " + productEntity.getId(), ex, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return productRepository.save(productEntity);
     }
-
 
     public ProductEntity updateProduct(Long productId, ProductEntity productEntityDetails) {
         if (productEntityDetails == null) {
@@ -64,93 +53,69 @@ public class ProductServiceImpl implements ProductService {
         }
 
         ProductEntity productEntity = findProductById(productId);
+        updateProductEntity(productEntity, productEntityDetails);
+        return productRepository.save(productEntity);
+    }
 
-        productEntity.setName(productEntityDetails.getName());
-        productEntity.setDescription(productEntityDetails.getDescription());
-        productEntity.setPrice(productEntityDetails.getPrice());
-        productEntity.setCategoryId(productEntityDetails.getCategoryId());
-        productEntity.setWeight(productEntityDetails.getWeight());
-        productEntity.setCurrent_stock(productEntityDetails.getCurrent_stock());
-        productEntity.setMin_stock(productEntityDetails.getMin_stock());
-
-        try {
-            return productRepository.save(productEntity);
-        } catch (DataAccessException ex) {
-            throw new ServiceException("Failed to update the product with ID: " + productId, ex, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    private void updateProductEntity(ProductEntity existingProduct, ProductEntity newDetails) {
+        existingProduct.setName(newDetails.getName());
+        existingProduct.setDescription(newDetails.getDescription());
+        existingProduct.setPrice(newDetails.getPrice());
+        existingProduct.setCategoryId(newDetails.getCategoryId());
+        existingProduct.setWeight(newDetails.getWeight());
+        existingProduct.setCurrent_stock(newDetails.getCurrent_stock());
+        existingProduct.setMin_stock(newDetails.getMin_stock());
     }
 
     public void deleteProduct(long productId) {
-        ProductEntity productEntity = findProductById(productId);
-        log.info("Deleting product with ID: {}", productId);
-        try {
-            productRepository.delete(productEntity);
-        } catch (DataAccessException ex) {
-            log.error("Failed to delete product with ID: {}", productId, ex);
-            throw new RuntimeException("Failed to delete product with ID: " + productId, ex);
-        }
+        ProductEntity product = findProductById(productId);
+        productRepository.delete(product);
     }
 
     public ProductEntity updateProductPrice(long productId, double newPrice) {
         if (newPrice < 0) {
             throw new AddProductInvalidArgumentsExceptions("Price cannot be negative");
         }
-        ProductEntity productEntity = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + productId));
-        productEntity.setPrice(newPrice);
-        try {
-            return productRepository.save(productEntity);
-        } catch (DataAccessException e) {
-            throw new ServiceException("Failed to update product price for ID: " + productId, e, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        ProductEntity product = findProductById(productId);
+        product.setPrice(newPrice);
+        return productRepository.save(product);
     }
 
     public ProductEntity updateProductStock(long productId, int quantity) {
-        ProductEntity productEntity = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + productId));
-
-        int newStock = productEntity.getCurrent_stock() + quantity;
+        ProductEntity product = findProductById(productId);
+        int newStock = product.getCurrent_stock() + quantity;
         if (newStock < 0) {
-            throw new AddProductInvalidArgumentsExceptions("Insufficient stock to decrement by " + quantity);
+            throw new BadRequest("Insufficient stock to decrement by " + quantity);
         }
-
-        productEntity.setCurrent_stock(newStock);
-        try {
-            return productRepository.save(productEntity);
-        } catch (DataAccessException ex) {
-            throw new ServiceException("Failed to update product stock for ID: " + productId, ex, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        product.setCurrent_stock(newStock);
+        return productRepository.save(product);
     }
 
-
     public List<ProductEntity> findProductsByIds(List<Long> ids) {
-        List<ProductEntity> products = new ArrayList<>(productRepository.findAllById(ids));
+        List<ProductEntity> products = productRepository.findAllById(ids);
         if (products.size() != ids.size()) {
             throw new NotFoundProduct("One or more product IDs not found");
         }
         return products;
     }
 
+    public double calculateDiscountedPrice(Long id, int quantity) {
+        ProductEntity product = findProductById(id);
+        PromotionEntity promotion = promotionRepository.findActivePromotionByCategoryId(product.getCategoryId());
 
-        public double calculateDiscountedPrice(Long id, int quantity) {
-            ProductEntity product = productRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + id));
-
-            PromotionEntity promotion = promotionRepository.findActivePromotionByCategoryId(product.getCategoryId());
-
-            if (promotion != null && promotion.getIsActive() && "VOLUME".equalsIgnoreCase(promotion.getPromotionType())) {
-                return calculateNewPrice(product.getPrice(), promotion, quantity);
-            }
-
-            return product.getPrice();
+        if (promotion != null && promotion.getIsActive() && "VOLUME".equalsIgnoreCase(promotion.getPromotionType())) {
+            return calculateNewPrice(product.getPrice(), promotion, quantity);
         }
+        return product.getPrice();
+    }
 
-        private double calculateNewPrice(double originalPrice, PromotionEntity promotion, int quantity) {
-            if (quantity >= promotion.getVolumeThreshold()) {
-                return originalPrice * (1 - promotion.getDiscount());
-            }
-            return originalPrice;
+    private double calculateNewPrice(double originalPrice, PromotionEntity promotion, int quantity) {
+        if (quantity >= promotion.getVolumeThreshold()) {
+            return originalPrice * (1 - promotion.getDiscount());
         }
+        return originalPrice;
+    }
 
     private void validateProductEntity(ProductEntity productEntity) {
         if (productEntity.getName() == null ||
@@ -159,7 +124,7 @@ public class ProductServiceImpl implements ProductService {
                 productEntity.getWeight() == null || productEntity.getWeight() < 0 ||
                 productEntity.getCurrent_stock() == null || productEntity.getCurrent_stock() < 0 ||
                 productEntity.getMin_stock() == null || productEntity.getMin_stock() < 0) {
-            throw new AddProductInvalidArgumentsExceptions("Product details must not be null except description");
+            throw new AddProductInvalidArgumentsExceptions("Product details must not contain negative values.");
         }
     }
 }
