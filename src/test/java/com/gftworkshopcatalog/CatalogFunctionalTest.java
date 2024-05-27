@@ -118,7 +118,6 @@ class CatalogFunctionalTest {
     @DisplayName("Product Not Found Error")
     void testProductNotFoundError() {
         long productId = 999L;
-
         int newStock = 200;
 
         webTestClient.patch().uri("/products/{productId}/stock?newStock={newStock}", productId, newStock)
