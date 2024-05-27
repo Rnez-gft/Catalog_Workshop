@@ -39,7 +39,7 @@ class CatalogFunctionalTest {
                 });
     }
     @Test
-    @DisplayName("Test AddNewProduct()")
+    @DisplayName("Add NewProduct")
     void testAddNewProduct() {
         ProductEntity newProductEntity = new ProductEntity();
         newProductEntity.setName("Test Product");
@@ -68,7 +68,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.errorCode").doesNotExist();
     }
     @Test
-    @DisplayName("Test GetProductDetails()")
+    @DisplayName("Get Product by ID")
     void testGetProductDetails() {
         long productId = 1L;
 
@@ -102,7 +102,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.status").isEqualTo("INTERNAL_SERVER_ERROR");
     }
     @Test
-    @DisplayName("Test UpdateProduct()")
+    @DisplayName("Update Product")
     void testUpdateProduct() {
         long productId = 1L;
 
@@ -133,7 +133,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.errorCode").doesNotExist();
     }
     @Test
-    @DisplayName("Test DeleteProduct()")
+    @DisplayName("Delete Product")
     void testDeleteProduct() {
 
         webTestClient.delete().uri("/products/{id}", 1L)
