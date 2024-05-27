@@ -1,11 +1,7 @@
 package com.gftworkshopcatalog.controllers;
 
-import com.gftworkshopcatalog.exceptions.BadRequest;
 import com.gftworkshopcatalog.exceptions.ErrorResponse;
-import com.gftworkshopcatalog.exceptions.InternalServerError;
-import com.gftworkshopcatalog.exceptions.NotFoundProduct;
 import com.gftworkshopcatalog.model.ProductEntity;
-import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 
 @RestController
@@ -41,14 +36,9 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> listAllProducts() {
-        try {
+    public ResponseEntity<List<ProductEntity>> listAllProducts() {
             List<ProductEntity> products = productServiceImpl.findAllProducts();
             return ResponseEntity.ok(products);
-        } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @PostMapping
@@ -61,14 +51,9 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> addNewProduct( @RequestBody ProductEntity productEntity) {
-        try {
+    public ResponseEntity<ProductEntity> addNewProduct( @RequestBody ProductEntity productEntity) {
             ProductEntity createdProductEntity = productServiceImpl.addProduct(productEntity);
             return new ResponseEntity<>(createdProductEntity, HttpStatus.CREATED);
-        } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @GetMapping("/{id}")
@@ -81,17 +66,9 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> getProductDetails(@Parameter(description = "Product ID")@PathVariable long id) {
-        try {
+    public ResponseEntity<ProductEntity> getProductDetails(@Parameter(description = "Product ID")@PathVariable long id) {
             ProductEntity productEntity = productServiceImpl.findProductById(id);
             return ResponseEntity.ok(productEntity);
-        } catch (EntityNotFoundException e) {
-            ErrorResponse errorResponse = new ErrorResponse("Product not found", HttpStatus.NOT_FOUND);
-            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @PutMapping("/{id}")
@@ -104,17 +81,9 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> updateProduct(@Parameter(description = "Product ID")@PathVariable Long id, @RequestBody ProductEntity productEntity) {
-        try {
+    public ResponseEntity<ProductEntity> updateProduct(@Parameter(description = "Product ID")@PathVariable Long id, @RequestBody ProductEntity productEntity) {
             ProductEntity updatedProductEntity = productServiceImpl.updateProduct(id, productEntity);
             return ResponseEntity.ok(updatedProductEntity);
-        } catch (EntityNotFoundException e) {
-            ErrorResponse errorResponse = new ErrorResponse("Product not found", HttpStatus.NOT_FOUND);
-            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @DeleteMapping("/{id}")
@@ -127,17 +96,9 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> deleteProduct(@Parameter(description = "Product ID")@PathVariable long id) {
-        try {
+    public ResponseEntity<ProductEntity> deleteProduct(@Parameter(description = "Product ID")@PathVariable long id) {
             productServiceImpl.deleteProduct(id);
             return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException e) {
-            ErrorResponse errorResponse = new ErrorResponse("Product not found", HttpStatus.NOT_FOUND);
-            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @PatchMapping("/{id}/{newPrice}")
@@ -150,20 +111,9 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> updateProductPrice(@Parameter(description = "Product ID")@PathVariable long id, @Parameter(description = "New price to update the current one")@RequestParam double newPrice) {
-        try {
+    public ResponseEntity<ProductEntity> updateProductPrice(@Parameter(description = "Product ID")@PathVariable long id, @Parameter(description = "New price to update the current one")@RequestParam double newPrice) {
             ProductEntity updatedProductEntity = productServiceImpl.updateProductPrice(id, newPrice);
             return ResponseEntity.ok(updatedProductEntity);
-        } catch (EntityNotFoundException e) {
-            ErrorResponse errorResponse = new ErrorResponse("Product not found with ID: " + id, HttpStatus.NOT_FOUND);
-            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-        }catch (BadRequest e) {
-            ErrorResponse errorResponse = new ErrorResponse("Product details must not be null except description", HttpStatus.BAD_REQUEST);
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @PatchMapping("/{id}/{quantity}")
@@ -176,17 +126,9 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> updateProductStock(@Parameter(description = "Product ID")@PathVariable long id, @Parameter(description = "Quantity of the stock to change")@RequestParam int quantity) {
-        try {
+    public ResponseEntity<ProductEntity> updateProductStock(@Parameter(description = "Product ID")@PathVariable long id, @Parameter(description = "Quantity of the stock to change")@RequestParam int quantity) {
             ProductEntity updatedProductEntity = productServiceImpl.updateProductStock(id, quantity);
             return ResponseEntity.ok(updatedProductEntity);
-        } catch (NotFoundProduct e) {
-            ErrorResponse errorResponse = new ErrorResponse("Product not found with ID: " + id, HttpStatus.NOT_FOUND);
-            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
 
@@ -200,17 +142,9 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> listProductsById(@RequestBody List<Long> ids) {
-        try {
+    public ResponseEntity<List<ProductEntity>> listProductsById(@RequestBody List<Long> ids) {
             List<ProductEntity> products = productServiceImpl.findProductsByIds(ids);
             return ResponseEntity.ok(products);
-        } catch (EntityNotFoundException e) {
-            ErrorResponse errorResponse = new ErrorResponse("One or more product IDs not found", HttpStatus.NOT_FOUND);
-            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @GetMapping("/{id}/{quantity}")
@@ -223,17 +157,9 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> getPriceProductCheckout(@Parameter(description = "Product ID")@PathVariable Long id, @Parameter(description = "Quantity of a product")@RequestParam int quantity) {
-        try {
+    public ResponseEntity<Double> getPriceProductCheckout(@Parameter(description = "Product ID")@PathVariable Long id, @Parameter(description = "Quantity of a product")@RequestParam int quantity) {
             double discountedPrice = productServiceImpl.calculateDiscountedPrice(id, quantity);
             return ResponseEntity.ok(discountedPrice);
-        } catch (NotFoundProduct e) {
-            ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);
-            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @Generated

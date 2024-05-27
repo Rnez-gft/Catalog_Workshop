@@ -97,9 +97,9 @@ class CatalogFunctionalTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(invalidProduct)
                 .exchange()
-                .expectStatus().is5xxServerError()
+                .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.status").isEqualTo("INTERNAL_SERVER_ERROR");
+                .jsonPath("$.status").isEqualTo("BAD_REQUEST");
     }
     @Test
     @DisplayName("Test UpdateProduct()")
