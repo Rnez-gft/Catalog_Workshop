@@ -21,11 +21,10 @@ import java.util.*;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final ProductRepository productRepository;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, ProductRepository productRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
-        this.productRepository = productRepository;
+
     }
 
     public List<CategoryEntity> getAllCategories() {

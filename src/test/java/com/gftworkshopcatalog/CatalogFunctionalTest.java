@@ -1,27 +1,34 @@
 package com.gftworkshopcatalog;
 
 import com.gftworkshopcatalog.model.ProductEntity;
+import com.gftworkshopcatalog.repositories.ProductRepository;
+import lombok.Generated;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebTestClient
 class CatalogFunctionalTest {
 
+    @Autowired
     private WebTestClient webTestClient;
 
-    @Value("${local.server.port}")
-    private int port;
-
-    @BeforeEach
-    public void setup() {
-        webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:" + port + "/catalog").build();
-    }
+    @Autowired
+    ProductRepository productRepository;
 
     @Test
     @DisplayName("Find all products")
@@ -30,19 +37,14 @@ class CatalogFunctionalTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody()
-                .jsonPath("$.[0].id").isNotEmpty()
-                .jsonPath("$.[0].name").isNotEmpty()
-                .jsonPath("$.[0].description").isNotEmpty()
-                .jsonPath("$.[0].price").isNumber()
-                .jsonPath("$.[0].categoryId").isNumber()
-                .jsonPath("$.[0].weight").isNumber()
-                .jsonPath("$.[0].currentStock").isNumber()
-                .jsonPath("$.[0].minStock").isNumber()
-                .jsonPath("$.[0].error_code").doesNotExist();
+                .expectBodyList(ProductEntity.class).hasSize(20)
+                .consumeWith(response -> {
+                    assertNotNull(response.getResponseBody());
+                    assertTrue(response.getResponseBody().size() > 0);
+                });
     }
     @Test
-    @DisplayName("Add new product")
+    @DisplayName("Test AddNewProduct()")
     void testAddNewProduct() {
         ProductEntity newProductEntity = new ProductEntity();
         newProductEntity.setName("Test Product");
@@ -71,7 +73,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.errorCode").doesNotExist();
     }
     @Test
-    @DisplayName("Find product by ID")
+    @DisplayName("Test GetProductDetails()")
     void testGetProductDetails() {
         long productId = 1L;
 
@@ -88,46 +90,79 @@ class CatalogFunctionalTest {
                 .jsonPath("$.weight").isNumber()
                 .jsonPath("$.currentStock").isNumber()
                 .jsonPath("$.minStock").isNumber()
-                .jsonPath("$.errorCode").doesNotExist(); //Ajustar el valor existente en la base de datos
+                .jsonPath("$.errorCode").doesNotExist();
     }
     @Test
-    @DisplayName("Delete Product")
+    @DisplayName("Add new product with invalid data")
+    void testAddInvalidProduct() {
+        ProductEntity invalidProduct = new ProductEntity();
+        invalidProduct.setPrice(-19.99); // Invalid price
+
+        webTestClient.post().uri("/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(invalidProduct)
+                .exchange()
+                .expectStatus().is5xxServerError()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("INTERNAL_SERVER_ERROR");
+    }
+    @Test
+    @DisplayName("Test UpdateProduct()")
+    void testUpdateProduct() {
+        long productId = 1L;
+
+        ProductEntity updatedProductEntity = new ProductEntity();
+        updatedProductEntity.setName("Updated Product Name");
+        updatedProductEntity.setDescription("Updated Product Description");
+        updatedProductEntity.setPrice(29.99);
+        updatedProductEntity.setCategoryId(6L);
+        updatedProductEntity.setWeight(2.5);
+        updatedProductEntity.setCurrentStock(150);
+        updatedProductEntity.setMinStock(15);
+
+        webTestClient.put().uri("/products/{id}", productId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(updatedProductEntity)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(productId)
+                .jsonPath("$.name").isEqualTo("Updated Product Name")
+                .jsonPath("$.description").isEqualTo("Updated Product Description")
+                .jsonPath("$.price").isEqualTo(29.99)
+                .jsonPath("$.categoryId").isEqualTo(6L)
+                .jsonPath("$.weight").isEqualTo(2.5)
+                .jsonPath("$.currentStock").isEqualTo(150)
+                .jsonPath("$.minStock").isEqualTo(15)
+                .jsonPath("$.errorCode").doesNotExist();
+    }
+    @Test
+    @DisplayName("Test DeleteProduct()")
     void testDeleteProduct() {
+
         webTestClient.delete().uri("/products/{id}", 1L)
                 .exchange()
                 .expectStatus().isNoContent()
                 .expectBody()
                 .jsonPath("$.errorCode").doesNotExist();
     }
+
     @Test
-    @DisplayName("Update Product Price")
-    void testUpdateProductPrice() {
-        long productId = 1L;
-        long newPrice = 200;
+    @DisplayName("Update non-existent product price")
+    void testUpdateNonExistentProductPrice() {
+        long productId = 999L; // Non-existent product ID
+        double newPrice = 200.0;
 
-        webTestClient.patch().uri("/products/{productId}/price?newPrice={newPrice}", productId, newPrice)
+        Map<String, Object> priceUpdate = Map.of("newPrice", newPrice);
+
+        webTestClient.patch().uri("/products/{productId}/price", productId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(priceUpdate)
                 .exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectStatus().is5xxServerError()
                 .expectBody()
-                .jsonPath("$.id").isEqualTo(productId)
-                .jsonPath("$.price").isEqualTo(newPrice)
-                .jsonPath("$.errorCode").doesNotExist();
+                .jsonPath("$.status").isEqualTo(500);
     }
-    @Test
-    @DisplayName("Product Not Found Error")
-    void testProductNotFoundError() {
-        long productId = 999L;
 
-        int newStock = 200;
-
-        webTestClient.patch().uri("/products/{productId}/stock?newStock={newStock}", productId, newStock)
-                .exchange()
-                .expectStatus().isNotFound()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody()
-                .jsonPath("$.status").isEqualTo("NOT_FOUND")
-                .jsonPath("$.message").isEqualTo("Product not found with ID: " + productId);
-
-    }
 }

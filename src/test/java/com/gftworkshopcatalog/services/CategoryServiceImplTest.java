@@ -29,8 +29,6 @@ class CategoryServiceImplTest {
     @Mock
     private CategoryRepository categoryRepository;
 
-    @Mock
-    private ProductRepository productRepository;
     @InjectMocks
     private CategoryServiceImpl categoryServiceImpl;
 
