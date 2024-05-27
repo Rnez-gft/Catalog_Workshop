@@ -7,12 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
-
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -39,7 +40,7 @@ class CatalogFunctionalTest {
                 });
     }
     @Test
-    @DisplayName("Test AddNewProduct()")
+    @DisplayName("Add NewProduct")
     void testAddNewProduct() {
         ProductEntity newProductEntity = new ProductEntity();
         newProductEntity.setName("Test Product");
@@ -68,7 +69,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.errorCode").doesNotExist();
     }
     @Test
-    @DisplayName("Test GetProductDetails()")
+    @DisplayName("Get Product by ID")
     void testGetProductDetails() {
         long productId = 1L;
 
@@ -86,7 +87,9 @@ class CatalogFunctionalTest {
                 .jsonPath("$.currentStock").isNumber()
                 .jsonPath("$.minStock").isNumber()
                 .jsonPath("$.errorCode").doesNotExist();
+
     }
+
     @Test
     @DisplayName("Add new product with invalid data")
     void testAddInvalidProduct() {
@@ -126,7 +129,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.name").isEqualTo("Updated Product Name")
                 .jsonPath("$.description").isEqualTo("Updated Product Description")
                 .jsonPath("$.price").isEqualTo(29.99)
-                .jsonPath("$.categoryId").isEqualTo(6)
+                .jsonPath("$.categoryId").isEqualTo(6L)
                 .jsonPath("$.weight").isEqualTo(2.5)
                 .jsonPath("$.currentStock").isEqualTo(150)
                 .jsonPath("$.minStock").isEqualTo(15)
@@ -161,3 +164,4 @@ class CatalogFunctionalTest {
     }
 
 }
+
