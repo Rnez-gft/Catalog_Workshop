@@ -1,8 +1,9 @@
 package com.gftworkshopcatalog.services.impl;
 
-import com.gftworkshopcatalog.exceptions.AddProductInvalidArgumentsExceptions;
+import com.gftworkshopcatalog.exceptions.*;
 import com.gftworkshopcatalog.model.CategoryEntity;
 import com.gftworkshopcatalog.model.ProductEntity;
+import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.repositories.CategoryRepository;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.services.CategoryService;
@@ -21,9 +22,12 @@ import java.util.*;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+
+    public CategoryServiceImpl(CategoryRepository categoryRepository, ProductRepository productRepository) {
         this.categoryRepository = categoryRepository;
+        this.productRepository = productRepository;
 
     }
 
@@ -39,8 +43,19 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryEntity findCategoryById(long categoryId) {
         return categoryRepository.findById(categoryId).orElseThrow(() -> {
             log.error("Category not found with ID: {}", categoryId);
-            return new EntityNotFoundException("Category not found with ID: " + categoryId);
+            return new NotFoundCategory("Category not found with ID: " + categoryId);
         });
+    }
+
+
+    public List<ProductEntity> findProductsByCategoryId(Long categoryId) {
+
+        List<ProductEntity> products = productRepository.findByCategoryId(categoryId);
+        if (products.isEmpty()) {
+            log.error("Category not found with ID: {}", categoryId);
+            throw new NotFoundCategory("Category not found with ID: " + categoryId);
+        }
+        return new ArrayList<>(products);
     }
 
 
@@ -48,29 +63,15 @@ public class CategoryServiceImpl implements CategoryService {
         if (categoryEntity.getName() == null || categoryEntity.getCategoryId() < 0) {
             throw new AddProductInvalidArgumentsExceptions("Category details must not contain null or negative values");
         }
-
-        try {
-            return categoryRepository.save(categoryEntity);
-        } catch (DataAccessException ex) {
-            log.error("Failed to save category", ex);
-            throw new RuntimeException("Failed to save category", ex);
-        }
+        return categoryRepository.save(categoryEntity);
     }
+
 
 
     public void deleteCategoryById(long categoryId) {
         CategoryEntity categoryEntity = findCategoryById(categoryId);
-        try {
-            categoryRepository.delete(categoryEntity);
-            log.info("Deleting category with ID: {}", categoryId);
-        } catch (EmptyResultDataAccessException ex) {
-            throw new EntityNotFoundException("Category with ID: " + categoryId + " not found");
-        } catch (DataAccessException ex) {
-            log.error("Error accessing data from database", ex);
-            throw new RuntimeException("Error accessing data from database", ex);
-        }
+        categoryRepository.delete(categoryEntity);
     }
-
 
 }
 

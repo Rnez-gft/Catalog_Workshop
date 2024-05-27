@@ -72,7 +72,7 @@ public class CategoryController {
         }
     }
 
-    @DeleteMapping("/{category_Id}")
+    @DeleteMapping("/{categoryId}")
     @Operation(summary = "Delete a category", description = "Deletes a specific category.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Category deleted"),
@@ -81,9 +81,9 @@ public class CategoryController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> deleteCategoryById(@Parameter(description = "Category ID") @PathVariable("category_Id") long category_Id) {
+    public ResponseEntity<?> deleteCategoryById(@Parameter(description = "Category ID") @PathVariable("categoryId") long categoryId) {
         try {
-            categoryService.deleteCategoryById(category_Id);
+            categoryService.deleteCategoryById(categoryId);
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException ex) {
             ErrorResponse errorResponse = new ErrorResponse("Category not found", HttpStatus.NOT_FOUND);
@@ -93,4 +93,29 @@ public class CategoryController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
+
+    @GetMapping("/{categoryId}/products")
+    @Operation(summary = "List all products by category ID", description = "Returns a list of all products for the specified category ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product list",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
+            @ApiResponse(responseCode = "404", description = "Category not found",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
+            @ApiResponse(responseCode = "500", description = "Error response",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
+    })
+    public ResponseEntity<?> listProductsByCategoryId(@Parameter(description = "Category ID") @PathVariable("categoryId") Long categoryId) {
+        try {
+            List<ProductEntity> products = categoryService.findProductsByCategoryId(categoryId);
+            if (products.isEmpty()) {
+                ErrorResponse errorResponse = new ErrorResponse("Category not found or no products in this category", HttpStatus.NOT_FOUND);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+            }
+            return ResponseEntity.ok(products);
+        } catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

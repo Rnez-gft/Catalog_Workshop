@@ -1,8 +1,9 @@
 package com.gftworkshopcatalog.services;
 
-import com.gftworkshopcatalog.exceptions.AddProductInvalidArgumentsExceptions;
+import com.gftworkshopcatalog.exceptions.*;
 import com.gftworkshopcatalog.model.CategoryEntity;
 import com.gftworkshopcatalog.model.ProductEntity;
+import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.repositories.CategoryRepository;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.services.impl.CategoryServiceImpl;
@@ -14,12 +15,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -28,6 +27,8 @@ class CategoryServiceImplTest {
 
     @Mock
     private CategoryRepository categoryRepository;
+    @Mock
+    private ProductRepository productRepository;
 
     @InjectMocks
     private CategoryServiceImpl categoryServiceImpl;
@@ -124,14 +125,12 @@ class CategoryServiceImplTest {
                 .name("Category 1")
                 .build();
 
-        when(categoryRepository.save(categoryEntity)).thenThrow(new DataAccessException("Database access error") {});
+        when(categoryRepository.save(categoryEntity)).thenThrow(new DataIntegrityViolationException("Database access error") {});
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> categoryServiceImpl.addCategory(categoryEntity),
-                "Expected addCategory to throw, but it did not");
 
-        assertTrue(exception.getMessage().contains("Failed to save category"), "The exception message should indicate failure to save category");
-        assertNotNull(exception.getCause(), "Cause should not be null");
-        assertInstanceOf(DataAccessException.class, exception.getCause(), "The cause should be a DataAccessException");
+        assertThrows(RuntimeException.class, () -> categoryServiceImpl.addCategory(categoryEntity),
+                "Expected RuntimeException when database error occurs");
+
     }
 
 
@@ -148,13 +147,13 @@ class CategoryServiceImplTest {
     @Test
     @DisplayName("Delete Category: Throw EntityNotFoundException when deleting non-existing category")
     void testDeleteCategory_NotFound() {
-        long nonExistentCategoryId = 99L; // ID de la categoría que no existe
+        long nonExistentCategoryId = 99L;
 
         when(categoryRepository.findById(nonExistentCategoryId)).thenReturn(Optional.empty());
 
         doThrow(EmptyResultDataAccessException.class).when(categoryRepository).delete(any());
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> categoryServiceImpl.deleteCategoryById(nonExistentCategoryId));
+        NotFoundCategory exception = assertThrows(NotFoundCategory.class, () -> categoryServiceImpl.deleteCategoryById(nonExistentCategoryId));
 
         assertEquals("Category not found with ID: " + nonExistentCategoryId, exception.getMessage(), "The exception message should be 'Category not found with ID: " + nonExistentCategoryId + "'");
 
@@ -165,10 +164,42 @@ class CategoryServiceImplTest {
     @DisplayName("Delete Category: Handle DataAccessException")
     void testDeleteCategory_DataAccessException() {
         when(categoryRepository.findById(categoryEntity.getCategoryId())).thenReturn(Optional.of(categoryEntity));
-        doThrow(new DataAccessException("...") {}).when(categoryRepository).delete(categoryEntity);
+        doThrow(new InternalServiceException("Failed to delete category with ID: " + categoryEntity.getCategoryId()) {}).when(categoryRepository).delete(categoryEntity);
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> categoryServiceImpl.deleteCategoryById(categoryEntity.getCategoryId()));
+        InternalServiceException exception = assertThrows(InternalServiceException.class, () -> categoryServiceImpl.deleteCategoryById(categoryEntity.getCategoryId()));
 
-        assertEquals("Error accessing data from database", exception.getMessage(), "The exception message should be 'Error accessing data from database'");
+        assertEquals("Failed to delete category with ID: " + categoryEntity.getCategoryId(), exception.getMessage(), "The exception message should be 'Failed to delete category with ID: " + categoryEntity.getCategoryId());
     }
+
+    @Test
+    @DisplayName("Find products by category ID: Success")
+    void testFindProductsByCategoryId_Success() {
+        Long categoryId = 1L;
+        List<ProductEntity> products = new ArrayList<>();
+        products.add(new ProductEntity());
+        products.add(new ProductEntity());
+
+        when(productRepository.findByCategoryId(categoryId)).thenReturn(products);
+
+        List<ProductEntity> result = categoryServiceImpl.findProductsByCategoryId(categoryId);
+
+        assertNotNull(result, "The result should not be null");
+        assertEquals(products.size(), result.size(), "The size of result should match the size of products");
+        assertTrue(result.containsAll(products), "The result should contain all products");
+    }
+
+    @Test
+    @DisplayName("Find products by category ID: Empty list")
+    void testFindProductsByCategoryId_EmptyList() {
+        Long categoryId = 1L;
+        List<ProductEntity> products = Collections.emptyList();
+
+        when(productRepository.findByCategoryId(categoryId)).thenReturn(products);
+
+        NotFoundCategory exception = assertThrows(NotFoundCategory.class, () -> categoryServiceImpl.findProductsByCategoryId(categoryId),
+                "Expected findProductsByCategoryId to throw, but it did not");
+
+        assertTrue(exception.getMessage().contains("Category not found with ID: " + categoryId), "The exception message should indicate category not found");
+    }
+
 }

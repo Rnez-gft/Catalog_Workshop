@@ -2,6 +2,7 @@ package com.gftworkshopcatalog.controllers;
 
 import com.gftworkshopcatalog.exceptions.ErrorResponse;
 import com.gftworkshopcatalog.model.CategoryEntity;
+import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.services.impl.CategoryServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.service.spi.ServiceException;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -132,4 +134,47 @@ class CategoryEntityControllerTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
     }
+
+    @Test
+    void testFindProductsByCategoryId_CategoryExists() {
+        Long categoryId = 1L;
+        List<ProductEntity> products = Arrays.asList(new ProductEntity(), new ProductEntity());
+        when(categoryServiceImpl.findProductsByCategoryId(categoryId)).thenReturn(products);
+
+        ResponseEntity<?> responseEntity = categoryController.listProductsByCategoryId(categoryId);
+
+        assertEquals(products, responseEntity.getBody());
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Category not found when finding products by category ID")
+    void testFindProductsByCategoryId_CategoryNotFound() {
+        Long categoryId = 1L;
+        when(categoryServiceImpl.findProductsByCategoryId(categoryId)).thenReturn(Collections.emptyList());
+
+        ResponseEntity<?> responseEntity = categoryController.listProductsByCategoryId(categoryId);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertInstanceOf(ErrorResponse.class, responseEntity.getBody());
+        assertEquals("Category not found or no products in this category", ((ErrorResponse) responseEntity.getBody()).getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, ((ErrorResponse) responseEntity.getBody()).getStatus());
+    }
+
+    @Test
+    @DisplayName("Server Error findProductsByCategoryId()")
+    void testFindProductsByCategoryId_InternalServerError() {
+        Long categoryId = 1L;
+        when(categoryServiceImpl.findProductsByCategoryId(categoryId)).thenThrow(new ServiceException("Internal Server Error"));
+
+        ResponseEntity<?> responseEntity = categoryController.listProductsByCategoryId(categoryId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertInstanceOf(ErrorResponse.class, responseEntity.getBody());
+        assertEquals("Internal Server Error", ((ErrorResponse) responseEntity.getBody()).getMessage());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ((ErrorResponse) responseEntity.getBody()).getStatus());
+    }
 }
+
+
+

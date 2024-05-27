@@ -15,4 +15,6 @@ public interface CategoryService {
 
     public CategoryEntity findCategoryById(long categoryId);
 
+    public List<ProductEntity> findProductsByCategoryId(Long categoryId);
+
 }
