@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface ProductService {
 
-    public List<ProductEntity> findAllProducts();
-    public ProductEntity findProductById(long productId);
-    public ProductEntity addProduct(ProductEntity productEntity);
-    public ProductEntity updateProduct(Long productId, ProductEntity productEntityDetails);
-    public void deleteProduct(long productId);
-    public ProductEntity updateProductPrice(long productId, double newPrice);
-    public ProductEntity updateProductStock(long productId, int newStock);
+    List<ProductEntity> findAllProducts();
+    ProductEntity findProductById(long productId);
+    ProductEntity addProduct(ProductEntity productEntity);
+    ProductEntity updateProduct(Long productId, ProductEntity productEntityDetails);
+    void deleteProduct(long productId);
+    ProductEntity updateProductPrice(long productId, double newPrice);
+    ProductEntity updateProductStock(long productId, int newStock);
 }
