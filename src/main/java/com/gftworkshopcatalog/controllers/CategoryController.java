@@ -40,13 +40,8 @@ public class CategoryController {
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
     public ResponseEntity<?> findAllCategories() {
-        try {
             List<CategoryEntity> categories = categoryService.getAllCategories();
             return ResponseEntity.ok(categories);
-        } catch (Exception ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
     }
 
     @PostMapping
@@ -60,16 +55,9 @@ public class CategoryController {
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
     public ResponseEntity<?> addNewCategory(@RequestBody CategoryEntity categoryEntity) {
-        try {
+
             CategoryEntity createdCategoryEntity = categoryService.addCategory(categoryEntity);
             return new ResponseEntity<>(createdCategoryEntity, HttpStatus.CREATED);
-        } catch (IllegalArgumentException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Bad request", HttpStatus.BAD_REQUEST);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        } catch (Exception ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
     }
 
     @DeleteMapping("/{categoryId}")
@@ -82,16 +70,8 @@ public class CategoryController {
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
     public ResponseEntity<?> deleteCategoryById(@Parameter(description = "Category ID") @PathVariable("categoryId") long categoryId) {
-        try {
             categoryService.deleteCategoryById(categoryId);
             return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Category not found", HttpStatus.NOT_FOUND);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-        } catch (Exception ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
     }
 
     @GetMapping("/{categoryId}/products")
@@ -105,17 +85,9 @@ public class CategoryController {
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
     public ResponseEntity<?> listProductsByCategoryId(@Parameter(description = "Category ID") @PathVariable("categoryId") Long categoryId) {
-        try {
-            List<ProductEntity> products = categoryService.findProductsByCategoryId(categoryId);
-            if (products.isEmpty()) {
-                ErrorResponse errorResponse = new ErrorResponse("Category not found or no products in this category", HttpStatus.NOT_FOUND);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-            }
-            return ResponseEntity.ok(products);
-        } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
-            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
+            List<ProductEntity> products = categoryService.findProductsByCategoryId(categoryId);
+            return ResponseEntity.ok(products);
+
+    }
 }

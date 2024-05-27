@@ -1,8 +1,13 @@
 package com.gftworkshopcatalog.controllers;
 
-import com.gftworkshopcatalog.exceptions.ErrorResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.gftworkshopcatalog.exceptions.*;
 import com.gftworkshopcatalog.model.CategoryEntity;
 import com.gftworkshopcatalog.model.ProductEntity;
+import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.services.impl.CategoryServiceImpl;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.service.spi.ServiceException;
@@ -13,133 +18,134 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class CategoryEntityControllerTest {
+
+    private MockMvc mockMvc;
+    private ObjectMapper objectMapper;
     @Mock
-    private CategoryServiceImpl categoryServiceImpl;
+    private CategoryServiceImpl categoryService;
     @InjectMocks
     private CategoryController categoryController;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        objectMapper = new ObjectMapper();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(categoryController)
+                .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
     }
 
     @Test
-    void test_listAllCategories() {
-        CategoryEntity categoryEntity1 = new CategoryEntity(1L, "Electronics");
-        CategoryEntity categoryEntity2 = new CategoryEntity(2L, "Clothing");
-        List<CategoryEntity> mockCategoryEntities = Arrays.asList(categoryEntity1, categoryEntity2);
-        when(categoryServiceImpl.getAllCategories()).thenReturn(mockCategoryEntities);
-
-        ResponseEntity<?> responseEntity = categoryController.findAllCategories();
-
-        assertEquals(mockCategoryEntities, responseEntity.getBody());
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-    }
-
-    @DisplayName("Server Error listAllCategories()")
-    @Test
-    void test_listAllCategories_InternalServerError() {
-        when(categoryServiceImpl.getAllCategories()).thenThrow(new ServiceException("Internal Server Error"));
-
-        ResponseEntity<?> responseEntity = categoryController.findAllCategories();
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+    void test_listAllCategories() throws Exception {
+        List<CategoryEntity> mockCategoryEntities = Arrays.asList(
+                new CategoryEntity(1L, "Electronics"),
+                new CategoryEntity(2L, "Clothing")
+        );
+        when(categoryService.getAllCategories()).thenReturn(mockCategoryEntities);
+            mockMvc.perform(get("/categories")
+                .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$", hasSize(2)))
+                    .andExpect(jsonPath("$[0].categoryId").value(mockCategoryEntities.get(0).getCategoryId()))
+                    .andExpect(jsonPath("$[0].name").value(mockCategoryEntities.get(0).getName()))
+                    .andExpect(jsonPath("$[1].categoryId").value(mockCategoryEntities.get(1).getCategoryId()))
+                    .andExpect(jsonPath("$[1].name").value(mockCategoryEntities.get(1).getName()));
+        verify(categoryService).getAllCategories();
     }
 
     @Test
-    void test_addNewCategory() {
+    @DisplayName("List all Categories - InternalServiceException")
+    void listAllPromotions_Failure() throws Exception {
+        when(categoryService.getAllCategories()).thenThrow(new InternalServiceException("Database error"));
+        mockMvc.perform(get("/categories")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("Database error"));
+        verify(categoryService).getAllCategories();
+    }
+
+    @Test
+    @DisplayName("Add new category - Success")
+    void test_addNewCategory() throws Exception {
         CategoryEntity categoryEntityToAdd = new CategoryEntity(1L, "Electronics");
-        CategoryEntity addedCategoryEntity = new CategoryEntity(1L, "Electronics");
 
-        when(categoryServiceImpl.addCategory(categoryEntityToAdd)).thenReturn(addedCategoryEntity);
+        when(categoryService.addCategory(any(CategoryEntity.class))).thenReturn(categoryEntityToAdd);
 
-        ResponseEntity<?> responseEntity = categoryController.addNewCategory(categoryEntityToAdd);
-
-        assertEquals(addedCategoryEntity, responseEntity.getBody());
-        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+        mockMvc.perform(post("/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(categoryEntityToAdd)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.categoryId").value(categoryEntityToAdd.getCategoryId()))
+                .andExpect(jsonPath("$.name").value(categoryEntityToAdd.getName()));
     }
 
-    @DisplayName("Server Error addNewCategory()")
-    @Test
-    void test_addNewCategory_InternalServerError() {
-        CategoryEntity categoryEntity = new CategoryEntity(1L, "Electronics");
-
-        when(categoryServiceImpl.addCategory(categoryEntity)).thenThrow(new ServiceException("Internal Server Error"));
-
-        ResponseEntity<?> responseEntity = categoryController.addNewCategory(categoryEntity);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-    }
 
     @Test
-    @DisplayName("Add New Category - Bad Request on Invalid Input")
-    void testAddNewCategory_BadRequest() {
-        CategoryEntity categoryEntityToAdd = new CategoryEntity(1L, ""); // Assume empty name is invalid
-        when(categoryServiceImpl.addCategory(categoryEntityToAdd)).thenThrow(new IllegalArgumentException("Invalid category details"));
+    @DisplayName("Add new category - BadRequest")
+    void whenPostCategory_thenFailDueToInvalidData() throws Exception {
+        CategoryEntity categoryEntityToAdd = new CategoryEntity(1L, "");
 
-        ResponseEntity<?> response = categoryController.addNewCategory(categoryEntityToAdd);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertInstanceOf(ErrorResponse.class, response.getBody());
-        assertEquals(HttpStatus.BAD_REQUEST, ((ErrorResponse) response.getBody()).getStatus());
-        assertEquals("Bad request", ((ErrorResponse) response.getBody()).getMessage());
+        when(categoryService.addCategory(any(CategoryEntity.class))).thenThrow(new BadRequest("Invalid category data"));
+        mockMvc.perform(post("/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(categoryEntityToAdd)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid category data"));
+        verify(categoryService).addCategory(any(CategoryEntity.class));
     }
 
     @Test
-    void test_deleteCategoryById() {
+    void test_deleteCategoryById() throws Exception {
         long categoryId = 1L;
 
-        doNothing().when(categoryServiceImpl).deleteCategoryById(categoryId);
+        doNothing().when(categoryService).deleteCategoryById(categoryId);
 
-        ResponseEntity<?> response = categoryController.deleteCategoryById(categoryId);
-
-        verify(categoryServiceImpl, times(1)).deleteCategoryById(categoryId);
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        mockMvc.perform(delete("/categories/{id}", categoryId))
+                .andExpect(status().isNoContent());
+        verify(categoryService).deleteCategoryById(categoryId);
     }
+
 
     @Test
-    @DisplayName("Category not found when trying to delete")
-    void testDeleteCategoryById_NotFound() {
-        long categoryId = 1L;
+    @DisplayName("Delete a category - NotFoundCategory")
+    void deletePromotion_NotFound() throws Exception {
+        Long categoryId = 999L;
 
-        doThrow(new EntityNotFoundException("Category not found")).when(categoryServiceImpl).deleteCategoryById(categoryId);
-
-        ResponseEntity<?> response = categoryController.deleteCategoryById(categoryId);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertInstanceOf(ErrorResponse.class, response.getBody());
-        assertEquals("Category not found", ((ErrorResponse) response.getBody()).getMessage());
-        assertEquals(HttpStatus.NOT_FOUND, ((ErrorResponse) response.getBody()).getStatus());
+        doThrow(new NotFoundPromotion("Promotion not found with ID: " + categoryId))
+                .when(categoryService).deleteCategoryById(categoryId);
+        mockMvc.perform(delete("/categories/{id}", categoryId))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Promotion not found with ID: " + categoryId));
+        verify(categoryService).deleteCategoryById(categoryId);
     }
 
-    @Test
-    @DisplayName("Server Error deleteCategoryById()")
-    void test_deleteCategoryById_InternalServerError() {
-        long categoryId = 1L;
-
-        doThrow(new ServiceException("Internal Server Error")).when(categoryServiceImpl).deleteCategoryById(categoryId);
-
-        ResponseEntity<?> responseEntity = categoryController.deleteCategoryById(categoryId);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-    }
 
     @Test
     void testFindProductsByCategoryId_CategoryExists() {
         Long categoryId = 1L;
         List<ProductEntity> products = Arrays.asList(new ProductEntity(), new ProductEntity());
-        when(categoryServiceImpl.findProductsByCategoryId(categoryId)).thenReturn(products);
+        when(categoryService.findProductsByCategoryId(categoryId)).thenReturn(products);
 
         ResponseEntity<?> responseEntity = categoryController.listProductsByCategoryId(categoryId);
 
@@ -147,33 +153,45 @@ class CategoryEntityControllerTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
-    @Test
-    @DisplayName("Category not found when finding products by category ID")
-    void testFindProductsByCategoryId_CategoryNotFound() {
-        Long categoryId = 1L;
-        when(categoryServiceImpl.findProductsByCategoryId(categoryId)).thenReturn(Collections.emptyList());
-
-        ResponseEntity<?> responseEntity = categoryController.listProductsByCategoryId(categoryId);
-
-        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-        assertInstanceOf(ErrorResponse.class, responseEntity.getBody());
-        assertEquals("Category not found or no products in this category", ((ErrorResponse) responseEntity.getBody()).getMessage());
-        assertEquals(HttpStatus.NOT_FOUND, ((ErrorResponse) responseEntity.getBody()).getStatus());
-    }
 
     @Test
-    @DisplayName("Server Error findProductsByCategoryId()")
-    void testFindProductsByCategoryId_InternalServerError() {
-        Long categoryId = 1L;
-        when(categoryServiceImpl.findProductsByCategoryId(categoryId)).thenThrow(new ServiceException("Internal Server Error"));
+    @DisplayName("Get promotion details by ID - Success")
+    void getPromotionById_Success() throws Exception {
 
-        ResponseEntity<?> responseEntity = categoryController.listProductsByCategoryId(categoryId);
+        CategoryEntity category = new CategoryEntity(1L, "products");
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-        assertInstanceOf(ErrorResponse.class, responseEntity.getBody());
-        assertEquals("Internal Server Error", ((ErrorResponse) responseEntity.getBody()).getMessage());
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ((ErrorResponse) responseEntity.getBody()).getStatus());
+        List<ProductEntity> products = Arrays.asList(
+                new ProductEntity(1L, "Updated Product", "Updated Description", 55.55, 1L, 1.0, 100, 10),
+                new ProductEntity(2L, "Updated Product2", "Updated Description2", 65.55, 1L, 2.0, 200, 20)
+        );
+
+        when(categoryService.findProductsByCategoryId(category.getCategoryId())).thenReturn(products);
+        mockMvc.perform(get("/categories/{id}/products", category.getCategoryId())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].categoryId").value(products.get(0).getCategoryId()))
+                .andExpect(jsonPath("$[1].categoryId").value(products.get(1).getCategoryId()))
+                .andExpect(jsonPath("$[0].name").value(products.get(0).getName()))
+                .andExpect(jsonPath("$[1].name").value(products.get(1).getName()));
+
+        verify(categoryService).findProductsByCategoryId(category.getCategoryId());
     }
+
+
+    @Test
+    @DisplayName("Get Category details by ID - NotFound")
+    void testFindProductsByCategoryId_NotFound() throws Exception {
+        Long categoryId = 999L;
+
+        when(categoryService.findProductsByCategoryId(categoryId)).thenThrow(new NotFoundCategory("Category not found with ID: " + categoryId));
+        mockMvc.perform(get("/categories/{id}/products", categoryId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Category not found with ID: " + categoryId));
+        verify(categoryService).findProductsByCategoryId(categoryId);
+    }
+
+
 }
 
 
