@@ -1,5 +1,5 @@
-# Usa una imagen base con JDK 17 en Alpine Linux
-FROM adoptopenjdk:17-jdk-alpine
+# Usa una imagen base con JDK 17
+FROM eclipse-temurin:17-jdk-jammy
 
 # Establece el directorio de trabajo
 WORKDIR /app
