@@ -72,8 +72,8 @@ class ProductServiceImplTest {
         product.setPrice(100.0);
         product.setCategoryId(1L);
         product.setWeight(10.0);
-        product.setCurrent_stock(50);
-        product.setMin_stock(5);
+        product.setCurrentStock(50);
+        product.setMinStock(5);
 
         when(productRepository.save(any(ProductEntity.class))).thenReturn(product);
 
@@ -123,11 +123,11 @@ class ProductServiceImplTest {
         long productId = 1L;
         int quantity = 5;
         ProductEntity product = new ProductEntity();
-        product.setCurrent_stock(10);
+        product.setCurrentStock(10);
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
         when(productRepository.save(product)).thenReturn(product);
         ProductEntity result = productServiceImpl.updateProductStock(productId, quantity);
-        assertEquals(15, result.getCurrent_stock());
+        assertEquals(15, result.getCurrentStock());
     }
 
     @Test

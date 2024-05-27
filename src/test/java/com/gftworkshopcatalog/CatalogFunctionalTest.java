@@ -2,22 +2,17 @@ package com.gftworkshopcatalog;
 
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.repositories.ProductRepository;
-import lombok.Generated;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -25,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CatalogFunctionalTest {
 
     @Autowired
-    private WebTestClient webTestClient;
+    WebTestClient webTestClient;
 
     @Autowired
     ProductRepository productRepository;
@@ -40,7 +35,7 @@ class CatalogFunctionalTest {
                 .expectBodyList(ProductEntity.class).hasSize(20)
                 .consumeWith(response -> {
                     assertNotNull(response.getResponseBody());
-                    assertTrue(response.getResponseBody().size() > 0);
+                    assertFalse(response.getResponseBody().isEmpty());
                 });
     }
     @Test
@@ -52,8 +47,8 @@ class CatalogFunctionalTest {
         newProductEntity.setPrice(19.99);
         newProductEntity.setCategoryId(6L);
         newProductEntity.setWeight(2.0);
-        newProductEntity.setCurrent_stock(100);
-        newProductEntity.setMin_stock(10);
+        newProductEntity.setCurrentStock(100);
+        newProductEntity.setMinStock(10);
 
         webTestClient.post().uri("/products")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -68,8 +63,8 @@ class CatalogFunctionalTest {
                 .jsonPath("$.price").isEqualTo(19.99)
                 .jsonPath("$.categoryId").isEqualTo(6)
                 .jsonPath("$.weight").isEqualTo(2.0)
-                .jsonPath("$.current_stock").isEqualTo(100)
-                .jsonPath("$.min_stock").isEqualTo(10)
+                .jsonPath("$.currentStock").isEqualTo(100)
+                .jsonPath("$.minStock").isEqualTo(10)
                 .jsonPath("$.errorCode").doesNotExist();
     }
     @Test
@@ -88,8 +83,8 @@ class CatalogFunctionalTest {
                 .jsonPath("$.price").isNumber()
                 .jsonPath("$.categoryId").isNumber()
                 .jsonPath("$.weight").isNumber()
-                .jsonPath("$.current_stock").isNumber()
-                .jsonPath("$.min_stock").isNumber()
+                .jsonPath("$.currentStock").isNumber()
+                .jsonPath("$.minStock").isNumber()
                 .jsonPath("$.errorCode").doesNotExist();
     }
     @Test
@@ -117,8 +112,8 @@ class CatalogFunctionalTest {
         updatedProductEntity.setPrice(29.99);
         updatedProductEntity.setCategoryId(6L);
         updatedProductEntity.setWeight(2.5);
-        updatedProductEntity.setCurrent_stock(150);
-        updatedProductEntity.setMin_stock(15);
+        updatedProductEntity.setCurrentStock(150);
+        updatedProductEntity.setMinStock(15);
 
         webTestClient.put().uri("/products/{id}", productId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -133,8 +128,8 @@ class CatalogFunctionalTest {
                 .jsonPath("$.price").isEqualTo(29.99)
                 .jsonPath("$.categoryId").isEqualTo(6)
                 .jsonPath("$.weight").isEqualTo(2.5)
-                .jsonPath("$.current_stock").isEqualTo(150)
-                .jsonPath("$.min_stock").isEqualTo(15)
+                .jsonPath("$.currentStock").isEqualTo(150)
+                .jsonPath("$.minStock").isEqualTo(15)
                 .jsonPath("$.errorCode").doesNotExist();
     }
     @Test
