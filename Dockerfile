@@ -1,5 +1,5 @@
-# Usa una imagen base con JDK 17
-FROM eclipse-temurin:17-jdk-jammy
+# Usa una imagen base con JDK 17 en Alpine Linux
+FROM adoptopenjdk:17-jdk-alpine
 
 # Establece el directorio de trabajo
 WORKDIR /app
@@ -12,8 +12,9 @@ COPY mvnw pom.xml ./
 RUN chmod +x ./mvnw
 
 # Instala dos2unix para convertir los finales de línea
-RUN apt-get update && apt-get install -y dos2unix
-RUN dos2unix ./mvnw
+RUN apk update && \
+    apk add dos2unix && \
+    dos2unix ./mvnw
 
 # Resuelve las dependencias
 RUN ./mvnw dependency:resolve
@@ -24,5 +25,8 @@ COPY src ./src
 # Exponer el puerto 8080
 EXPOSE 8080
 
-# Comando para ejecutar la aplicación
-CMD ["./mvnw", "spring-boot:run"]
+# Define el perfil a utilizar (por defecto, production)
+ARG PROFILE=production
+
+# Comando para ejecutar la aplicación con el perfil especificado
+CMD ["./mvnw", "spring-boot:run", "-P${PROFILE}"]
