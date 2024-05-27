@@ -1,6 +1,5 @@
 package com.gftworkshopcatalog.services;
 
-import com.gftworkshopcatalog.exceptions.DatabaseException;
 import com.gftworkshopcatalog.exceptions.InternalServiceException;
 import com.gftworkshopcatalog.exceptions.NotFoundProduct;
 import com.gftworkshopcatalog.exceptions.NotFoundPromotion;
@@ -10,7 +9,6 @@ import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import com.gftworkshopcatalog.services.impl.PromotionServiceImpl;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -14,7 +14,4 @@ public class AddProductInvalidArgumentsExceptions extends RuntimeException {
         this.status = HttpStatus.BAD_REQUEST;
     }
 
-    public HttpStatus getStatus() {
-        return status;
-    }
 }

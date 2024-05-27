@@ -2,22 +2,18 @@ package com.gftworkshopcatalog;
 
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.repositories.ProductRepository;
-import lombok.Generated;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
-
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -25,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CatalogFunctionalTest {
 
     @Autowired
-    private WebTestClient webTestClient;
+    WebTestClient webTestClient;
 
     @Autowired
     ProductRepository productRepository;
@@ -40,11 +36,11 @@ class CatalogFunctionalTest {
                 .expectBodyList(ProductEntity.class).hasSize(20)
                 .consumeWith(response -> {
                     assertNotNull(response.getResponseBody());
-                    assertTrue(response.getResponseBody().size() > 0);
+                    assertFalse(response.getResponseBody().isEmpty());
                 });
     }
     @Test
-    @DisplayName("Test AddNewProduct()")
+    @DisplayName("Add NewProduct")
     void testAddNewProduct() {
         ProductEntity newProductEntity = new ProductEntity();
         newProductEntity.setName("Test Product");
@@ -73,7 +69,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.errorCode").doesNotExist();
     }
     @Test
-    @DisplayName("Test GetProductDetails()")
+    @DisplayName("Get Product by ID")
     void testGetProductDetails() {
         long productId = 1L;
 
@@ -91,7 +87,9 @@ class CatalogFunctionalTest {
                 .jsonPath("$.currentStock").isNumber()
                 .jsonPath("$.minStock").isNumber()
                 .jsonPath("$.errorCode").doesNotExist();
+
     }
+
     @Test
     @DisplayName("Add new product with invalid data")
     void testAddInvalidProduct() {
@@ -166,3 +164,4 @@ class CatalogFunctionalTest {
     }
 
 }
+

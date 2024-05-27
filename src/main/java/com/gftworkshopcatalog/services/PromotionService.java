@@ -5,10 +5,10 @@ import com.gftworkshopcatalog.model.PromotionEntity;
 import java.util.List;
 
 public interface PromotionService {
-    public List<PromotionEntity> findAllPromotions();
-    public PromotionEntity findPromotiontById(long promotionId);
-    public PromotionEntity addPromotion(PromotionEntity promotionEntity);
-    public PromotionEntity updatePromotion(long promotionId, PromotionEntity promotionEntityDetails);
-    public void deletePromotion(long promotionId);
-    public List<PromotionEntity> getActivePromotions();
+    List<PromotionEntity> findAllPromotions();
+    PromotionEntity findPromotiontById(long promotionId);
+    PromotionEntity addPromotion(PromotionEntity promotionEntity);
+    PromotionEntity updatePromotion(long promotionId, PromotionEntity promotionEntityDetails);
+    void deletePromotion(long promotionId);
+    List<PromotionEntity> getActivePromotions();
 }
