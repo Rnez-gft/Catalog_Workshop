@@ -132,22 +132,32 @@ public class ProductServiceImpl implements ProductService {
         List<ProductEntity> discountedProducts = new ArrayList<>();
 
         for (CartProductDTO cartProduct : cartProducts) {
-            Long id = cartProduct.getProductId();
+            Long productId = cartProduct.getProductId();
             int quantity = cartProduct.getQuantity();
 
-            ProductEntity product = productRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + id));
+            ProductEntity product = productRepository.findById(productId)
+                    .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + productId));
 
             PromotionEntity promotion = promotionRepository.findActivePromotionByCategoryId(product.getCategoryId());
 
-            double discountedPrice = product.getPrice();
+            double discountedPricePerUnit = product.getPrice();
             if (promotion != null && promotion.getIsActive() && "VOLUME".equalsIgnoreCase(promotion.getPromotionType())) {
-                discountedPrice = calculateNewPriceV2(product.getPrice(), promotion, quantity);
+                discountedPricePerUnit = calculateNewPriceV2(product.getPrice(), promotion, quantity);
             }
 
-            product.setPrice(discountedPrice * quantity); // Assume price is updated for the quantity
+            double totalPrice = discountedPricePerUnit * quantity;
 
-            discountedProducts.add(product);
+            ProductEntity discountedProduct = new ProductEntity();
+            discountedProduct.setId(product.getId());
+            discountedProduct.setName(product.getName());
+            discountedProduct.setDescription(product.getDescription());
+            discountedProduct.setPrice(totalPrice);
+            discountedProduct.setCategoryId(product.getCategoryId());
+            discountedProduct.setWeight(product.getWeight());
+            discountedProduct.setCurrentStock(product.getCurrentStock());
+            discountedProduct.setMinStock(product.getMinStock());
+
+            discountedProducts.add(discountedProduct);
         }
 
         return discountedProducts;
