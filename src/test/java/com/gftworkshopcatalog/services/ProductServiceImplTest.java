@@ -1,7 +1,9 @@
 package com.gftworkshopcatalog.services;
 
+import com.gftworkshopcatalog.api.dto.CartProductDTO;
 import com.gftworkshopcatalog.exceptions.*;
 import com.gftworkshopcatalog.model.ProductEntity;
+import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
@@ -12,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +34,9 @@ class ProductServiceImplTest {
     @InjectMocks
     private ProductServiceImpl productServiceImpl;
     private ProductEntity product;
+    private ProductEntity product1;
+    private ProductEntity product2;
+    private PromotionEntity promotion1;
 
 
     @BeforeEach
@@ -39,6 +45,36 @@ class ProductServiceImplTest {
         product = new ProductEntity();
         product.setId(1L);
         product.setCurrentStock(100);
+
+        product1 = ProductEntity.builder()
+                .id(1L)
+                .name("Jacket")
+                .description("Something indicate large central measure watch provide.")
+                .price(65.0)
+                .categoryId(1L)
+                .weight(3.71)
+                .currentStock(26)
+                .minStock(10)
+                .build();
+
+        product2 = ProductEntity.builder()
+                .id(2L)
+                .name("Building Blocks")
+                .description("Agent word occur number chair.")
+                .price(100.0)
+                .categoryId(2L)
+                .weight(1.41)
+                .currentStock(25)
+                .minStock(5)
+                .build();
+
+        promotion1 = PromotionEntity.builder()
+                .categoryId(2L)
+                .isActive(true)
+                .promotionType("VOLUME")
+                .volumeThreshold(5)
+                .discount(0.20) //
+                .build();
     }
 
     @Test
@@ -214,4 +250,43 @@ class ProductServiceImplTest {
         assertEquals(100.0, result);
     }
 
+    @Test
+    @DisplayName("Calculate discounted price - Any promotion")
+    void calculateDiscountedPriceV2_noPromotion() {
+        List<CartProductDTO> cartProducts = Arrays.asList(
+                new CartProductDTO(1L, 1L, "Jacket", "Something indicate large central measure watch provide.",1, new BigDecimal("65.0")),
+                new CartProductDTO(2L, 2L, "Building Blocks", "Agent word occur number chair.",5, new BigDecimal("100.0"))
+        );
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product1));
+        when(productRepository.findById(2L)).thenReturn(Optional.of(product2));
+        when(promotionRepository.findActivePromotionByCategoryId(1L)).thenReturn(null);
+        when(promotionRepository.findActivePromotionByCategoryId(2L)).thenReturn(null);
+
+        List<ProductEntity> result = productServiceImpl.calculateDiscountedPriceV2(cartProducts);
+
+        assertEquals(2, result.size());
+        assertEquals(65.0, result.get(0).getPrice());
+        assertEquals(500.0, result.get(1).getPrice());
+    }
+
+    @Test
+    @DisplayName("Calculate discounted price - Active promotion")
+    void calculateDiscountedPriceV2_withPromotion() {
+        List<CartProductDTO> cartProducts = Arrays.asList(
+                new CartProductDTO(1L, 1L, "Jacket", "Something indicate large central measure watch provide.",1, new BigDecimal("65.0")),
+                new CartProductDTO(2L, 2L, "Building Blocks", "Agent word occur number chair.",5, new BigDecimal("100.0"))
+        );
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product1));
+        when(productRepository.findById(2L)).thenReturn(Optional.of(product2));
+        when(promotionRepository.findActivePromotionByCategoryId(1L)).thenReturn(null);
+        when(promotionRepository.findActivePromotionByCategoryId(2L)).thenReturn(promotion1);
+
+        List<ProductEntity> result = productServiceImpl.calculateDiscountedPriceV2(cartProducts);
+
+        assertEquals(2, result.size());
+        assertEquals(65.0, result.get(0).getPrice());
+        assertEquals(400.0, result.get(1).getPrice());
+    }
 }

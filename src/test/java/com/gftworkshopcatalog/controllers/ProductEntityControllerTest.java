@@ -1,5 +1,6 @@
 package com.gftworkshopcatalog.controllers;
 
+import com.gftworkshopcatalog.api.dto.CartProductDTO;
 import com.gftworkshopcatalog.exceptions.*;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
@@ -16,7 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -401,6 +404,83 @@ class ProductEntityControllerTest {
 
         assertNotNull(exception);
         assertEquals("Failed to calculate price due to server error", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Get total price at checkout - Success")
+    void testGetPriceProductCheckoutV2() {
+        List<CartProductDTO> cartProducts = Arrays.asList(
+                CartProductDTO.builder()
+                        .id(1L)
+                        .productId(1L)
+                        .productName("Jacket")
+                        .productDescription("Something indicate large central measure watch provide.")
+                        .quantity(1)
+                        .price(new BigDecimal("65.0"))
+                        .build(),
+                CartProductDTO.builder()
+                        .id(2L)
+                        .productId(2L)
+                        .productName("Building Blocks")
+                        .productDescription("Agent word occur number chair.")
+                        .quantity(5)
+                        .price(new BigDecimal("100.0"))
+                        .build()
+        );
+
+        List<ProductEntity> discountedProducts = Arrays.asList(
+                ProductEntity.builder()
+                        .id(1L)
+                        .name("Jacket")
+                        .price(58.5)
+                        .build(),
+                ProductEntity.builder()
+                        .id(1L)
+                        .name("Building Blocks")
+                        .price(500.0)
+                        .build()
+        );
+
+        when(productServiceImpl.calculateDiscountedPriceV2(cartProducts)).thenReturn(discountedProducts);
+
+        ResponseEntity<List<ProductEntity>> response = productController.getPriceProductCheckout(cartProducts);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(2, response.getBody().size());
+        assertEquals(58.5, response.getBody().get(0).getPrice());
+        assertEquals(500.0, response.getBody().get(1).getPrice());
+    }
+
+    @Test
+    @DisplayName("Get total price at checkout - NotFoundProduct")
+    void testGetPriceProductCheckoutV2_ProductNotFound() {
+        List<CartProductDTO> cartProducts = Arrays.asList(
+                CartProductDTO.builder()
+                        .id(1L)
+                        .productId(1L)
+                        .productName("Jacket")
+                        .productDescription("Something indicate large central measure watch provide.")
+                        .quantity(1)
+                        .price(new BigDecimal("65.0"))
+                        .build(),
+                CartProductDTO.builder()
+                        .id(2L)
+                        .productId(2L)
+                        .productName("Building Blocks")
+                        .productDescription("Agent word occur number chair.")
+                        .quantity(5)
+                        .price(new BigDecimal("100.0"))
+                        .build()
+        );
+
+        when(productServiceImpl.calculateDiscountedPriceV2(cartProducts)).thenThrow(new NotFoundProduct("Product not found"));
+
+        NotFoundProduct exception = assertThrows(NotFoundProduct.class, () -> {
+            productController.getPriceProductCheckout(cartProducts);
+        });
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        assertEquals("Product not found", exception.getMessage());
     }
 
 }
