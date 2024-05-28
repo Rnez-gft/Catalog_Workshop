@@ -149,7 +149,7 @@ class CatalogFunctionalTest {
     @Test
     @DisplayName("Update non-existent product price")
     void testUpdateNonExistentProductPrice() {
-        long productId = 999L; // Non-existent product ID
+        long productId = 999L;
         double newPrice = 200.0;
 
         Map<String, Object> priceUpdate = Map.of("newPrice", newPrice);
