@@ -24,5 +24,8 @@ COPY src ./src
 # Exponer el puerto 8080
 EXPOSE 8080
 
-# Comando para ejecutar la aplicación
-CMD ["./mvnw", "spring-boot:run"]
+# Define el perfil a utilizar (por defecto, production)
+ARG PROFILE=production
+
+# Comando para ejecutar la aplicación con el perfil especificado
+CMD ["./mvnw", "spring-boot:run", "-P${PROFILE}"]

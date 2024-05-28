@@ -57,6 +57,7 @@ class CatalogFunctionalTest {
                     assertNotNull(response.getResponseBody());
                     assertFalse(response.getResponseBody().isEmpty());
                 });
+
     }
     @Test
     @DisplayName("Add NewProduct")

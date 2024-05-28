@@ -145,7 +145,9 @@ public class ProductServiceImpl implements ProductService {
                 discountedPricePerUnit = calculateNewPriceV2(product.getPrice(), promotion, quantity);
             }
 
+
             double totalPrice = discountedPricePerUnit * quantity;
+            double totalWeight = product.getWeight() * quantity;
 
             ProductEntity discountedProduct = new ProductEntity();
             discountedProduct.setId(product.getId());
@@ -153,7 +155,7 @@ public class ProductServiceImpl implements ProductService {
             discountedProduct.setDescription(product.getDescription());
             discountedProduct.setPrice(totalPrice);
             discountedProduct.setCategoryId(product.getCategoryId());
-            discountedProduct.setWeight(product.getWeight());
+            discountedProduct.setWeight(totalWeight);
             discountedProduct.setCurrentStock(product.getCurrentStock());
             discountedProduct.setMinStock(product.getMinStock());
 
