@@ -85,7 +85,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public ProductEntity updateProductStock(long productId, int quantity) {
-        ProductEntity product = findProductById(productId);
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + productId));
         int newStock = product.getCurrentStock() + quantity;
         if (newStock < 0) {
             throw new BadRequest("Insufficient stock to decrement by " + quantity);

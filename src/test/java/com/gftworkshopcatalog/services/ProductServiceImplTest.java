@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,11 +30,15 @@ class ProductServiceImplTest {
 
     @InjectMocks
     private ProductServiceImpl productServiceImpl;
+    private ProductEntity product;
 
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        product = new ProductEntity();
+        product.setId(1L);
+        product.setCurrentStock(100);
     }
 
     @Test
@@ -104,6 +109,18 @@ class ProductServiceImplTest {
         productServiceImpl.deleteProduct(productId);
         verify(productRepository).delete(product);
     }
+    @Test
+    @DisplayName("Update product with null details - Throws Exception")
+    void updateProduct_NullDetails_ThrowsException() {
+        Long productId = 1L;
+
+        Exception exception = assertThrows(AddProductInvalidArgumentsExceptions.class, () -> {
+            productServiceImpl.updateProduct(productId, null);
+        });
+
+        assertEquals("Product details must not be null.", exception.getMessage());
+    }
+
 
     @Test
     @DisplayName("Update product price - Success")
@@ -116,19 +133,48 @@ class ProductServiceImplTest {
         ProductEntity result = productServiceImpl.updateProductPrice(productId, newPrice);
         assertEquals(newPrice, result.getPrice());
     }
+    @Test
+    @DisplayName("Update product price with negative price - Throws Exception")
+    void updateProductPrice_NegativePrice_ThrowsException() {
+        long productId = 1L;
+        double newPrice = -50.00;
+
+        Exception exception = assertThrows(AddProductInvalidArgumentsExceptions.class, () -> {
+            productServiceImpl.updateProductPrice(productId, newPrice);
+        });
+
+        assertEquals("Price cannot be negative", exception.getMessage());
+    }
+
 
     @Test
     @DisplayName("Update product stock - Success")
     void updateProductStock_Success() {
-        long productId = 1L;
-        int quantity = 5;
-        ProductEntity product = new ProductEntity();
-        product.setCurrentStock(10);
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(productRepository.save(product)).thenReturn(product);
-        ProductEntity result = productServiceImpl.updateProductStock(productId, quantity);
-        assertEquals(15, result.getCurrentStock());
+        int quantity = 50;
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.save(any(ProductEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ProductEntity updatedProduct = productServiceImpl.updateProductStock(1L, quantity);
+
+        assertNotNull(updatedProduct);
+        assertEquals(150, updatedProduct.getCurrentStock());
+        verify(productRepository).save(product);
     }
+    @Test
+    @DisplayName("Fail to update product stock due to insufficient stock")
+    void testUpdateProductStock_FailDueToInsufficientStock() {
+
+        int quantity = -150;
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+        BadRequest exception = assertThrows(BadRequest.class, () -> productServiceImpl.updateProductStock(1L, quantity),
+                "Should throw BadRequest due to insufficient stock");
+
+        assertEquals("Insufficient stock to decrement by " + (quantity), exception.getMessage());
+        verify(productRepository, never()).save(any(ProductEntity.class));
+    }
+
+
 
     @Test
     @DisplayName("Find products by IDs - Success")
@@ -140,6 +186,20 @@ class ProductServiceImplTest {
         assertNotNull(result);
         assertEquals(2, result.size());
     }
+    @Test
+    @DisplayName("Find products by IDs - Not Found")
+    void testFindProductsByIdsNotFound() {
+        List<Long> ids = Arrays.asList(1L, 999L); // 999L is assumed to not exist
+        List<ProductEntity> foundProducts = List.of(
+                new ProductEntity(1L, "Product 1", "Description 1", 100.0, 1L, 1.0, 10, 5)
+        );
+        when(productRepository.findAllById(ids)).thenReturn(foundProducts);
+
+        Exception exception = assertThrows(NotFoundProduct.class, () -> productServiceImpl.findProductsByIds(ids));
+
+        assertEquals("One or more product IDs not found", exception.getMessage());
+    }
+
 
     @Test
     @DisplayName("Calculate discounted price - No active promotion")
