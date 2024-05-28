@@ -6,10 +6,10 @@ import org.springframework.http.HttpStatus;
 
 @Generated
 @Getter
-public class AddProductInvalidArgumentsExceptions extends RuntimeException {
+public class AddCategoryInvalidArgumentsExceptions extends RuntimeException {
     private final HttpStatus status;
 
-    public AddProductInvalidArgumentsExceptions(String message) {
+    public AddCategoryInvalidArgumentsExceptions(String message) {
         super(message);
         this.status = HttpStatus.BAD_REQUEST;
     }

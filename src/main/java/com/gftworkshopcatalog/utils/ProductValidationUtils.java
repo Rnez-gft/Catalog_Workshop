@@ -5,6 +5,9 @@ import com.gftworkshopcatalog.model.ProductEntity;
 
 public class ProductValidationUtils {
 
+    private ProductValidationUtils() {
+    }
+
     public static void validateProductEntity(ProductEntity productEntity) {
         if (productEntity.getName() == null ||
                 productEntity.getPrice() == null || productEntity.getPrice() < 0 ||

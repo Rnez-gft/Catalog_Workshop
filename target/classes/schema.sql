@@ -17,7 +17,7 @@ CREATE TABLE products (
 
 
 CREATE TABLE promotions (
-    promotion_id INT AUTO_INCREMENT PRIMARY KEY,
+    promotion_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     category_id INT NOT NULL,
     discount DECIMAL(4, 2) NOT NULL,
     promotion_type VARCHAR(50) NOT NULL,

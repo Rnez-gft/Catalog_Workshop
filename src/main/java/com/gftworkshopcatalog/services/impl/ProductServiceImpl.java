@@ -1,21 +1,23 @@
 package com.gftworkshopcatalog.services.impl;
 
+import com.gftworkshopcatalog.api.dto.CartProductDTO;
 import com.gftworkshopcatalog.exceptions.AddProductInvalidArgumentsExceptions;
+import com.gftworkshopcatalog.exceptions.BadRequest;
 import com.gftworkshopcatalog.exceptions.NotFoundProduct;
-import com.gftworkshopcatalog.exceptions.ServiceException;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.model.PromotionEntity;
-import com.gftworkshopcatalog.utils.ProductValidationUtils;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.ProductService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static com.gftworkshopcatalog.utils.ProductValidationUtils.validateProductEntity;
 
 @Slf4j
 @Service
@@ -45,12 +47,8 @@ public class ProductServiceImpl implements ProductService {
 
 
     public ProductEntity addProduct(ProductEntity productEntity) {
-        ProductValidationUtils.validateProductEntity(productEntity);
-        try {
+        validateProductEntity(productEntity);
             return productRepository.save(productEntity);
-        } catch (DataAccessException ex) {
-            throw new ServiceException("Failed to save the product with ID: " + productEntity.getId(), ex, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
 
@@ -60,62 +58,44 @@ public class ProductServiceImpl implements ProductService {
         }
 
         ProductEntity productEntity = findProductById(productId);
+        updateProductEntity(productEntity, productEntityDetails);
+        return productRepository.save(productEntity);
+    }
 
-        productEntity.setName(productEntityDetails.getName());
-        productEntity.setDescription(productEntityDetails.getDescription());
-        productEntity.setPrice(productEntityDetails.getPrice());
-        productEntity.setCategoryId(productEntityDetails.getCategoryId());
-        productEntity.setWeight(productEntityDetails.getWeight());
-        productEntity.setCurrentStock(productEntityDetails.getCurrentStock());
-        productEntity.setMinStock(productEntityDetails.getMinStock());
-
-        try {
-            return productRepository.save(productEntity);
-        } catch (DataAccessException ex) {
-            throw new ServiceException("Failed to update the product with ID: " + productId, ex, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    private void updateProductEntity(ProductEntity existingProduct, ProductEntity newDetails) {
+        existingProduct.setName(newDetails.getName());
+        existingProduct.setDescription(newDetails.getDescription());
+        existingProduct.setPrice(newDetails.getPrice());
+        existingProduct.setCategoryId(newDetails.getCategoryId());
+        existingProduct.setWeight(newDetails.getWeight());
+        existingProduct.setCurrentStock(newDetails.getCurrentStock());
+        existingProduct.setMinStock(newDetails.getMinStock());
     }
 
     public void deleteProduct(long productId) {
         ProductEntity productEntity = findProductById(productId);
-        log.info("Deleting product with ID: {}", productId);
-        try {
-            productRepository.delete(productEntity);
-        } catch (DataAccessException ex) {
-            log.error("Failed to delete product with ID: {}", productId, ex);
-            throw new RuntimeException("Failed to delete product with ID: " + productId, ex);
-        }
+        productRepository.delete(productEntity);
     }
 
     public ProductEntity updateProductPrice(long productId, double newPrice) {
         if (newPrice < 0) {
             throw new AddProductInvalidArgumentsExceptions("Price cannot be negative");
         }
-        ProductEntity productEntity = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + productId));
-        productEntity.setPrice(newPrice);
-        try {
-            return productRepository.save(productEntity);
-        } catch (DataAccessException e) {
-            throw new ServiceException("Failed to update product price for ID: " + productId, e, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        ProductEntity product = findProductById(productId);
+        product.setPrice(newPrice);
+        return productRepository.save(product);
     }
 
     public ProductEntity updateProductStock(long productId, int quantity) {
-        ProductEntity productEntity = productRepository.findById(productId)
+        ProductEntity product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + productId));
-
-        int newStock = productEntity.getCurrentStock() + quantity;
+        int newStock = product.getCurrentStock() + quantity;
         if (newStock < 0) {
-            throw new AddProductInvalidArgumentsExceptions("Insufficient stock to decrement by " + quantity);
+            throw new BadRequest("Insufficient stock to decrement by " + quantity);
         }
-
-        productEntity.setCurrentStock(newStock);
-        try {
-            return productRepository.save(productEntity);
-        } catch (DataAccessException ex) {
-            throw new ServiceException("Failed to update product stock for ID: " + productId, ex, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        product.setCurrentStock(newStock);
+        return productRepository.save(product);
     }
 
 
@@ -147,4 +127,48 @@ public class ProductServiceImpl implements ProductService {
             }
             return originalPrice;
         }
+
+    public List<ProductEntity> calculateDiscountedPriceV2(List<CartProductDTO> cartProducts) {
+        List<ProductEntity> discountedProducts = new ArrayList<>();
+
+        for (CartProductDTO cartProduct : cartProducts) {
+            Long productId = cartProduct.getProductId();
+            int quantity = cartProduct.getQuantity();
+
+            ProductEntity product = productRepository.findById(productId)
+                    .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + productId));
+
+            PromotionEntity promotion = promotionRepository.findActivePromotionByCategoryId(product.getCategoryId());
+
+            double discountedPricePerUnit = product.getPrice();
+            if (promotion != null && promotion.getIsActive() && "VOLUME".equalsIgnoreCase(promotion.getPromotionType())) {
+                discountedPricePerUnit = calculateNewPriceV2(product.getPrice(), promotion, quantity);
+            }
+
+
+            double totalPrice = discountedPricePerUnit * quantity;
+            double totalWeight = product.getWeight() * quantity;
+
+            ProductEntity discountedProduct = new ProductEntity();
+            discountedProduct.setId(product.getId());
+            discountedProduct.setName(product.getName());
+            discountedProduct.setDescription(product.getDescription());
+            discountedProduct.setPrice(totalPrice);
+            discountedProduct.setCategoryId(product.getCategoryId());
+            discountedProduct.setWeight(totalWeight);
+            discountedProduct.setCurrentStock(product.getCurrentStock());
+            discountedProduct.setMinStock(product.getMinStock());
+
+            discountedProducts.add(discountedProduct);
+        }
+
+        return discountedProducts;
+    }
+
+    public double calculateNewPriceV2(double originalPrice, PromotionEntity promotion, int quantity) {
+        if (quantity >= promotion.getVolumeThreshold()) {
+            return originalPrice * (1 - promotion.getDiscount());
+        }
+        return originalPrice;
+    }
 }
