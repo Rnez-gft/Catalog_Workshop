@@ -163,7 +163,7 @@ public class ProductServiceImpl implements ProductService {
         return discountedProducts;
     }
 
-    private double calculateNewPriceV2(double originalPrice, PromotionEntity promotion, int quantity) {
+    public double calculateNewPriceV2(double originalPrice, PromotionEntity promotion, int quantity) {
         if (quantity >= promotion.getVolumeThreshold()) {
             return originalPrice * (1 - promotion.getDiscount());
         }

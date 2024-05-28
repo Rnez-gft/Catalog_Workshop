@@ -289,4 +289,26 @@ class ProductServiceImplTest {
         assertEquals(65.0, result.get(0).getPrice());
         assertEquals(400.0, result.get(1).getPrice());
     }
+
+    @Test
+    @DisplayName("Calculate new price - Below volume threshold")
+    void calculateNewPriceV2_belowThreshold() {
+        double originalPrice = 100.0;
+        int quantity = 4;
+
+        double newPrice = productServiceImpl.calculateNewPriceV2(originalPrice, promotion1, quantity);
+
+        assertEquals(originalPrice, newPrice);
+    }
+
+    @Test
+    @DisplayName("Calculate new price - Above volume threshold")
+    void calculateNewPriceV2_aboveThreshold() {
+        double originalPrice = 100.0;
+        int quantity = 5;
+
+        double newPrice = productServiceImpl.calculateNewPriceV2(originalPrice, promotion1, quantity);
+
+        assertEquals(80.0, newPrice);
+    }
 }
