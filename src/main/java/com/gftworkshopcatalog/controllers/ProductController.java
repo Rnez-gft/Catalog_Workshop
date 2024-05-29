@@ -2,6 +2,7 @@ package com.gftworkshopcatalog.controllers;
 
 import com.gftworkshopcatalog.api.dto.CartProductDTO;
 import com.gftworkshopcatalog.exceptions.ErrorResponse;
+import com.gftworkshopcatalog.exceptions.SuccessResponse;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,13 +12,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Generated;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
+
 
 @RestController
 @RequestMapping("/products")
@@ -164,7 +164,6 @@ public class ProductController {
             return ResponseEntity.ok(discountedPrice);
     }
 
-
     @PostMapping("/volumePromotion")
     @Operation(summary = "Get the total price at checkout", description = "Gets the total price based on volume promotions during checkout.")
     @ApiResponses(value = {
@@ -179,24 +178,5 @@ public class ProductController {
             @Parameter(description = "List of cart products") @RequestBody List<CartProductDTO> cartProducts) {
         List<ProductEntity> discountedProducts = productServiceImpl.calculateDiscountedPriceV2(cartProducts);
         return ResponseEntity.ok(discountedProducts);
-    }
-
-
-
-    @Generated
-    public class SuccessResponse {
-        private String message;
-
-        public SuccessResponse(String message) {
-            this.message = message;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
     }
 }

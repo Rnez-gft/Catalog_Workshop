@@ -67,6 +67,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
+
     public ResponseEntity<CategoryEntity> deleteCategoryById(@Parameter(description = "Category ID") @PathVariable("categoryId") long categoryId) {
             categoryService.deleteCategoryById(categoryId);
             return ResponseEntity.noContent().build();
@@ -82,10 +83,30 @@ public class CategoryController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<List<ProductEntity>> listProductsByCategoryId(@Parameter(description = "Category ID") @PathVariable("categoryId") Long categoryId) {
 
+    public ResponseEntity<List<ProductEntity>> listProductsByCategoryId(@Parameter(description = "Category ID") @PathVariable("categoryId") Long categoryId) {
             List<ProductEntity> products = categoryService.findProductsByCategoryId(categoryId);
             return ResponseEntity.ok(products);
 
     }
+
+    @GetMapping("/{categoryId}/{name}/products")
+    @Operation(summary = "List all products by category ID and name",
+            description = "Returns a list of all products for the specified category ID and name.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product list",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
+            @ApiResponse(responseCode = "404", description = "Category not found",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
+            @ApiResponse(responseCode = "500", description = "Error response",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
+    })
+    public ResponseEntity<?> listProductsByCategoryIdAndName(
+            @Parameter(description = "Category ID") @PathVariable("categoryId") Long categoryId,
+            @Parameter(description = "First word of the product name") @PathVariable("name") String name) {
+
+        List<ProductEntity> products = categoryService.findProductsByCategoryIdAndName(categoryId, name);
+        return ResponseEntity.ok(products);
+    }
+
 }

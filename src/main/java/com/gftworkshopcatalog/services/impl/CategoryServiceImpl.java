@@ -6,12 +6,14 @@ import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.repositories.CategoryRepository;
 import com.gftworkshopcatalog.repositories.ProductRepository;
+import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 
@@ -23,11 +25,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+    private final PromotionRepository promotionRepository;
 
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, ProductRepository productRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, ProductRepository productRepository, PromotionRepository promotionRepository) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
+        this.promotionRepository = promotionRepository;
 
     }
 
@@ -67,12 +71,40 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
 
-
     public void deleteCategoryById(long categoryId) {
         CategoryEntity categoryEntity = findCategoryById(categoryId);
-        categoryRepository.delete(categoryEntity);
+
+        List<ProductEntity> products = productRepository.findByCategoryId(categoryId);
+        if (!products.isEmpty()) {
+            throw new InternalServiceException("Cannot delete category because it's referenced by products.");
+        }
+
+        List<PromotionEntity> promotions = promotionRepository.findByCategoryId(categoryId);
+        if (!promotions.isEmpty()) {
+            throw new InternalServiceException("Cannot delete category because it is referenced by promotions.");
+        }
+
+        try {
+            categoryRepository.delete(categoryEntity);
+        } catch (Exception e) {
+            throw new InternalServiceException("Failed to delete category with ID: " + categoryId);
+        }
+    }
+
+    public List<ProductEntity> findProductsByCategoryIdAndName(Long categoryId, String name) {
+        String namePrefix = formatName(name);
+
+        List<ProductEntity> products = productRepository.findByCategoryIdAndNameStartsWith(categoryId, namePrefix);
+        if (products.isEmpty()) {
+            log.error("Products not founds with ID: {} and NAME: {}", categoryId, namePrefix);
+            throw new NotFoundCategory("Category not found with ID: " + categoryId + " and NAME: " + namePrefix);
+        }
+        return new ArrayList<>(products);
+    }
+
+    public String formatName(String name) {
+        String lowerCaseName = name.toLowerCase();
+        return lowerCaseName.substring(0, 1).toUpperCase() + lowerCaseName.substring(1) + "%";
     }
 
 }
-
-

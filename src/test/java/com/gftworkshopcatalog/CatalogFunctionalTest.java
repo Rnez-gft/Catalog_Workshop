@@ -1,14 +1,14 @@
 package com.gftworkshopcatalog;
 
+
+import com.gftworkshopcatalog.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.model.PromotionEntity;
-import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
-import com.gftworkshopcatalog.services.impl.PromotionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,12 +17,10 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
-
 import java.time.LocalDate;
-import java.util.Map;
+
 
 import static org.junit.jupiter.api.Assertions.*;
-
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -45,8 +43,9 @@ class CatalogFunctionalTest {
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
     }
+
     @Test
-    @DisplayName("Find all products")
+    @DisplayName("Find all products - Success")
     void testListAllProducts() {
         webTestClient.get().uri("/products")
                 .exchange()
@@ -60,7 +59,8 @@ class CatalogFunctionalTest {
 
     }
     @Test
-    @DisplayName("Add NewProduct")
+    @DisplayName("Add NewProduct - Success")
+
     void testAddNewProduct() {
         ProductEntity newProductEntity = new ProductEntity();
         newProductEntity.setName("Test Product");
@@ -89,7 +89,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.errorCode").doesNotExist();
     }
     @Test
-    @DisplayName("Get Product by ID")
+    @DisplayName("Get Product by ID - Success")
     void testGetProductDetails() {
         long productId = 1L;
 
@@ -111,7 +111,8 @@ class CatalogFunctionalTest {
     }
 
     @Test
-    @DisplayName("Add new product with invalid data")
+
+    @DisplayName("Add new product - BadRequest")
     void testAddInvalidProduct() {
         ProductEntity invalidProduct = new ProductEntity();
         invalidProduct.setPrice(-19.99); // Invalid price
@@ -125,7 +126,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.status").isEqualTo("BAD_REQUEST");
     }
     @Test
-    @DisplayName("Test UpdateProduct()")
+    @DisplayName("Update Product - Success")
     void testUpdateProduct() {
         long productId = 1L;
 
@@ -156,7 +157,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.errorCode").doesNotExist();
     }
     @Test
-    @DisplayName("Test DeleteProduct()")
+    @DisplayName("Delete Product - Success")
     void testDeleteProduct() {
 
         webTestClient.delete().uri("/products/{id}", 1L)
@@ -169,6 +170,7 @@ class CatalogFunctionalTest {
     @Test
     @DisplayName("List all promotions - Success")
     void testGetAllPromotionsSuccess() {
+
         webTestClient.get().uri("/promotions")
                 .exchange()
                 .expectStatus().isOk()
@@ -176,7 +178,7 @@ class CatalogFunctionalTest {
                 .expectBodyList(PromotionEntity.class)
                 .consumeWith(response -> {
                     assertNotNull(response.getResponseBody());
-                    assertTrue(response.getResponseBody().size() > 0); // Check that some promotions are returned
+                    assertFalse(response.getResponseBody().isEmpty());
                 });
     }
     @Test
@@ -221,7 +223,7 @@ class CatalogFunctionalTest {
     @Test
     @DisplayName("Update a promotion - Success")
     void testUpdatePromotionSuccess() {
-        long promotionId = 1L; // Assumed existing promotion ID
+        long promotionId = 1L;
         PromotionEntity updatedPromotionDetails = new PromotionEntity(promotionId, 1L, 0.20, "SEASONAL", 10, LocalDate.now(), LocalDate.now().plusDays(30), true);
 
         webTestClient.put().uri("/promotions/{id}", promotionId)
@@ -243,6 +245,150 @@ class CatalogFunctionalTest {
         webTestClient.delete().uri("/promotions/{id}", promotionId)
                 .exchange()
                 .expectStatus().isNoContent();
+    }
+
+    @Test
+    @DisplayName("Find all categories - Success")
+    void testFindAllCategories() {
+
+        webTestClient.get().uri("/categories")
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(CategoryEntity.class).hasSize(7)
+                .consumeWith(response -> {
+                    assertNotNull(response.getResponseBody());
+                    assertFalse(response.getResponseBody().isEmpty());
+                });
+    }
+
+    @Test
+    @DisplayName("Add NewProduct - Success")
+
+    void testAddNewCategory() {
+        CategoryEntity newCategoryEntity = new CategoryEntity();
+        newCategoryEntity.setCategoryId(7L);
+        newCategoryEntity.setName("Category7");
+
+        webTestClient.post().uri("/categories")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newCategoryEntity)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.categoryId").isNotEmpty()
+                .jsonPath("$.name").isEqualTo("Category7");
+    }
+
+    @Test
+    @DisplayName("Delete Category by Id - Success")
+    void testdeleteCategoryById() {
+        long categoryId = 7L;
+
+        CategoryEntity newCategoryEntity = new CategoryEntity();
+        newCategoryEntity.setCategoryId(7L);
+        newCategoryEntity.setName("Category7");
+
+        webTestClient.post().uri("/categories")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newCategoryEntity)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.categoryId").isNotEmpty()
+                .jsonPath("$.name").isEqualTo("Category7");
+
+        webTestClient.delete().uri("/categories/{categoryId}", categoryId)
+                .exchange()
+                .expectStatus().isNoContent()
+                .expectBody()
+                .jsonPath("$.errorCode").doesNotExist();
+    }
+
+    @Test
+    @DisplayName("Get list of Product by categoryId - Success")
+    void testlistProductsByCategoryId() {
+        long categoryId = 1L;
+
+        webTestClient.get().uri("/categories/{categoryId}/products", categoryId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$[0].categoryId").isEqualTo(categoryId)
+                .jsonPath("$[1].categoryId").isEqualTo(categoryId)
+                .jsonPath("$[2].categoryId").isEqualTo(categoryId);
+
+
+    }
+
+    @Test
+    @DisplayName("List Products by Category ID and Name - Success")
+    void testListProductsByCategoryIdAndName_Success() {
+        long categoryId = 2L;
+        String name = "pu";
+
+        webTestClient.get()
+                .uri("/categories/{categoryId}/{name}/products", categoryId, name)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(ProductEntity.class);
+
+    }
+
+    @Test
+    @DisplayName("Add New Category with Invalid Data - Bad Request")
+    void testAddNewCategory_InvalidData() {
+        CategoryEntity newCategoryEntity = new CategoryEntity();
+
+        webTestClient.post().uri("/categories")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newCategoryEntity)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("BAD_REQUEST");
+    }
+
+    @Test
+    @DisplayName("Delete Category By Id - Not Found")
+    void testDeleteCategoryById_NotFound() {
+        long nonExistingCategoryId = 999L;
+
+        webTestClient.delete().uri("/categories/{categoryId}", nonExistingCategoryId)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("NOT_FOUND");
+    }
+
+    @Test
+    @DisplayName("Get list of Products by CategoryId - Not Found")
+    void testListProductsByCategoryId_NotFound() {
+        long nonExistingCategoryId = 999L;
+
+        webTestClient.get().uri("/categories/{categoryId}/products", nonExistingCategoryId)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("NOT_FOUND");
+    }
+
+    @Test
+    @DisplayName("List Products By Category ID and Name - Not Found")
+    void testListProductsByCategoryIdAndName_NotFound() {
+        long nonExistingCategoryId = 2L;
+        String name = "nonexisting";
+
+        webTestClient.get()
+                .uri("/categories/{categoryId}/{name}/products", nonExistingCategoryId, name)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("NOT_FOUND");
     }
 
 }

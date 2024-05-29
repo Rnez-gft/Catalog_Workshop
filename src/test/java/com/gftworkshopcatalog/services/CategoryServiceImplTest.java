@@ -3,11 +3,10 @@ package com.gftworkshopcatalog.services;
 import com.gftworkshopcatalog.exceptions.*;
 import com.gftworkshopcatalog.model.CategoryEntity;
 import com.gftworkshopcatalog.model.ProductEntity;
-import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.repositories.CategoryRepository;
 import com.gftworkshopcatalog.repositories.ProductRepository;
+import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.impl.CategoryServiceImpl;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,11 +28,13 @@ class CategoryServiceImplTest {
     private CategoryRepository categoryRepository;
     @Mock
     private ProductRepository productRepository;
-
+    @Mock
+    private PromotionRepository promotionRepository;
     @InjectMocks
     private CategoryServiceImpl categoryServiceImpl;
 
     private CategoryEntity categoryEntity;
+
 
     @BeforeEach
     void setUp() {
@@ -138,6 +139,8 @@ class CategoryServiceImplTest {
     @DisplayName("Delete Category: Success")
     void testDeleteCategory() {
         when(categoryRepository.findById(categoryEntity.getCategoryId())).thenReturn(Optional.of(categoryEntity));
+        when(productRepository.findByCategoryId(categoryEntity.getCategoryId())).thenReturn(List.of());
+        when(promotionRepository.findByCategoryId(categoryEntity.getCategoryId())).thenReturn(List.of());
 
         categoryServiceImpl.deleteCategoryById(categoryEntity.getCategoryId());
 
@@ -164,7 +167,10 @@ class CategoryServiceImplTest {
     @DisplayName("Delete Category: Handle DataAccessException")
     void testDeleteCategory_DataAccessException() {
         when(categoryRepository.findById(categoryEntity.getCategoryId())).thenReturn(Optional.of(categoryEntity));
-        doThrow(new InternalServiceException("Failed to delete category with ID: " + categoryEntity.getCategoryId()) {}).when(categoryRepository).delete(categoryEntity);
+        when(productRepository.findByCategoryId(categoryEntity.getCategoryId())).thenReturn(List.of());
+        when(promotionRepository.findByCategoryId(categoryEntity.getCategoryId())).thenReturn(List.of());
+        
+        doThrow(new InternalServiceException("Failed to delete category with ID: " + categoryEntity.getCategoryId())).when(categoryRepository).delete(categoryEntity);
 
         InternalServiceException exception = assertThrows(InternalServiceException.class, () -> categoryServiceImpl.deleteCategoryById(categoryEntity.getCategoryId()));
 
@@ -202,4 +208,49 @@ class CategoryServiceImplTest {
         assertTrue(exception.getMessage().contains("Category not found with ID: " + categoryId), "The exception message should indicate category not found");
     }
 
+
+    @Test
+    @DisplayName("Find products by category ID and name: Success")
+    void testFindProductsByCategoryIdAndName_Success() {
+        Long categoryId = 10L;
+        String name = "pro";
+        String formattedName = categoryServiceImpl.formatName(name);
+        List<ProductEntity> products = new ArrayList<>();
+        products.add(new ProductEntity(1L, "Product1", "Description1", 10.0, 10L, 1.0, 100, 10));
+        products.add(new ProductEntity(2L, "Product2", "Description2", 20.0, 10L, 2.0, 200, 20));
+
+        when(productRepository.findByCategoryIdAndNameStartsWith(categoryId, formattedName)).thenReturn(products);
+
+        List<ProductEntity> result = categoryServiceImpl.findProductsByCategoryIdAndName(categoryId, name);
+
+        assertNotNull(result, "The result should not be null");
+        assertEquals(products.size(), result.size(), "The size of the result should match the size of products");
+        assertTrue(result.containsAll(products), "The result should contain all products");
+    }
+
+    @Test
+    @DisplayName("Find products by category ID and name: Empty list")
+    void testFindProductsByCategoryIdAndName_EmptyList() {
+        Long categoryId = 1L;
+        String name = "products";
+        String formattedName = categoryServiceImpl.formatName(name);;
+
+        when(productRepository.findByCategoryIdAndNameStartsWith(categoryId, formattedName)).thenReturn(Collections.emptyList());
+
+        NotFoundCategory exception = assertThrows(NotFoundCategory.class, () -> categoryServiceImpl.findProductsByCategoryIdAndName(categoryId, name),
+                "Expected findProductsByCategoryIdAndName to throw, but it did not");
+
+        assertEquals("Category not found with ID: " + categoryId + " and NAME: " + formattedName, exception.getMessage(),
+                "The exception message should indicate category not found");
+    }
+
+    @Test
+    @DisplayName("Format name: Correct formatting")
+    void testFormatName() {
+        String name = "example";
+        String formattedName = categoryServiceImpl.formatName(name);
+
+        assertEquals("Example%", formattedName, "The formatted name should be 'Example%'");
+    }
 }
+
