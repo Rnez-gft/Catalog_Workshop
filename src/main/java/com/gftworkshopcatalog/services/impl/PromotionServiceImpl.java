@@ -32,12 +32,7 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     public List<PromotionEntity> findAllPromotions() {
-        try{
             return promotionRepository.findAll();
-        }catch (DataAccessException ex){
-            log.error("Error accessing data from database", ex);
-            throw new RuntimeException("Error accessing data from database", ex);
-        }
     }
 
     public PromotionEntity findPromotiontById(long promotionId) {

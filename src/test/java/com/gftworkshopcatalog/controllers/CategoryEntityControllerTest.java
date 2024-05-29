@@ -111,11 +111,11 @@ class CategoryEntityControllerTest {
     void test_deleteCategoryById() throws Exception {
         long categoryId = 1L;
 
-        doNothing().when(categoryService).deleteCategory(categoryId);
+        doNothing().when(categoryService).deleteCategoryById(categoryId);
 
         mockMvc.perform(delete("/categories/{id}", categoryId))
                 .andExpect(status().isNoContent());
-        verify(categoryService).deleteCategory(categoryId);
+        verify(categoryService).deleteCategoryById(categoryId);
     }
 
 
@@ -125,11 +125,11 @@ class CategoryEntityControllerTest {
         Long categoryId = 999L;
 
         doThrow(new NotFoundPromotion("Promotion not found with ID: " + categoryId))
-                .when(categoryService).deleteCategory(categoryId);
+                .when(categoryService).deleteCategoryById(categoryId);
         mockMvc.perform(delete("/categories/{id}", categoryId))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Promotion not found with ID: " + categoryId));
-        verify(categoryService).deleteCategory(categoryId);
+        verify(categoryService).deleteCategoryById(categoryId);
     }
 
 

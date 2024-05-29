@@ -71,7 +71,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
 
-    public void deleteCategory(long categoryId) {
+    public void deleteCategoryById(long categoryId) {
         CategoryEntity categoryEntity = findCategoryById(categoryId);
 
         List<ProductEntity> products = productRepository.findByCategoryId(categoryId);

@@ -3,7 +3,6 @@ package com.gftworkshopcatalog.services;
 import com.gftworkshopcatalog.exceptions.*;
 import com.gftworkshopcatalog.model.CategoryEntity;
 import com.gftworkshopcatalog.model.ProductEntity;
-import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.repositories.CategoryRepository;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
@@ -143,7 +142,7 @@ class CategoryServiceImplTest {
         when(productRepository.findByCategoryId(categoryEntity.getCategoryId())).thenReturn(List.of());
         when(promotionRepository.findByCategoryId(categoryEntity.getCategoryId())).thenReturn(List.of());
 
-        categoryServiceImpl.deleteCategory(categoryEntity.getCategoryId());
+        categoryServiceImpl.deleteCategoryById(categoryEntity.getCategoryId());
 
         verify(categoryRepository, times(1)).delete(categoryEntity);
     }
@@ -157,7 +156,7 @@ class CategoryServiceImplTest {
 
         doThrow(EmptyResultDataAccessException.class).when(categoryRepository).delete(any());
 
-        NotFoundCategory exception = assertThrows(NotFoundCategory.class, () -> categoryServiceImpl.deleteCategory(nonExistentCategoryId));
+        NotFoundCategory exception = assertThrows(NotFoundCategory.class, () -> categoryServiceImpl.deleteCategoryById(nonExistentCategoryId));
 
         assertEquals("Category not found with ID: " + nonExistentCategoryId, exception.getMessage(), "The exception message should be 'Category not found with ID: " + nonExistentCategoryId + "'");
 
@@ -173,7 +172,7 @@ class CategoryServiceImplTest {
         
         doThrow(new InternalServiceException("Failed to delete category with ID: " + categoryEntity.getCategoryId())).when(categoryRepository).delete(categoryEntity);
 
-        InternalServiceException exception = assertThrows(InternalServiceException.class, () -> categoryServiceImpl.deleteCategory(categoryEntity.getCategoryId()));
+        InternalServiceException exception = assertThrows(InternalServiceException.class, () -> categoryServiceImpl.deleteCategoryById(categoryEntity.getCategoryId()));
 
         assertEquals("Failed to delete category with ID: " + categoryEntity.getCategoryId(), exception.getMessage(), "The exception message should be 'Failed to delete category with ID: " + categoryEntity.getCategoryId());
     }

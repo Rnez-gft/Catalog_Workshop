@@ -11,7 +11,7 @@ public interface CategoryService {
 
     public List<CategoryEntity> getAllCategories();
 
-    public void deleteCategory(long categoryId);
+    public void deleteCategoryById(long categoryId);
 
     public CategoryEntity findCategoryById(long categoryId);
 

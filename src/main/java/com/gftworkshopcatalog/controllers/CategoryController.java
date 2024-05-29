@@ -37,7 +37,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> findAllCategories() {
+    public ResponseEntity<List<CategoryEntity>> findAllCategories() {
             List<CategoryEntity> categories = categoryService.getAllCategories();
             return ResponseEntity.ok(categories);
     }
@@ -52,7 +52,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> addNewCategory(@RequestBody CategoryEntity categoryEntity) {
+    public ResponseEntity<CategoryEntity> addNewCategory(@RequestBody CategoryEntity categoryEntity) {
 
             CategoryEntity createdCategoryEntity = categoryService.addCategory(categoryEntity);
             return new ResponseEntity<>(createdCategoryEntity, HttpStatus.CREATED);
@@ -67,8 +67,9 @@ public class CategoryController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> deleteCategoryById(@Parameter(description = "Category ID") @PathVariable("categoryId") long categoryId) {
-            categoryService.deleteCategory(categoryId);
+
+    public ResponseEntity<CategoryEntity> deleteCategoryById(@Parameter(description = "Category ID") @PathVariable("categoryId") long categoryId) {
+            categoryService.deleteCategoryById(categoryId);
             return ResponseEntity.noContent().build();
     }
 
@@ -82,7 +83,8 @@ public class CategoryController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> listProductsByCategoryId(@Parameter(description = "Category ID") @PathVariable("categoryId") Long categoryId) {
+
+    public ResponseEntity<List<ProductEntity>> listProductsByCategoryId(@Parameter(description = "Category ID") @PathVariable("categoryId") Long categoryId) {
             List<ProductEntity> products = categoryService.findProductsByCategoryId(categoryId);
             return ResponseEntity.ok(products);
 

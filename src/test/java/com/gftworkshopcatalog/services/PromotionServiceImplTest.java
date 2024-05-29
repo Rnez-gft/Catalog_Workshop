@@ -99,13 +99,11 @@ class PromotionServiceImplTest {
     @Test
     @DisplayName("Find all promotions - DataAccessException")
     void testFindAllPromotionsDataAccessException() {
-        when(promotionRepository.findAll()).thenThrow(new DataAccessException("Database access error") {});
+        when(promotionRepository.findAll()).thenThrow(new DataAccessException("Failed to access data") {});
 
-        Exception exception = assertThrows(RuntimeException.class, () -> promotionServiceImpl.findAllPromotions(),
-                "Expected findAllPromotions to throw, but it did not");
-        assertTrue(exception.getMessage().contains("Error accessing data from database"));
-        assertNotNull(exception.getCause(), "Cause should not be null");
-        assertInstanceOf(DataAccessException.class, exception.getCause(), "The cause should be a DataAccessException");
+        assertThrows(DataAccessException.class, () -> {
+            promotionServiceImpl.findAllPromotions();
+        });
     }
     @Test
     @DisplayName("Find promotion by ID - Success")
@@ -336,6 +334,5 @@ class PromotionServiceImplTest {
 
         assertEquals(80.0, price);
     }
-
 }
 

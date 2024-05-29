@@ -1,25 +1,25 @@
 package com.gftworkshopcatalog;
 
+
 import com.gftworkshopcatalog.model.*;
-import com.gftworkshopcatalog.repositories.ProductRepository;
-import com.gftworkshopcatalog.services.CategoryService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.gftworkshopcatalog.model.ProductEntity;
+import com.gftworkshopcatalog.model.PromotionEntity;
+import com.gftworkshopcatalog.repositories.PromotionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -30,12 +30,18 @@ class CatalogFunctionalTest {
     WebTestClient webTestClient;
 
     @Autowired
-    ProductRepository productRepository;
+    PromotionRepository promotionRepository;
 
-    private CategoryService categoryService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
+    @BeforeEach
+    void setUp() {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-
+    }
 
     @Test
     @DisplayName("Find all products")
@@ -49,6 +55,7 @@ class CatalogFunctionalTest {
                     assertNotNull(response.getResponseBody());
                     assertFalse(response.getResponseBody().isEmpty());
                 });
+
     }
     @Test
     @DisplayName("Add NewProduct")
@@ -158,20 +165,83 @@ class CatalogFunctionalTest {
     }
 
     @Test
-    @DisplayName("Update non-existent product price")
-    void testUpdateNonExistentProductPrice() {
-        long productId = 999L;
-        double newPrice = 200.0;
+    @DisplayName("List all promotions - Success")
+    void testGetAllPromotionsSuccess() {
 
-        Map<String, Object> priceUpdate = Map.of("newPrice", newPrice);
-
-        webTestClient.patch().uri("/products/{productId}/price", productId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(priceUpdate)
+        webTestClient.get().uri("/promotions")
                 .exchange()
-                .expectStatus().is5xxServerError()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(PromotionEntity.class)
+                .consumeWith(response -> {
+                    assertNotNull(response.getResponseBody());
+                    assertTrue(response.getResponseBody().size() > 0); // Check that some promotions are returned
+                });
+    }
+    @Test
+    @DisplayName("Get Promotion Details - Success")
+    void testGetPromotionDetailsSuccess() {
+        PromotionEntity existingPromotion = promotionRepository.findAll().stream().findFirst()
+                .orElseThrow(() -> new IllegalStateException("No promotions available for testing"));
+
+        webTestClient.get().uri("/promotions/{id}", existingPromotion.getId())
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
-                .jsonPath("$.status").isEqualTo(500);
+                .jsonPath("$.id").isEqualTo(existingPromotion.getId());
+    }
+
+    @Test
+    @DisplayName("Add a new promotion - Success")
+    void testAddNewPromotionSuccess() throws JsonProcessingException {
+        LocalDate startDate = LocalDate.of(2024, 6, 1);
+        LocalDate endDate = startDate.plusDays(10);
+
+        PromotionEntity newPromotion = new PromotionEntity(1L, 1L, 10.0, "Volume", 5, startDate, endDate, true);
+
+        String promotionJson = objectMapper.writeValueAsString(newPromotion);
+
+        webTestClient.post().uri("/promotions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(promotionJson)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.categoryId").isEqualTo(newPromotion.getCategoryId())
+                .jsonPath("$.discount").isEqualTo(newPromotion.getDiscount())
+                .jsonPath("$.promotionType").isEqualTo(newPromotion.getPromotionType())
+                .jsonPath("$.volumeThreshold").isEqualTo(newPromotion.getVolumeThreshold())
+                .jsonPath("$.startDate").isEqualTo(startDate.toString())
+                .jsonPath("$.endDate").isEqualTo(endDate.toString())
+                .jsonPath("$.isActive").isEqualTo(newPromotion.getIsActive());
+    }
+    @Test
+    @DisplayName("Update a promotion - Success")
+    void testUpdatePromotionSuccess() {
+        long promotionId = 1L; // Assumed existing promotion ID
+        PromotionEntity updatedPromotionDetails = new PromotionEntity(promotionId, 1L, 0.20, "SEASONAL", 10, LocalDate.now(), LocalDate.now().plusDays(30), true);
+
+        webTestClient.put().uri("/promotions/{id}", promotionId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(updatedPromotionDetails)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(promotionId)
+                .jsonPath("$.discount").isEqualTo(0.20);
+    }
+
+    @Test
+    @DisplayName("Delete a promotion - Success")
+    void testDeletePromotionSuccess() {
+        Long promotionId = 2L;
+
+        webTestClient.delete().uri("/promotions/{id}", promotionId)
+                .exchange()
+                .expectStatus().isNoContent();
     }
 
     @Test

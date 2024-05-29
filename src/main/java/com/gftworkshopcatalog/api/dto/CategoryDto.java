@@ -11,14 +11,14 @@ import java.util.List;
 @Generated
 public class CategoryDto {
 
-    private Long category_Id;
+    private Long categoryId;
     private String name;
 
 
     @Override
     public String toString() {
         return "CategoryDto{" +
-                "categoryId=" + category_Id +
+                "categoryId=" + categoryId +
                 ", name='" + name + '\'' +
                 '}';
     }

@@ -62,7 +62,7 @@ public class PromotionController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> addPromotion(@RequestBody PromotionEntity promotionEntity) {
+    public ResponseEntity<PromotionEntity> addPromotion(@RequestBody PromotionEntity promotionEntity) {
         PromotionEntity createdPromotion = promotionService.addPromotion(promotionEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPromotion);
     }
