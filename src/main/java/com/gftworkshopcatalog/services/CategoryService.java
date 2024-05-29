@@ -11,10 +11,12 @@ public interface CategoryService {
 
     public List<CategoryEntity> getAllCategories();
 
-    public void deleteCategoryById(long id);
+    public void deleteCategory(long categoryId);
 
     public CategoryEntity findCategoryById(long categoryId);
 
     public List<ProductEntity> findProductsByCategoryId(Long categoryId);
+
+    public List<ProductEntity> findProductsByCategoryIdAndName(Long categoryId, String namePref);
 
 }

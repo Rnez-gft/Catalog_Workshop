@@ -4,7 +4,6 @@ import com.gftworkshopcatalog.exceptions.ErrorResponse;
 import com.gftworkshopcatalog.model.CategoryEntity;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.services.CategoryService;
-import com.gftworkshopcatalog.services.impl.CategoryServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -12,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -70,7 +68,7 @@ public class CategoryController {
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
     public ResponseEntity<?> deleteCategoryById(@Parameter(description = "Category ID") @PathVariable("categoryId") long categoryId) {
-            categoryService.deleteCategoryById(categoryId);
+            categoryService.deleteCategory(categoryId);
             return ResponseEntity.noContent().build();
     }
 
@@ -85,9 +83,28 @@ public class CategoryController {
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
     public ResponseEntity<?> listProductsByCategoryId(@Parameter(description = "Category ID") @PathVariable("categoryId") Long categoryId) {
-
             List<ProductEntity> products = categoryService.findProductsByCategoryId(categoryId);
             return ResponseEntity.ok(products);
 
     }
+
+    @GetMapping("/{categoryId}/{name}/products")
+    @Operation(summary = "List all products by category ID and name",
+            description = "Returns a list of all products for the specified category ID and name.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product list",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
+            @ApiResponse(responseCode = "404", description = "Category not found",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
+            @ApiResponse(responseCode = "500", description = "Error response",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
+    })
+    public ResponseEntity<?> listProductsByCategoryIdAndName(
+            @Parameter(description = "Category ID") @PathVariable("categoryId") Long categoryId,
+            @Parameter(description = "First word of the product name") @PathVariable("name") String name) {
+
+        List<ProductEntity> products = categoryService.findProductsByCategoryIdAndName(categoryId, name);
+        return ResponseEntity.ok(products);
+    }
+
 }
