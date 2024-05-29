@@ -138,7 +138,7 @@ class ProductServiceImplTest {
 
         ProductEntity productDetails = new ProductEntity();
         productDetails.setName("Sample Product 2");
-        productDetails.setPrice(2git 00.0);
+        productDetails.setPrice(200.0);
         productDetails.setCategoryId(2L);
         productDetails.setWeight(20.0);
         productDetails.setCurrentStock(70);
