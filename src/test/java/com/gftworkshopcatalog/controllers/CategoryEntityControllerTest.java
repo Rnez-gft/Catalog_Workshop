@@ -1,16 +1,10 @@
 package com.gftworkshopcatalog.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gftworkshopcatalog.exceptions.*;
 import com.gftworkshopcatalog.model.CategoryEntity;
 import com.gftworkshopcatalog.model.ProductEntity;
-import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.services.impl.CategoryServiceImpl;
-import jakarta.persistence.EntityNotFoundException;
-import org.hibernate.service.spi.ServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,9 +18,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -189,6 +181,46 @@ class CategoryEntityControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Category not found with ID: " + categoryId));
         verify(categoryService).findProductsByCategoryId(categoryId);
+    }
+
+    @Test
+    @DisplayName("List products by category ID and name - Success")
+    void test_listProductsByCategoryIdAndName_Success() throws Exception {
+        Long categoryId = 1L;
+        String name = "Electronics";
+        List<ProductEntity> products = Arrays.asList(
+                new ProductEntity(1L, "Electronics Product1", "Description1", 100.0, 1L, 1.0, 100, 10),
+                new ProductEntity(2L, "Electronics Product2", "Description2", 200.0, 1L, 2.0, 200, 20)
+        );
+
+        when(categoryService.findProductsByCategoryIdAndName(categoryId, name)).thenReturn(products);
+
+        mockMvc.perform(get("/categories/{categoryId}/{name}/products", categoryId, name)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].categoryId").value(products.get(0).getCategoryId()))
+                .andExpect(jsonPath("$[0].name").value(products.get(0).getName()))
+                .andExpect(jsonPath("$[1].categoryId").value(products.get(1).getCategoryId()))
+                .andExpect(jsonPath("$[1].name").value(products.get(1).getName()));
+
+        verify(categoryService).findProductsByCategoryIdAndName(categoryId, name);
+    }
+
+    @Test
+    @DisplayName("List products by category ID and name - NotFound")
+    void test_listProductsByCategoryIdAndName_NotFound() throws Exception {
+        Long categoryId = 999L;
+        String name = "NonExistent";
+
+        when(categoryService.findProductsByCategoryIdAndName(categoryId, name)).thenThrow(new NotFoundCategory("Category not found with ID: " + categoryId + " and NAME: " + name));
+
+        mockMvc.perform(get("/categories/{categoryId}/{name}/products", categoryId, name)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Category not found with ID: " + categoryId + " and NAME: " + name));
+
+        verify(categoryService).findProductsByCategoryIdAndName(categoryId, name);
     }
 
 

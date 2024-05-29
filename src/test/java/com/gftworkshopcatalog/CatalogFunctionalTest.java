@@ -1,5 +1,7 @@
 package com.gftworkshopcatalog;
 
+
+import com.gftworkshopcatalog.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -15,12 +17,10 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
-
 import java.time.LocalDate;
 
 
 import static org.junit.jupiter.api.Assertions.*;
-
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -43,6 +43,7 @@ class CatalogFunctionalTest {
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
     }
+
     @Test
     @DisplayName("Find all products")
     void testListAllProducts() {
@@ -123,7 +124,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.status").isEqualTo("BAD_REQUEST");
     }
     @Test
-    @DisplayName("Test UpdateProduct()")
+    @DisplayName("Update Product")
     void testUpdateProduct() {
         long productId = 1L;
 
@@ -154,7 +155,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.errorCode").doesNotExist();
     }
     @Test
-    @DisplayName("Test DeleteProduct()")
+    @DisplayName("Delete Product")
     void testDeleteProduct() {
 
         webTestClient.delete().uri("/products/{id}", 1L)
@@ -167,6 +168,7 @@ class CatalogFunctionalTest {
     @Test
     @DisplayName("List all promotions - Success")
     void testGetAllPromotionsSuccess() {
+
         webTestClient.get().uri("/promotions")
                 .exchange()
                 .expectStatus().isOk()
@@ -241,6 +243,97 @@ class CatalogFunctionalTest {
         webTestClient.delete().uri("/promotions/{id}", promotionId)
                 .exchange()
                 .expectStatus().isNoContent();
+    }
+
+    @Test
+    @DisplayName("Find all categories")
+    void testfindAllCategories() {
+
+        webTestClient.get().uri("/categories")
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(CategoryEntity.class).hasSize(7)
+                .consumeWith(response -> {
+                    assertNotNull(response.getResponseBody());
+                    assertFalse(response.getResponseBody().isEmpty());
+                });
+    }
+
+    @Test
+    @DisplayName("Add NewProduct")
+    void testAddNewCategory() {
+        CategoryEntity newCategoryEntity = new CategoryEntity();
+        newCategoryEntity.setCategoryId(7L);
+        newCategoryEntity.setName("Category7");
+
+        webTestClient.post().uri("/categories")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newCategoryEntity)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.categoryId").isNotEmpty()
+                .jsonPath("$.name").isEqualTo("Category7");
+    }
+
+    @Test
+    @DisplayName("Delete CategoryById")
+    void testdeleteCategoryById() {
+        long categoryId = 7L;
+
+        CategoryEntity newCategoryEntity = new CategoryEntity();
+        newCategoryEntity.setCategoryId(7L);
+        newCategoryEntity.setName("Category7");
+
+        webTestClient.post().uri("/categories")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newCategoryEntity)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.categoryId").isNotEmpty()
+                .jsonPath("$.name").isEqualTo("Category7");
+
+        webTestClient.delete().uri("/categories/{categoryId}", categoryId)
+                .exchange()
+                .expectStatus().isNoContent()
+                .expectBody()
+                .jsonPath("$.errorCode").doesNotExist();
+    }
+
+    @Test
+    @DisplayName("Get list of Product by categoryId")
+    void testlistProductsByCategoryId() {
+        long categoryId = 1L;
+
+        webTestClient.get().uri("/categories/{categoryId}/products", categoryId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$[0].categoryId").isEqualTo(categoryId)
+                .jsonPath("$[1].categoryId").isEqualTo(categoryId)
+                .jsonPath("$[2].categoryId").isEqualTo(categoryId);
+
+
+    }
+
+    @Test
+    @DisplayName("List Products By Category ID and Name - Success")
+    void testListProductsByCategoryIdAndName_Success() {
+        long categoryId = 2L;
+        String name = "pu";
+
+        webTestClient.get()
+                .uri("/categories/{categoryId}/{name}/products", categoryId, name)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(ProductEntity.class);
+
     }
 
 }
