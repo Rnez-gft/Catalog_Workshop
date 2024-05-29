@@ -6,9 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.model.PromotionEntity;
-import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
-import com.gftworkshopcatalog.services.impl.PromotionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.time.LocalDate;
-import java.util.Map;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -175,7 +173,7 @@ class CatalogFunctionalTest {
                 .expectBodyList(PromotionEntity.class)
                 .consumeWith(response -> {
                     assertNotNull(response.getResponseBody());
-                    assertTrue(response.getResponseBody().size() > 0); // Check that some promotions are returned
+                    assertFalse(response.getResponseBody().isEmpty());
                 });
     }
     @Test
@@ -220,7 +218,7 @@ class CatalogFunctionalTest {
     @Test
     @DisplayName("Update a promotion - Success")
     void testUpdatePromotionSuccess() {
-        long promotionId = 1L; // Assumed existing promotion ID
+        long promotionId = 1L;
         PromotionEntity updatedPromotionDetails = new PromotionEntity(promotionId, 1L, 0.20, "SEASONAL", 10, LocalDate.now(), LocalDate.now().plusDays(30), true);
 
         webTestClient.put().uri("/promotions/{id}", promotionId)

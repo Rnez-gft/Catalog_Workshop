@@ -1,6 +1,7 @@
 package com.gftworkshopcatalog.controllers;
 
 import com.gftworkshopcatalog.exceptions.ErrorResponse;
+import com.gftworkshopcatalog.exceptions.SuccessResponse;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -160,22 +161,5 @@ public class ProductController {
     public ResponseEntity<Double> getPriceProductCheckout(@Parameter(description = "Product ID")@PathVariable Long id, @Parameter(description = "Quantity of a product")@RequestParam int quantity) {
             double discountedPrice = productServiceImpl.calculateDiscountedPrice(id, quantity);
             return ResponseEntity.ok(discountedPrice);
-    }
-
-    @Generated
-    public class SuccessResponse {
-        private String message;
-
-        public SuccessResponse(String message) {
-            this.message = message;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
     }
 }
