@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import java.time.LocalDate;
 
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -123,7 +124,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.status").isEqualTo("BAD_REQUEST");
     }
     @Test
-    @DisplayName("Test UpdateProduct()")
+    @DisplayName("Update Product")
     void testUpdateProduct() {
         long productId = 1L;
 
@@ -154,7 +155,7 @@ class CatalogFunctionalTest {
                 .jsonPath("$.errorCode").doesNotExist();
     }
     @Test
-    @DisplayName("Test DeleteProduct()")
+    @DisplayName("Delete Product")
     void testDeleteProduct() {
 
         webTestClient.delete().uri("/products/{id}", 1L)
@@ -175,7 +176,7 @@ class CatalogFunctionalTest {
                 .expectBodyList(PromotionEntity.class)
                 .consumeWith(response -> {
                     assertNotNull(response.getResponseBody());
-                    assertTrue(response.getResponseBody().size() > 0); // Check that some promotions are returned
+                    assertFalse(response.getResponseBody().isEmpty());
                 });
     }
     @Test
@@ -220,7 +221,7 @@ class CatalogFunctionalTest {
     @Test
     @DisplayName("Update a promotion - Success")
     void testUpdatePromotionSuccess() {
-        long promotionId = 1L; // Assumed existing promotion ID
+        long promotionId = 1L;
         PromotionEntity updatedPromotionDetails = new PromotionEntity(promotionId, 1L, 0.20, "SEASONAL", 10, LocalDate.now(), LocalDate.now().plusDays(30), true);
 
         webTestClient.put().uri("/promotions/{id}", promotionId)
@@ -245,7 +246,7 @@ class CatalogFunctionalTest {
     }
 
     @Test
-    @DisplayName("find all categories")
+    @DisplayName("Find all categories")
     void testfindAllCategories() {
 
         webTestClient.get().uri("/categories")
@@ -278,7 +279,7 @@ class CatalogFunctionalTest {
     }
 
     @Test
-    @DisplayName("Test deleteCategoryById()")
+    @DisplayName("Delete CategoryById")
     void testdeleteCategoryById() {
         long categoryId = 7L;
 

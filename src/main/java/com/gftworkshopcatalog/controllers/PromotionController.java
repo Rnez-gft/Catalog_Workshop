@@ -1,7 +1,7 @@
 package com.gftworkshopcatalog.controllers;
 
 import com.gftworkshopcatalog.exceptions.ErrorResponse;
-import com.gftworkshopcatalog.exceptions.NotFoundPromotion;
+import com.gftworkshopcatalog.exceptions.SuccessResponse;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.services.impl.PromotionServiceImpl;
@@ -84,7 +84,7 @@ public class PromotionController {
     @Operation(summary = "Delete a promotion", description = "Deletes a specific promotion.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Promotion deleted",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductController.SuccessResponse.class)) }),
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = SuccessResponse.class)) }),
             @ApiResponse(responseCode = "404", description = "Promotion not found",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "500", description = "Error response",
