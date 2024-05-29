@@ -334,6 +334,5 @@ class PromotionServiceImplTest {
 
         assertEquals(80.0, price);
     }
-
 }
 

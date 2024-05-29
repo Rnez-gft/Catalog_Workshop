@@ -1,5 +1,6 @@
 package com.gftworkshopcatalog.controllers;
 
+import com.gftworkshopcatalog.api.dto.CartProductDTO;
 import com.gftworkshopcatalog.exceptions.ErrorResponse;
 import com.gftworkshopcatalog.exceptions.SuccessResponse;
 import com.gftworkshopcatalog.model.ProductEntity;
@@ -11,12 +12,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Generated;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/products")
@@ -161,5 +162,21 @@ public class ProductController {
     public ResponseEntity<Double> getPriceProductCheckout(@Parameter(description = "Product ID")@PathVariable Long id, @Parameter(description = "Quantity of a product")@RequestParam int quantity) {
             double discountedPrice = productServiceImpl.calculateDiscountedPrice(id, quantity);
             return ResponseEntity.ok(discountedPrice);
+    }
+
+    @PostMapping("/volumePromotion")
+    @Operation(summary = "Get the total price at checkout", description = "Gets the total price based on volume promotions during checkout.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Price successfully retrieved",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class))),
+            @ApiResponse(responseCode = "404", description = "Product not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<List<ProductEntity>> getPriceProductCheckout(
+            @Parameter(description = "List of cart products") @RequestBody List<CartProductDTO> cartProducts) {
+        List<ProductEntity> discountedProducts = productServiceImpl.calculateDiscountedPriceV2(cartProducts);
+        return ResponseEntity.ok(discountedProducts);
     }
 }

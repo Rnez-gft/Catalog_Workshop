@@ -1,5 +1,6 @@
 package com.gftworkshopcatalog.services.impl;
 
+import com.gftworkshopcatalog.api.dto.CartProductDTO;
 import com.gftworkshopcatalog.exceptions.AddProductInvalidArgumentsExceptions;
 import com.gftworkshopcatalog.exceptions.BadRequest;
 import com.gftworkshopcatalog.exceptions.NotFoundProduct;
@@ -12,7 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.gftworkshopcatalog.utils.ProductValidationUtils.validateProductEntity;
 
@@ -124,4 +127,48 @@ public class ProductServiceImpl implements ProductService {
             }
             return originalPrice;
         }
+
+    public List<ProductEntity> calculateDiscountedPriceV2(List<CartProductDTO> cartProducts) {
+        List<ProductEntity> discountedProducts = new ArrayList<>();
+
+        for (CartProductDTO cartProduct : cartProducts) {
+            Long productId = cartProduct.getProductId();
+            int quantity = cartProduct.getQuantity();
+
+            ProductEntity product = productRepository.findById(productId)
+                    .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + productId));
+
+            PromotionEntity promotion = promotionRepository.findActivePromotionByCategoryId(product.getCategoryId());
+
+            double discountedPricePerUnit = product.getPrice();
+            if (promotion != null && promotion.getIsActive() && "VOLUME".equalsIgnoreCase(promotion.getPromotionType())) {
+                discountedPricePerUnit = calculateNewPriceV2(product.getPrice(), promotion, quantity);
+            }
+
+
+            double totalPrice = discountedPricePerUnit * quantity;
+            double totalWeight = product.getWeight() * quantity;
+
+            ProductEntity discountedProduct = new ProductEntity();
+            discountedProduct.setId(product.getId());
+            discountedProduct.setName(product.getName());
+            discountedProduct.setDescription(product.getDescription());
+            discountedProduct.setPrice(totalPrice);
+            discountedProduct.setCategoryId(product.getCategoryId());
+            discountedProduct.setWeight(totalWeight);
+            discountedProduct.setCurrentStock(product.getCurrentStock());
+            discountedProduct.setMinStock(product.getMinStock());
+
+            discountedProducts.add(discountedProduct);
+        }
+
+        return discountedProducts;
+    }
+
+    public double calculateNewPriceV2(double originalPrice, PromotionEntity promotion, int quantity) {
+        if (quantity >= promotion.getVolumeThreshold()) {
+            return originalPrice * (1 - promotion.getDiscount());
+        }
+        return originalPrice;
+    }
 }
