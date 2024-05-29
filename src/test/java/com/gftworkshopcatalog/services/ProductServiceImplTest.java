@@ -129,7 +129,21 @@ class ProductServiceImplTest {
     void updateProduct_Success() {
         long productId = 1L;
         ProductEntity existingProduct = new ProductEntity();
+        existingProduct.setName("Sample Product");
+        existingProduct.setPrice(100.0);
+        existingProduct.setCategoryId(1L);
+        existingProduct.setWeight(10.0);
+        existingProduct.setCurrentStock(50);
+        existingProduct.setMinStock(5);
+
         ProductEntity productDetails = new ProductEntity();
+        productDetails.setName("Sample Product 2");
+        productDetails.setPrice(2git 00.0);
+        productDetails.setCategoryId(2L);
+        productDetails.setWeight(20.0);
+        productDetails.setCurrentStock(70);
+        productDetails.setMinStock(10);
+
         when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
         when(productRepository.save(any(ProductEntity.class))).thenReturn(existingProduct);
         ProductEntity result = productServiceImpl.updateProduct(productId, productDetails);

@@ -1,5 +1,6 @@
 package com.gftworkshopcatalog.services.impl;
 
+import com.gftworkshopcatalog.exceptions.AddProductInvalidArgumentsExceptions;
 import com.gftworkshopcatalog.exceptions.NotFoundPromotion;
 import com.gftworkshopcatalog.model.ProductEntity;
 
@@ -13,6 +14,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
+
+import static com.gftworkshopcatalog.utils.ProductValidationUtils.validateProductEntity;
+import static com.gftworkshopcatalog.utils.PromotionValidationUtils.validatePromotionEntity;
 
 
 @Slf4j
@@ -44,10 +48,19 @@ public class PromotionServiceImpl implements PromotionService {
         if (promotionEntity == null) {
             throw new IllegalArgumentException("Promotion details must not be null");
         }
+        validatePromotionEntity(promotionEntity);
+
         return promotionRepository.save(promotionEntity);
     }
 
     public PromotionEntity updatePromotion(long promotionId, PromotionEntity promotionEntityDetails) {
+
+        if (promotionEntityDetails == null) {
+            throw new AddProductInvalidArgumentsExceptions("Product details must not be null.");
+        }
+
+        validatePromotionEntity(promotionEntityDetails);
+
         PromotionEntity existingPromotion = findPromotiontById(promotionId);
         updatePromotionEntity(existingPromotion, promotionEntityDetails);
         return promotionRepository.save(existingPromotion);

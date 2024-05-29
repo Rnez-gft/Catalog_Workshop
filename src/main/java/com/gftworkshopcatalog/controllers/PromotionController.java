@@ -59,6 +59,8 @@ public class PromotionController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Promotion created",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
+            @ApiResponse(responseCode = "400", description = "Error response",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
@@ -71,6 +73,8 @@ public class PromotionController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Promotion updated",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
+            @ApiResponse(responseCode = "400", description = "Promotion bad request",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "404", description = "Promotion not found",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "500", description = "Error response",

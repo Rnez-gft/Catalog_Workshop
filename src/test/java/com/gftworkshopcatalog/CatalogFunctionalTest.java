@@ -156,6 +156,47 @@ class CatalogFunctionalTest {
                 .jsonPath("$.minStock").isEqualTo(15)
                 .jsonPath("$.errorCode").doesNotExist();
     }
+
+    @Test
+    @DisplayName("Update Product - Not Found")
+    void testUpdateProduct_NotFound() {
+        long nonExistingProductId = 999L;
+
+        ProductEntity updatedProductEntity = new ProductEntity();
+        updatedProductEntity.setName("Updated Product Name");
+        updatedProductEntity.setDescription("Updated Product Description");
+        updatedProductEntity.setPrice(29.99);
+        updatedProductEntity.setCategoryId(6L);
+        updatedProductEntity.setWeight(2.5);
+        updatedProductEntity.setCurrentStock(150);
+        updatedProductEntity.setMinStock(15);
+
+        webTestClient.put().uri("/products/{id}", nonExistingProductId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(updatedProductEntity)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("NOT_FOUND");
+    }
+
+    @Test
+    @DisplayName("Update Product with Invalid Data - Bad Request")
+    void testUpdateProduct_InvalidData() {
+        long productId = 1L;
+
+        ProductEntity invalidProductEntity = new ProductEntity();
+        invalidProductEntity.setPrice(-19.99);
+
+        webTestClient.put().uri("/products/{id}", productId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(invalidProductEntity)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("BAD_REQUEST");
+    }
+
     @Test
     @DisplayName("Delete Product - Success")
     void testDeleteProduct() {
@@ -165,6 +206,18 @@ class CatalogFunctionalTest {
                 .expectStatus().isNoContent()
                 .expectBody()
                 .jsonPath("$.errorCode").doesNotExist();
+    }
+
+    @Test
+    @DisplayName("Delete Product - Not Found")
+    void testDeleteProduct_NotFound() {
+        long nonExistingProductId = 999L;
+
+        webTestClient.delete().uri("/products/{id}", nonExistingProductId)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("NOT_FOUND");
     }
 
     @Test
@@ -196,6 +249,18 @@ class CatalogFunctionalTest {
     }
 
     @Test
+    @DisplayName("Get Promotion Details - Not Found")
+    void testGetPromotionDetails_NotFound() {
+        long nonExistingPromotionId = 999L;
+
+        webTestClient.get().uri("/promotions/{id}", nonExistingPromotionId)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("NOT_FOUND");
+    }
+
+    @Test
     @DisplayName("Add a new promotion - Success")
     void testAddNewPromotionSuccess() throws JsonProcessingException {
         LocalDate startDate = LocalDate.of(2024, 6, 1);
@@ -220,6 +285,22 @@ class CatalogFunctionalTest {
                 .jsonPath("$.endDate").isEqualTo(endDate.toString())
                 .jsonPath("$.isActive").isEqualTo(newPromotion.getIsActive());
     }
+
+    @Test
+    @DisplayName("Add New Promotion with Invalid Data - Bad Request")
+    void testAddNewPromotion_InvalidData() {
+        PromotionEntity invalidPromotion = new PromotionEntity();
+        // Do not set required fields
+
+        webTestClient.post().uri("/promotions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(invalidPromotion)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("BAD_REQUEST");
+    }
+
     @Test
     @DisplayName("Update a promotion - Success")
     void testUpdatePromotionSuccess() {
@@ -238,6 +319,37 @@ class CatalogFunctionalTest {
     }
 
     @Test
+    @DisplayName("Update Promotion - Not Found")
+    void testUpdatePromotion_NotFound() {
+        long nonExistingPromotionId = 999L;
+        PromotionEntity updatedPromotionDetails = new PromotionEntity(nonExistingPromotionId, 1L, 0.20, "SEASONAL", 10, LocalDate.now(), LocalDate.now().plusDays(30), true);
+
+        webTestClient.put().uri("/promotions/{id}", nonExistingPromotionId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(updatedPromotionDetails)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("NOT_FOUND");
+    }
+
+    @Test
+    @DisplayName("Update Promotion with Invalid Data - Bad Request")
+    void testUpdatePromotion_InvalidData() {
+        long promotionId = 1L;
+        PromotionEntity invalidPromotionDetails = new PromotionEntity();
+        // Do not set required fields or set invalid values
+
+        webTestClient.put().uri("/promotions/{id}", promotionId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(invalidPromotionDetails)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("BAD_REQUEST");
+    }
+
+    @Test
     @DisplayName("Delete a promotion - Success")
     void testDeletePromotionSuccess() {
         Long promotionId = 2L;
@@ -245,6 +357,18 @@ class CatalogFunctionalTest {
         webTestClient.delete().uri("/promotions/{id}", promotionId)
                 .exchange()
                 .expectStatus().isNoContent();
+    }
+
+    @Test
+    @DisplayName("Delete Promotion - Not Found")
+    void testDeletePromotion_NotFound() {
+        long nonExistingPromotionId = 999L;
+
+        webTestClient.delete().uri("/promotions/{id}", nonExistingPromotionId)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("NOT_FOUND");
     }
 
     @Test
