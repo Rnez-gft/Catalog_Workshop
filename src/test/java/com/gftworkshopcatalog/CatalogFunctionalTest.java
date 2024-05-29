@@ -60,6 +60,7 @@ class CatalogFunctionalTest {
     }
     @Test
     @DisplayName("Add NewProduct - Success")
+
     void testAddNewProduct() {
         ProductEntity newProductEntity = new ProductEntity();
         newProductEntity.setName("Test Product");
@@ -110,8 +111,9 @@ class CatalogFunctionalTest {
     }
 
     @Test
-    @DisplayName("Add new product - Bad Request")
-    void testAddNewProduct_InvalidData() {
+
+    @DisplayName("Add new product - BadRequest")
+    void testAddInvalidProduct() {
         ProductEntity invalidProduct = new ProductEntity();
         invalidProduct.setPrice(-19.99); // Invalid price
 
@@ -247,7 +249,7 @@ class CatalogFunctionalTest {
 
     @Test
     @DisplayName("Find all categories - Success")
-    void testfindAllCategories() {
+    void testFindAllCategories() {
 
         webTestClient.get().uri("/categories")
                 .exchange()
@@ -262,6 +264,7 @@ class CatalogFunctionalTest {
 
     @Test
     @DisplayName("Add NewProduct - Success")
+
     void testAddNewCategory() {
         CategoryEntity newCategoryEntity = new CategoryEntity();
         newCategoryEntity.setCategoryId(7L);
@@ -279,7 +282,7 @@ class CatalogFunctionalTest {
     }
 
     @Test
-    @DisplayName("Delete CategoryById - Success")
+    @DisplayName("Delete Category by Id - Success")
     void testdeleteCategoryById() {
         long categoryId = 7L;
 
@@ -322,7 +325,7 @@ class CatalogFunctionalTest {
     }
 
     @Test
-    @DisplayName("List Products By Category ID and Name - Success")
+    @DisplayName("List Products by Category ID and Name - Success")
     void testListProductsByCategoryIdAndName_Success() {
         long categoryId = 2L;
         String name = "pu";
