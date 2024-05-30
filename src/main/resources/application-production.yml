@@ -9,7 +9,7 @@ spring:
   datasource:
     driverClassName: org.h2.Driver
     password: ''
-    url: jdbc:h2:mem:production
+    url: jdbc:mysql://34.175.164.238:3306/CatalogDB
     username: sa
   h2:
     console:
