@@ -78,6 +78,8 @@ public class ProductController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product updated",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ProductEntity.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "404", description = "Product not found",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "500", description = "Error response",
@@ -103,7 +105,7 @@ public class ProductController {
             return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/{newPrice}")
+    @PatchMapping("/newPrice/{id}/{newPrice}")
     @Operation(summary = "Update the price of a product", description = "Partially updates the price of a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Price successfully updated",
@@ -118,7 +120,7 @@ public class ProductController {
             return ResponseEntity.ok(updatedProductEntity);
     }
 
-    @PatchMapping("/{id}/{quantity}")
+    @PatchMapping("/newStock/{id}/{quantity}")
     @Operation(summary = "Update the stock of a product", description = "Partially updates the stock of a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Stock successfully updated",
