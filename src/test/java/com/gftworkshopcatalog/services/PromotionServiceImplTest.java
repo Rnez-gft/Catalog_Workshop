@@ -1,5 +1,6 @@
 package com.gftworkshopcatalog.services;
 
+import com.gftworkshopcatalog.exceptions.AddProductInvalidArgumentsExceptions;
 import com.gftworkshopcatalog.exceptions.InternalServiceException;
 import com.gftworkshopcatalog.exceptions.NotFoundProduct;
 import com.gftworkshopcatalog.exceptions.NotFoundPromotion;
@@ -221,6 +222,13 @@ class PromotionServiceImplTest {
         );
         verify(promotionRepository).save(promotionEntity);
     }
+    @Test
+    @DisplayName("Update Promotion - Null Details Exception")
+    void testUpdatePromotionNullDetails() {
+        Exception exception = assertThrows(AddProductInvalidArgumentsExceptions.class, () -> promotionServiceImpl.updatePromotion(1L, null));
+        assertEquals("Product details must not be null.", exception.getMessage());
+    }
+
     @Test
     @DisplayName("Update a promotion - NotFoundPromotion")
     void updatePromotion_NotFound() {

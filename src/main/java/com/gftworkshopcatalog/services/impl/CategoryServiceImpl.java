@@ -3,17 +3,13 @@ package com.gftworkshopcatalog.services.impl;
 import com.gftworkshopcatalog.exceptions.*;
 import com.gftworkshopcatalog.model.CategoryEntity;
 import com.gftworkshopcatalog.model.ProductEntity;
-import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.repositories.CategoryRepository;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.CategoryService;
-import jakarta.persistence.EntityNotFoundException;
+import com.gftworkshopcatalog.utils.CategoryValidationUtils;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 
@@ -25,23 +21,18 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
-    private final PromotionRepository promotionRepository;
+    private final CategoryValidationUtils categoryValidationUtils;
 
 
     public CategoryServiceImpl(CategoryRepository categoryRepository, ProductRepository productRepository, PromotionRepository promotionRepository) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
-        this.promotionRepository = promotionRepository;
+        this.categoryValidationUtils = new CategoryValidationUtils(productRepository, promotionRepository);
 
     }
 
     public List<CategoryEntity> getAllCategories() {
-        try {
             return categoryRepository.findAll();
-        } catch (DataAccessException ex) {
-            log.error("Error accessing data from database", ex);
-            throw new RuntimeException("Error accessing data from database", ex);
-        }
     }
 
     public CategoryEntity findCategoryById(long categoryId) {
@@ -53,7 +44,6 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     public List<ProductEntity> findProductsByCategoryId(Long categoryId) {
-
         List<ProductEntity> products = productRepository.findByCategoryId(categoryId);
         if (products.isEmpty()) {
             log.error("Category not found with ID: {}", categoryId);
@@ -69,26 +59,10 @@ public class CategoryServiceImpl implements CategoryService {
         }
         return categoryRepository.save(categoryEntity);
     }
-
-
     public void deleteCategoryById(long categoryId) {
         CategoryEntity categoryEntity = findCategoryById(categoryId);
-
-        List<ProductEntity> products = productRepository.findByCategoryId(categoryId);
-        if (!products.isEmpty()) {
-            throw new InternalServiceException("Cannot delete category because it's referenced by products.");
-        }
-
-        List<PromotionEntity> promotions = promotionRepository.findByCategoryId(categoryId);
-        if (!promotions.isEmpty()) {
-            throw new InternalServiceException("Cannot delete category because it is referenced by promotions.");
-        }
-
-        try {
-            categoryRepository.delete(categoryEntity);
-        } catch (Exception e) {
-            throw new InternalServiceException("Failed to delete category with ID: " + categoryId);
-        }
+        categoryValidationUtils.validateCategoryDeletion(categoryId);
+        categoryRepository.delete(categoryEntity);
     }
 
     public List<ProductEntity> findProductsByCategoryIdAndName(Long categoryId, String name) {

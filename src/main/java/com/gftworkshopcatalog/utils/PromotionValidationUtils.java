@@ -1,10 +1,9 @@
 package com.gftworkshopcatalog.utils;
 
 import com.gftworkshopcatalog.exceptions.AddProductInvalidArgumentsExceptions;
-import com.gftworkshopcatalog.model.ProductEntity;
+
 import com.gftworkshopcatalog.model.PromotionEntity;
 
-import java.time.LocalDate;
 
 public class PromotionValidationUtils {
 
