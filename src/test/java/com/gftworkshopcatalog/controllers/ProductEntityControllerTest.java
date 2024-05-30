@@ -441,9 +441,9 @@ class ProductEntityControllerTest {
                         .build()
         );
 
-        when(productServiceImpl.calculateDiscountedPriceV2(cartProducts)).thenReturn(discountedProducts);
+        when(productServiceImpl.calculateCartProductPrice(cartProducts)).thenReturn(discountedProducts);
 
-        ResponseEntity<List<ProductEntity>> response = productController.getPriceProductCheckoutV2(cartProducts);
+        ResponseEntity<List<ProductEntity>> response = productController.priceCartProductCheckout(cartProducts);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(2, response.getBody().size());
@@ -473,10 +473,10 @@ class ProductEntityControllerTest {
                         .build()
         );
 
-        when(productServiceImpl.calculateDiscountedPriceV2(cartProducts)).thenThrow(new NotFoundProduct("Product not found"));
+        when(productServiceImpl.calculateCartProductPrice(cartProducts)).thenThrow(new NotFoundProduct("Product not found"));
 
         NotFoundProduct exception = assertThrows(NotFoundProduct.class, () -> {
-            productController.getPriceProductCheckoutV2(cartProducts);
+            productController.priceCartProductCheckout(cartProducts);
         });
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());

@@ -11,11 +11,8 @@ import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.gftworkshopcatalog.utils.ProductValidationUtils.validateProductEntity;
 
@@ -27,6 +24,8 @@ public class ProductServiceImpl implements ProductService {
 
     private final PromotionRepository promotionRepository;
     private final ProductRepository productRepository;
+
+    String notFound="Product not found with ID: ";
 
     public ProductServiceImpl(PromotionRepository promotionRepository, ProductRepository productRepository) {
         this.promotionRepository = promotionRepository;
@@ -41,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductEntity findProductById(long productId) {
         return productRepository.findById(productId).orElseThrow(() -> {
             log.error("Product not found with ID: {}", productId);
-            return new NotFoundProduct("Product not found with ID: " + productId);
+            return new NotFoundProduct(notFound + productId);
         });
     }
 
@@ -91,7 +90,7 @@ public class ProductServiceImpl implements ProductService {
 
     public ProductEntity updateProductStock(long productId, int quantity) {
         ProductEntity product = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + productId));
+                .orElseThrow(() -> new NotFoundProduct(notFound + productId));
         int newStock = product.getCurrentStock() + quantity;
         if (newStock < 0) {
             throw new BadRequest("Insufficient stock to decrement by " + quantity);
@@ -123,14 +122,14 @@ public class ProductServiceImpl implements ProductService {
             return product.getPrice();
         }
 
-        private double calculateNewPrice(double originalPrice, PromotionEntity promotion, int quantity) {
+        public double calculateNewPrice(double originalPrice, PromotionEntity promotion, int quantity) {
             if (quantity >= promotion.getVolumeThreshold()) {
                 return originalPrice * (1 - promotion.getDiscount());
             }
             return originalPrice;
         }
 
-    public List<ProductEntity> calculateDiscountedPriceV2(List<CartProductDTO> cartProducts) {
+    public List<ProductEntity> calculateCartProductPrice(List<CartProductDTO> cartProducts) {
         List<ProductEntity> discountedProducts = new ArrayList<>();
 
         for (CartProductDTO cartProduct : cartProducts) {
@@ -138,28 +137,30 @@ public class ProductServiceImpl implements ProductService {
             int quantity = cartProduct.getQuantity();
 
             ProductEntity product = productRepository.findById(productId)
-                    .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + productId));
+                    .orElseThrow(() -> new NotFoundProduct(notFound + productId));
 
             PromotionEntity promotion = promotionRepository.findActivePromotionByCategoryId(product.getCategoryId());
 
             double discountedPricePerUnit = product.getPrice();
             if (promotion != null && promotion.getIsActive() && "VOLUME".equalsIgnoreCase(promotion.getPromotionType())) {
-                discountedPricePerUnit = calculateNewPriceV2(product.getPrice(), promotion, quantity);
+                discountedPricePerUnit = calculateNewPrice(product.getPrice(), promotion, quantity);
             }
 
 
             double totalPrice = discountedPricePerUnit * quantity;
             double totalWeight = product.getWeight() * quantity;
 
-            ProductEntity discountedProduct = new ProductEntity();
-            discountedProduct.setId(product.getId());
-            discountedProduct.setName(product.getName());
-            discountedProduct.setDescription(product.getDescription());
-            discountedProduct.setPrice(totalPrice);
-            discountedProduct.setCategoryId(product.getCategoryId());
-            discountedProduct.setWeight(totalWeight);
-            discountedProduct.setCurrentStock(product.getCurrentStock());
-            discountedProduct.setMinStock(product.getMinStock());
+            ProductEntity discountedProduct = ProductEntity.builder()
+                    .id(product.getId())
+                    .name(product.getName())
+                    .description(product.getDescription())
+                    .price(totalPrice)
+                    .categoryId(product.getCategoryId())
+                    .weight(totalWeight)
+                    .currentStock(product.getCurrentStock())
+                    .minStock(product.getMinStock())
+                    .build();
+
 
             discountedProducts.add(discountedProduct);
         }
@@ -167,10 +168,4 @@ public class ProductServiceImpl implements ProductService {
         return discountedProducts;
     }
 
-    public double calculateNewPriceV2(double originalPrice, PromotionEntity promotion, int quantity) {
-        if (quantity >= promotion.getVolumeThreshold()) {
-            return originalPrice * (1 - promotion.getDiscount());
-        }
-        return originalPrice;
-    }
 }

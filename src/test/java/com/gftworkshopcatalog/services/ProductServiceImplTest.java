@@ -277,7 +277,7 @@ class ProductServiceImplTest {
         when(promotionRepository.findActivePromotionByCategoryId(1L)).thenReturn(null);
         when(promotionRepository.findActivePromotionByCategoryId(2L)).thenReturn(null);
 
-        List<ProductEntity> result = productServiceImpl.calculateDiscountedPriceV2(cartProducts);
+        List<ProductEntity> result = productServiceImpl.calculateCartProductPrice(cartProducts);
 
         assertEquals(2, result.size());
         assertEquals(65.0, result.get(0).getPrice());
@@ -297,7 +297,7 @@ class ProductServiceImplTest {
         when(promotionRepository.findActivePromotionByCategoryId(1L)).thenReturn(null);
         when(promotionRepository.findActivePromotionByCategoryId(2L)).thenReturn(promotion1);
 
-        List<ProductEntity> result = productServiceImpl.calculateDiscountedPriceV2(cartProducts);
+        List<ProductEntity> result = productServiceImpl.calculateCartProductPrice(cartProducts);
 
         assertEquals(2, result.size());
         assertEquals(65.0, result.get(0).getPrice());
@@ -310,7 +310,7 @@ class ProductServiceImplTest {
         double originalPrice = 100.0;
         int quantity = 4;
 
-        double newPrice = productServiceImpl.calculateNewPriceV2(originalPrice, promotion1, quantity);
+        double newPrice = productServiceImpl.calculateNewPrice(originalPrice, promotion1, quantity);
 
         assertEquals(originalPrice, newPrice);
     }
@@ -321,7 +321,7 @@ class ProductServiceImplTest {
         double originalPrice = 100.0;
         int quantity = 5;
 
-        double newPrice = productServiceImpl.calculateNewPriceV2(originalPrice, promotion1, quantity);
+        double newPrice = productServiceImpl.calculateNewPrice(originalPrice, promotion1, quantity);
 
         assertEquals(80.0, newPrice);
     }

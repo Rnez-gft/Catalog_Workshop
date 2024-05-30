@@ -176,9 +176,9 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<List<ProductEntity>> getPriceProductCheckoutV2(
+    public ResponseEntity<List<ProductEntity>> priceCartProductCheckout(
             @Parameter(description = "List of cart products") @RequestBody List<CartProductDTO> cartProducts) {
-        List<ProductEntity> discountedProducts = productServiceImpl.calculateDiscountedPriceV2(cartProducts);
+        List<ProductEntity> discountedProducts = productServiceImpl.calculateCartProductPrice(cartProducts);
         return ResponseEntity.ok(discountedProducts);
     }
 }
