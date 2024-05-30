@@ -51,7 +51,7 @@ class CatalogFunctionalTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBodyList(ProductEntity.class).hasSize(20)
+                .expectBodyList(ProductEntity.class).hasSize(40)
                 .consumeWith(response -> {
                     assertNotNull(response.getResponseBody());
                     assertFalse(response.getResponseBody().isEmpty());
