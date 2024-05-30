@@ -57,6 +57,8 @@ public class ProductServiceImpl implements ProductService {
             throw new AddProductInvalidArgumentsExceptions("Product details must not be null.");
         }
 
+        validateProductEntity(productEntityDetails);
+
         ProductEntity productEntity = findProductById(productId);
         updateProductEntity(productEntity, productEntityDetails);
         return productRepository.save(productEntity);
