@@ -134,37 +134,48 @@ public class ProductServiceImpl implements ProductService {
         List<ProductEntity> discountedProducts = new ArrayList<>();
 
         for (CartProductDTO cartProduct : cartProducts) {
-            Long productId = cartProduct.getProductId();
-            int quantity = cartProduct.getQuantity();
+            ProductEntity product = findProductById(cartProduct.getProductId());
+            PromotionEntity promotion = findActivePromotionByCategoryId(product.getCategoryId());
+            double discountedPricePerUnit = calculateDiscountedPricePerUnit(product, promotion, cartProduct.getQuantity());
 
-            ProductEntity product = productRepository.findById(productId)
-                    .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + productId));
-
-            PromotionEntity promotion = promotionRepository.findActivePromotionByCategoryId(product.getCategoryId());
-
-            double discountedPricePerUnit = product.getPrice();
-            if (promotion != null && promotion.getIsActive() && "VOLUME".equalsIgnoreCase(promotion.getPromotionType())) {
-                discountedPricePerUnit = calculateNewPriceV2(product.getPrice(), promotion, quantity);
-            }
-
-
-            double totalPrice = discountedPricePerUnit * quantity;
-            double totalWeight = product.getWeight() * quantity;
-
-            ProductEntity discountedProduct = new ProductEntity();
-            discountedProduct.setId(product.getId());
-            discountedProduct.setName(product.getName());
-            discountedProduct.setDescription(product.getDescription());
-            discountedProduct.setPrice(totalPrice);
-            discountedProduct.setCategoryId(product.getCategoryId());
-            discountedProduct.setWeight(totalWeight);
-            discountedProduct.setCurrentStock(product.getCurrentStock());
-            discountedProduct.setMinStock(product.getMinStock());
-
+            ProductEntity discountedProduct = createDiscountedProductEntity(product, discountedPricePerUnit, cartProduct.getQuantity());
             discountedProducts.add(discountedProduct);
         }
 
         return discountedProducts;
+    }
+
+    private ProductEntity findProductById(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + productId));
+    }
+
+    private PromotionEntity findActivePromotionByCategoryId(Long categoryId) {
+        return promotionRepository.findActivePromotionByCategoryId(categoryId);
+    }
+
+    private double calculateDiscountedPricePerUnit(ProductEntity product, PromotionEntity promotion, int quantity) {
+        if (promotion != null && promotion.getIsActive() && "VOLUME".equalsIgnoreCase(promotion.getPromotionType())) {
+            return calculateNewPriceV2(product.getPrice(), promotion, quantity);
+        }
+        return product.getPrice();
+    }
+
+    private ProductEntity createDiscountedProductEntity(ProductEntity product, double discountedPricePerUnit, int quantity) {
+        double totalPrice = discountedPricePerUnit * quantity;
+        double totalWeight = product.getWeight() * quantity;
+
+        ProductEntity discountedProduct = new ProductEntity();
+        discountedProduct.setId(product.getId());
+        discountedProduct.setName(product.getName());
+        discountedProduct.setDescription(product.getDescription());
+        discountedProduct.setPrice(totalPrice);
+        discountedProduct.setCategoryId(product.getCategoryId());
+        discountedProduct.setWeight(totalWeight);
+        discountedProduct.setCurrentStock(product.getCurrentStock());
+        discountedProduct.setMinStock(product.getMinStock());
+
+        return discountedProduct;
     }
 
     public double calculateNewPriceV2(double originalPrice, PromotionEntity promotion, int quantity) {
