@@ -38,8 +38,8 @@ class CategoryValidationUtilTest {
     @DisplayName("Validate category deletion fails due to associated products")
     void testValidateCategoryDeletionFailsDueToProducts() {
         Long categoryId = 1L;
-        List<ProductEntity> products = List.of(new ProductEntity()); // Asumimos que hay productos
-        List<PromotionEntity> promotions = Collections.emptyList();  // No hay promociones
+        List<ProductEntity> products = List.of(new ProductEntity());
+        List<PromotionEntity> promotions = Collections.emptyList();
 
         when(productRepository.findByCategoryId(categoryId)).thenReturn(products);
         when(promotionRepository.findByCategoryId(categoryId)).thenReturn(promotions);
