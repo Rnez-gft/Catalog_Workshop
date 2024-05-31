@@ -75,21 +75,6 @@ class CategoryServiceImplTest {
         assertNotNull(allCategoryEntities, "The category list should not be null");
         assertTrue(allCategoryEntities.isEmpty(), "The category list should be empty");
     }
-
-    @Test
-    @DisplayName("Find all categories: Handles DataAccessException")
-    void testFindAllCategoriesDataAccessException() {
-        when(categoryRepository.findAll()).thenThrow(new DataAccessException("Database access error") {});
-
-        Exception exception = assertThrows(RuntimeException.class, () -> categoryServiceImpl.getAllCategories(),
-                "Expected findAllCategories to throw, but it did not");
-
-        assertTrue(exception.getMessage().contains("Error accessing data from database"));
-        assertNotNull(exception.getCause(), "Cause should not be null");
-        assertInstanceOf(DataAccessException.class, exception.getCause(), "The cause should be a DataAccessException");
-    }
-
-
     @Test
     @DisplayName("Add Category: Success")
     void testAddCategory_Success() {

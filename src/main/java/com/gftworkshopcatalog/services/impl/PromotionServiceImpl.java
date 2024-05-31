@@ -10,12 +10,9 @@ import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.PromotionService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
-
-import static com.gftworkshopcatalog.utils.ProductValidationUtils.validateProductEntity;
 import static com.gftworkshopcatalog.utils.PromotionValidationUtils.validatePromotionEntity;
 
 
