@@ -16,6 +16,6 @@ COPY src ./src
 
 EXPOSE 8080
 
-ARG PROFILE=development
+ARG PROFILE=production
 
 CMD ["./mvnw", "spring-boot:run", "-P${PROFILE}"]
