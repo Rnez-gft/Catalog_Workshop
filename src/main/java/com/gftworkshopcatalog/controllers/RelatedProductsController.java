@@ -1,19 +1,16 @@
 package com.gftworkshopcatalog.controllers;
 
-import com.gftworkshopcatalog.api.dto.OrderDTO;
-import com.gftworkshopcatalog.api.dto.ProductDTO;
+import com.gftworkshopcatalog.api.dto.OrdersDTO;
 import com.gftworkshopcatalog.exceptions.ErrorResponse;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.services.ProductService;
 import com.gftworkshopcatalog.services.RelatedProductsService;
-import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,7 +48,7 @@ public class RelatedProductsController {
 
 
         public ResponseEntity<List<ProductEntity>> getRelatedProducts(@PathVariable Long userId) {
-                Optional<OrderDTO> orders = relatedProductsService.getLatestOrder(userId);
+                Optional<OrdersDTO> orders = relatedProductsService.getLatestOrder(userId);
                 List<ProductEntity> relatedProducts = productService.findRelatedProducts(orders);
                 return ResponseEntity.ok(relatedProducts);
         }

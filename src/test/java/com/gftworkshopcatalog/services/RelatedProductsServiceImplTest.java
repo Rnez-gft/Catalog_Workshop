@@ -11,10 +11,7 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
 import com.gftworkshopcatalog.services.impl.RelatedProductsServiceImpl;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -48,15 +45,15 @@ class RelatedProductsServiceImplTest {
     private static MockWebServer mockWebServer;
 
 
-    @BeforeAll
-    static void beforeAll() throws IOException {
+    @BeforeEach
+    void beforeEach() throws IOException {
         objectMapper = new ObjectMapper();
         mockWebServer = new MockWebServer();
-        mockWebServer.start(8080);
+        mockWebServer.start(8081);
     }
 
-    @AfterAll
-    static void afterAll() throws IOException {
+    @AfterEach
+    void afterEach() throws IOException {
         mockWebServer.close();
     }
 
@@ -68,8 +65,11 @@ class RelatedProductsServiceImplTest {
         OrderDTO orderDTO = new OrderDTO(1L, 1L, 1L, 1L, "Address", "Delivered", "2023-01-01", "2023-01-02", null, null, null, orderedProductsDTO, 100.0);
 
         mockWebServer.enqueue(new MockResponse()
-                .setBody(objectMapper.writeValueAsString(orderDTO))
-                .addHeader("Content-Type", "application/json"));
+                        .setBody(objectMapper.writeValueAsString(orderDTO))
+                        .addHeader("Content-Type", "application/json"));
+
+
+
 
         ProductEntity productEntity = new ProductEntity();
         productEntity.setId(1L);
@@ -77,6 +77,7 @@ class RelatedProductsServiceImplTest {
         productEntity.setDescription("Related Product Description 1");
         productEntity.setPrice(150.0);
         productEntity.setCategoryId(1L);
+
 
         // When
         webTestClient.get()
@@ -90,7 +91,7 @@ class RelatedProductsServiceImplTest {
                     assertThat(products.get(0).getName()).isEqualTo("Related Product 1");
                 });
     }
-
+}
     /*
 
         // Mock response data
@@ -272,4 +273,3 @@ class RelatedProductsServiceImplTest {
     }
 }
 */
-}

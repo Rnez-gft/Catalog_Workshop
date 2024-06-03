@@ -11,11 +11,9 @@ import org.springframework.web.client.RestClient;
 @Configuration
 @Generated
 public class AppConfig {
-    @Value("${orders.url}")
-    private String urlOrders;
     @Bean
-    public RestClient.Builder restClientBuilder(){
-        return RestClient.builder().baseUrl(urlOrders);
+    public RestClient restClient(){
+        return RestClient.create();
     }
 
 }

@@ -4,4 +4,7 @@ spring:
 
 
 orders:
-  url: "http://orders-microservice-vw7eo2nfaa-uc.a.run.app/orders/user/"
+  api:
+    base-url: http://orders-microservice-vw7eo2nfaa-uc.a.run.app
+    order-uri: /orders/user/{userId}
+

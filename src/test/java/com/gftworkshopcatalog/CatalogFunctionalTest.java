@@ -20,6 +20,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.time.LocalDate;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -513,6 +514,18 @@ class CatalogFunctionalTest {
                 .expectStatus().isNotFound()
                 .expectBody()
                 .jsonPath("$.status").isEqualTo("NOT_FOUND");
+    }
+
+    @Test
+    @DisplayName("List RelatedProducts")
+    void testListRelatedProducts() {
+
+    webTestClient.get()
+            .uri("/RelatedProducts/1")
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(ProductEntity.class);
     }
 
 }

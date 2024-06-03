@@ -174,23 +174,41 @@ public class ProductServiceImpl implements ProductService {
         return originalPrice;
     }
 
-    public List<ProductEntity> findRelatedProducts(Optional<OrderDTO> orders) {
-        OrderDTO latestOrder = orders.orElseThrow(() -> new NotFoundProduct("No recent order found for user"));
+    public List<ProductEntity> findRelatedProducts(Optional<OrdersDTO> orders) {
+        // Verifica si el pedido existe; si no, lanza una excepción
+        OrdersDTO latestOrder = orders.orElseThrow(() -> new NotFoundProduct("No recent order found for user"));
 
-        List<OrderProductDTO> orderedProducts = latestOrder.getOrderedProductsDTO().getOrderProductDTOList();
+        // Obtiene la lista de pedidos del último pedido
+        List<OrderDTO> orderDTOList = latestOrder.getOrderDTOList();
 
-        if (!orderedProducts.isEmpty()) {
-            OrderProductDTO lastOrderedProduct = orderedProducts.get(orderedProducts.size() - 1);
-            Long lastProductId = lastOrderedProduct.getProductId();
+        // Verifica si hay pedidos en la lista
+        if (!orderDTOList.isEmpty()) {
+            // Obtiene el último pedido de la lista de pedidos
+            OrderDTO lastOrder = orderDTOList.get(orderDTOList.size() - 1);
 
-            ProductEntity productEntity = productRepository.findById(lastProductId)
-                    .orElseThrow(() -> new NotFoundProduct("Product not found"));
+            // Obtiene la lista de productos ordenados del último pedido
+            List<OrderProductDTO> orderedProducts = lastOrder.getOrderedProductsDTO().getOrderProductDTOList();
 
-            Long categoryId = productEntity.getCategoryId();
+            // Verifica si hay productos ordenados
+            if (!orderedProducts.isEmpty()) {
+                // Obtiene el último producto ordenado
+                OrderProductDTO lastOrderedProduct = orderedProducts.get(orderedProducts.size() - 1);
+                Long lastProductId = lastOrderedProduct.getProductId();
 
-            return productRepository.findByCategoryId(categoryId);
+                // Encuentra la entidad de producto por ID
+                ProductEntity productEntity = productRepository.findById(lastProductId)
+                        .orElseThrow(() -> new NotFoundProduct("Product not found"));
+
+                // Obtiene el ID de la categoría del producto
+                Long categoryId = productEntity.getCategoryId();
+
+                // Encuentra y devuelve productos en la misma categoría
+                return productRepository.findByCategoryId(categoryId);
+            } else {
+                throw new NotFoundProduct("No products found in the latest order for user");
+            }
         } else {
-            throw new NotFoundProduct("No products found in the latest order for user");
+            throw new NotFoundProduct("No orders found for user");
         }
     }
 }

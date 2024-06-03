@@ -2,11 +2,12 @@ package com.gftworkshopcatalog.services.impl;
 
 
 import com.gftworkshopcatalog.api.dto.*;
-import com.gftworkshopcatalog.services.ProductService;
 import com.gftworkshopcatalog.services.RelatedProductsService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+
 
 import java.util.Optional;
 
@@ -15,25 +16,28 @@ import java.util.Optional;
 public class RelatedProductsServiceImpl implements RelatedProductsService {
 
 
-    public String orderUri = "{userId}";
 
-    private RestClient.Builder restClientBuilder;
-    private RestClient restClient;
+    public String baseUrl;
+    public String orderUri;
+    private final RestClient restClient;
 
-    public RelatedProductsServiceImpl(RestClient.Builder restClient) {
-        this.restClient = restClient.build();
-
+    public RelatedProductsServiceImpl(RestClient restClient,
+                           @Value("${orders.api.base-url}") String baseUrl,
+                           @Value("${orders.api.order-uri}") String orderUri) {
+        this.baseUrl = baseUrl;
+        this.orderUri = orderUri;
+        this.restClient = restClient;
     }
 
-    public Optional<OrderDTO> getLatestOrder(Long userId) {
+
+    public Optional<OrdersDTO> getLatestOrder(Long userId){
+
         return Optional.ofNullable(restClient.get()
-                .uri(orderUri, userId)
+                .uri(baseUrl + orderUri + userId)
                 .retrieve()
-                .body(OrderDTO.class));
+                .body(OrdersDTO.class));
     }
 
-    public void init() {
-        this.restClient = restClientBuilder.build();
-    }
+
 
 }

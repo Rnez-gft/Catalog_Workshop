@@ -1,6 +1,7 @@
 package com.gftworkshopcatalog.services;
 
 import com.gftworkshopcatalog.api.dto.OrderDTO;
+import com.gftworkshopcatalog.api.dto.OrdersDTO;
 import com.gftworkshopcatalog.model.ProductEntity;
 
 import java.util.List;
@@ -17,5 +18,5 @@ public interface ProductService {
     ProductEntity updateProductPrice(long productId, double newPrice);
     ProductEntity updateProductStock(long productId, int newStock);
     List<ProductEntity> findProductsByCategoryIds(Set<Long> categoryIds);
-    List<ProductEntity> findRelatedProducts(Optional<OrderDTO> orders);
+    List<ProductEntity> findRelatedProducts(Optional<OrdersDTO> orders);
 }

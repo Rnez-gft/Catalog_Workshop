@@ -6,7 +6,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Generated
+
 public class CountryDTO {
 
     private Long id;
