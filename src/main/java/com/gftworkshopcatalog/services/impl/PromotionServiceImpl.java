@@ -2,8 +2,6 @@ package com.gftworkshopcatalog.services.impl;
 
 import com.gftworkshopcatalog.exceptions.AddProductInvalidArgumentsExceptions;
 import com.gftworkshopcatalog.exceptions.NotFoundPromotion;
-import com.gftworkshopcatalog.model.ProductEntity;
-
 import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
@@ -11,7 +9,7 @@ import com.gftworkshopcatalog.services.PromotionService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import java.time.LocalDate;
+
 import java.util.List;
 import static com.gftworkshopcatalog.utils.PromotionValidationUtils.validatePromotionEntity;
 
@@ -21,7 +19,6 @@ import static com.gftworkshopcatalog.utils.PromotionValidationUtils.validateProm
 public class PromotionServiceImpl implements PromotionService {
     private final PromotionRepository promotionRepository;
     private final ProductRepository productRepository;
-
     public PromotionServiceImpl(PromotionRepository promotionRepository, ProductRepository productRepository) {
         this.promotionRepository = promotionRepository;
         this.productRepository = productRepository;
@@ -29,18 +26,17 @@ public class PromotionServiceImpl implements PromotionService {
 
     @PostConstruct
     public void init() {
-        getActivePromotions();
+        StatusPromotionServiceImpl statusPromotionService = new StatusPromotionServiceImpl(productRepository ,promotionRepository);
+        statusPromotionService.getActivePromotions();
     }
 
     public List<PromotionEntity> findAllPromotions() {
             return promotionRepository.findAll();
     }
-
-    public PromotionEntity findPromotiontById(long promotionId) {
+    public PromotionEntity findPromotionById(long promotionId) {
         return promotionRepository.findById(promotionId)
                 .orElseThrow(() -> new NotFoundPromotion("Promotion not found with ID: " + promotionId));
     }
-
     public PromotionEntity addPromotion(PromotionEntity promotionEntity) {
         if (promotionEntity == null) {
             throw new IllegalArgumentException("Promotion details must not be null");
@@ -49,7 +45,6 @@ public class PromotionServiceImpl implements PromotionService {
 
         return promotionRepository.save(promotionEntity);
     }
-
     public PromotionEntity updatePromotion(long promotionId, PromotionEntity promotionEntityDetails) {
 
         if (promotionEntityDetails == null) {
@@ -58,11 +53,10 @@ public class PromotionServiceImpl implements PromotionService {
 
         validatePromotionEntity(promotionEntityDetails);
 
-        PromotionEntity existingPromotion = findPromotiontById(promotionId);
+        PromotionEntity existingPromotion = findPromotionById(promotionId);
         updatePromotionEntity(existingPromotion, promotionEntityDetails);
         return promotionRepository.save(existingPromotion);
     }
-
     private void updatePromotionEntity(PromotionEntity existingPromotion, PromotionEntity newDetails) {
         existingPromotion.setCategoryId(newDetails.getCategoryId());
         existingPromotion.setDiscount(newDetails.getDiscount());
@@ -71,40 +65,9 @@ public class PromotionServiceImpl implements PromotionService {
         existingPromotion.setStartDate(newDetails.getStartDate());
         existingPromotion.setEndDate(newDetails.getEndDate());
     }
-
     public void deletePromotion(long promotionId) {
-        PromotionEntity promotion = findPromotiontById(promotionId);
+        PromotionEntity promotion = findPromotionById(promotionId);
         promotionRepository.delete(promotion);
     }
-
-    public List<PromotionEntity> getActivePromotions() {
-        List<PromotionEntity> promotions = promotionRepository.findAll();
-        promotions.forEach(this::updateIsActiveStatus);
-        applyActivePromotions(promotions.stream()
-                .filter(promotion -> promotion.getIsActive() && promotion.getPromotionType().equals("SEASONAL"))
-                .toList());
-        return promotions.stream()
-                .filter(PromotionEntity::getIsActive)
-                .toList();
-    }
-
-    private void updateIsActiveStatus(PromotionEntity promotion) {
-        LocalDate now = LocalDate.now();
-        boolean isActive = (now.isEqual(promotion.getStartDate()) || now.isAfter(promotion.getStartDate())) &&
-                (now.isEqual(promotion.getEndDate()) || now.isBefore(promotion.getEndDate()));
-        promotion.setIsActive(isActive);
-    }
-
-    private void applyActivePromotions(List<PromotionEntity> activePromotions) {
-        activePromotions.forEach(promotion -> {
-            List<ProductEntity> products = productRepository.findByCategoryId(promotion.getCategoryId());
-            products.forEach(product -> {
-                double newPrice = product.getPrice() * (1 - promotion.getDiscount());
-                product.setPrice(newPrice);
-                productRepository.save(product);
-            });
-        });
-    }
-
 }
 
