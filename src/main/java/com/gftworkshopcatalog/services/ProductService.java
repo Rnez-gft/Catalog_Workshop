@@ -9,6 +9,7 @@ public interface ProductService {
 
     List<ProductEntity> findAllProducts();
     ProductEntity findProductById(long productId);
+    List<ProductEntity> findProductsByIds(List<Long> ids);
     ProductEntity addProduct(ProductEntity productEntity);
     ProductEntity updateProduct(Long productId, ProductEntity productEntityDetails);
     void deleteProduct(long productId);

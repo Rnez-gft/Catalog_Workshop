@@ -32,7 +32,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     public List<ProductEntity> findAllProducts() {
-            return productRepository.findAll();
+        return productRepository.findAll();
     }
 
     public ProductEntity findProductById(long productId) {
@@ -45,7 +45,7 @@ public class ProductServiceImpl implements ProductService {
 
     public ProductEntity addProduct(ProductEntity productEntity) {
         validateProductEntity(productEntity);
-            return productRepository.save(productEntity);
+        return productRepository.save(productEntity);
     }
 
 
@@ -107,19 +107,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-        public double calculateDiscountedPrice(Long id, int quantity) {
-            ProductEntity product = productRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + id));
+    public double calculateDiscountedPrice(Long id, int quantity) {
+        ProductEntity product = productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + id));
 
-            PromotionEntity promotion = promotionRepository.findActivePromotionByCategoryId(product.getCategoryId());
+        PromotionEntity promotion = promotionRepository.findActivePromotionByCategoryId(product.getCategoryId());
 
-            if (promotion != null && promotion.getIsActive() && "VOLUME".equalsIgnoreCase(promotion.getPromotionType())) {
-                return calculateNewPrice(product.getPrice(), promotion, quantity);
-            }
-
-            return product.getPrice();
+        if (promotion != null && promotion.getIsActive() && "VOLUME".equalsIgnoreCase(promotion.getPromotionType())) {
+            return calculateNewPrice(product.getPrice(), promotion, quantity);
         }
 
+        return product.getPrice();
+    }
 
 
     public List<ProductEntity> calculateListDiscountedPrice(List<CartProductDTO> cartProducts) {
@@ -164,10 +163,6 @@ public class ProductServiceImpl implements ProductService {
     public PromotionEntity findActivePromotionByCategoryId(Long categoryId) {
         return promotionRepository.findActivePromotionByCategoryId(categoryId);
     }
-
-
-
-
 
 
 }
