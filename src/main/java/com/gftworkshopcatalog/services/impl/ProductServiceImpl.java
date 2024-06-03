@@ -6,19 +6,14 @@ import com.gftworkshopcatalog.exceptions.BadRequest;
 import com.gftworkshopcatalog.exceptions.NotFoundProduct;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.model.PromotionEntity;
-import com.gftworkshopcatalog.operations.PromotionOperations;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.ProductService;
-import com.gftworkshopcatalog.services.PromotionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import com.gftworkshopcatalog.operations.ProductOperations;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.gftworkshopcatalog.operations.ProductOperations.*;
 import static com.gftworkshopcatalog.utils.ProductValidationUtils.validateProductEntity;
