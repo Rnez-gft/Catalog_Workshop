@@ -1,3 +1,7 @@
 spring:
   profiles:
     active: development
+
+
+orders:
+  url: "http://orders-microservice-vw7eo2nfaa-uc.a.run.app/orders/user/"

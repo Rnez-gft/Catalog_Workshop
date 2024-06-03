@@ -6,12 +6,12 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Generated
-public class ProductDto {
+public class ProductDTO {
     private Long id;
     private String name;
     private String description;
     private Double price;
-    private Integer categoryId;
+    private Long categoryId;
     private Double weight;
     private Integer currentStock;
     private Integer minStock;

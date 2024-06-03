@@ -1,6 +1,6 @@
 package com.gftworkshopcatalog.services.impl;
 
-import com.gftworkshopcatalog.api.dto.CartProductDTO;
+import com.gftworkshopcatalog.api.dto.*;
 import com.gftworkshopcatalog.exceptions.AddProductInvalidArgumentsExceptions;
 import com.gftworkshopcatalog.exceptions.BadRequest;
 import com.gftworkshopcatalog.exceptions.NotFoundProduct;
@@ -12,10 +12,7 @@ import com.gftworkshopcatalog.services.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.gftworkshopcatalog.utils.ProductValidationUtils.validateProductEntity;
 
@@ -24,18 +21,18 @@ import static com.gftworkshopcatalog.utils.ProductValidationUtils.validateProduc
 public class ProductServiceImpl implements ProductService {
 
 
-
     private final PromotionRepository promotionRepository;
     private final ProductRepository productRepository;
 
     public ProductServiceImpl(PromotionRepository promotionRepository, ProductRepository productRepository) {
         this.promotionRepository = promotionRepository;
         this.productRepository = productRepository;
+
     }
 
 
     public List<ProductEntity> findAllProducts() {
-            return productRepository.findAll();
+        return productRepository.findAll();
     }
 
     public ProductEntity findProductById(long productId) {
@@ -45,10 +42,13 @@ public class ProductServiceImpl implements ProductService {
         });
     }
 
+    public List<ProductEntity> findProductsByCategoryIds(Set<Long> categoryIds) {
+        return productRepository.findByCategoryIdIn(categoryIds);
+    }
 
     public ProductEntity addProduct(ProductEntity productEntity) {
         validateProductEntity(productEntity);
-            return productRepository.save(productEntity);
+        return productRepository.save(productEntity);
     }
 
 
@@ -110,25 +110,25 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-        public double calculateDiscountedPrice(Long id, int quantity) {
-            ProductEntity product = productRepository.findById(id)
-                    .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + id));
+    public double calculateDiscountedPrice(Long id, int quantity) {
+        ProductEntity product = productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + id));
 
-            PromotionEntity promotion = promotionRepository.findActivePromotionByCategoryId(product.getCategoryId());
+        PromotionEntity promotion = promotionRepository.findActivePromotionByCategoryId(product.getCategoryId());
 
-            if (promotion != null && promotion.getIsActive() && "VOLUME".equalsIgnoreCase(promotion.getPromotionType())) {
-                return calculateNewPrice(product.getPrice(), promotion, quantity);
-            }
-
-            return product.getPrice();
+        if (promotion != null && promotion.getIsActive() && "VOLUME".equalsIgnoreCase(promotion.getPromotionType())) {
+            return calculateNewPrice(product.getPrice(), promotion, quantity);
         }
 
-        private double calculateNewPrice(double originalPrice, PromotionEntity promotion, int quantity) {
-            if (quantity >= promotion.getVolumeThreshold()) {
-                return originalPrice * (1 - promotion.getDiscount());
-            }
-            return originalPrice;
+        return product.getPrice();
+    }
+
+    private double calculateNewPrice(double originalPrice, PromotionEntity promotion, int quantity) {
+        if (quantity >= promotion.getVolumeThreshold()) {
+            return originalPrice * (1 - promotion.getDiscount());
         }
+        return originalPrice;
+    }
 
     public List<ProductEntity> calculateDiscountedPriceV2(List<CartProductDTO> cartProducts) {
         List<ProductEntity> discountedProducts = new ArrayList<>();
@@ -173,4 +173,28 @@ public class ProductServiceImpl implements ProductService {
         }
         return originalPrice;
     }
+
+    public List<ProductEntity> findRelatedProducts(Optional<OrderDTO> orders) {
+        OrderDTO latestOrder = orders.orElseThrow(() -> new NotFoundProduct("No recent order found for user"));
+
+        List<OrderProductDTO> orderedProducts = latestOrder.getOrderedProductsDTO().getOrderProductDTOList();
+
+        if (!orderedProducts.isEmpty()) {
+            OrderProductDTO lastOrderedProduct = orderedProducts.get(orderedProducts.size() - 1);
+            Long lastProductId = lastOrderedProduct.getProductId();
+
+            ProductEntity productEntity = productRepository.findById(lastProductId)
+                    .orElseThrow(() -> new NotFoundProduct("Product not found"));
+
+            Long categoryId = productEntity.getCategoryId();
+
+            return productRepository.findByCategoryId(categoryId);
+        } else {
+            throw new NotFoundProduct("No products found in the latest order for user");
+        }
+    }
 }
+
+
+
+
