@@ -21,14 +21,11 @@ import java.util.List;
 import java.util.Map;
 
 import static com.gftworkshopcatalog.operations.ProductOperations.*;
-import static com.gftworkshopcatalog.operations.PromotionOperations.findActivePromotionByCategoryId;
 import static com.gftworkshopcatalog.utils.ProductValidationUtils.validateProductEntity;
 
 @Slf4j
 @Service
 public class ProductServiceImpl implements ProductService {
-
-
 
     private final PromotionRepository promotionRepository;
     private final ProductRepository productRepository;
@@ -143,6 +140,34 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return discountedProducts;
+    }
+
+    private ProductEntity createDiscountedProductEntity(ProductEntity product, double discountedPricePerUnit, int quantity) {
+        double totalPrice = discountedPricePerUnit * quantity;
+        double totalWeight = product.getWeight() * quantity;
+
+        ProductEntity discountedProduct = new ProductEntity();
+        discountedProduct.setId(product.getId());
+        discountedProduct.setName(product.getName());
+        discountedProduct.setDescription(product.getDescription());
+        discountedProduct.setPrice(totalPrice);
+        discountedProduct.setCategoryId(product.getCategoryId());
+        discountedProduct.setWeight(totalWeight);
+        discountedProduct.setCurrentStock(product.getCurrentStock());
+        discountedProduct.setMinStock(product.getMinStock());
+
+        return discountedProduct;
+    }
+
+    private double calculateDiscountedPricePerUnit(ProductEntity product, PromotionEntity promotion, int quantity) {
+        if (promotion != null && promotion.getIsActive() && "VOLUME".equalsIgnoreCase(promotion.getPromotionType())) {
+            return calculateNewPriceV2(product.getPrice(), promotion, quantity);
+        }
+        return product.getPrice();
+    }
+
+    public PromotionEntity findActivePromotionByCategoryId(Long categoryId) {
+        return promotionRepository.findActivePromotionByCategoryId(categoryId);
     }
 
 
