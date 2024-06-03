@@ -4,9 +4,7 @@ import com.gftworkshopcatalog.exceptions.AddProductInvalidArgumentsExceptions;
 
 import com.gftworkshopcatalog.model.PromotionEntity;
 
-
 public class PromotionValidationUtils {
-
     private PromotionValidationUtils() {
     }
 
@@ -20,7 +18,5 @@ public class PromotionValidationUtils {
             throw new AddProductInvalidArgumentsExceptions("Product details must not be null except description");
         }
     }
-
-
 
 }

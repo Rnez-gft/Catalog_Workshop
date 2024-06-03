@@ -10,6 +10,7 @@ import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.impl.ProductServiceImpl;
 import com.gftworkshopcatalog.services.impl.PromotionServiceImpl;
+import com.gftworkshopcatalog.services.impl.StatusPromotionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,9 @@ class PromotionServiceImplTest {
     private ProductRepository productRepository;
     @InjectMocks
     private PromotionServiceImpl promotionServiceImpl;
+
+    @InjectMocks
+    private StatusPromotionServiceImpl statusPromotionServiceImpl;
 
     @InjectMocks
     private ProductServiceImpl productServiceImpl;
@@ -110,7 +114,7 @@ class PromotionServiceImplTest {
     @DisplayName("Find promotion by ID - Success")
     void test_findPromotionById(){
         when(promotionRepository.findById(1L)).thenReturn(Optional.of(promotionEntity));
-        PromotionEntity foundPromotionEntity = promotionServiceImpl.findPromotiontById(1L);
+        PromotionEntity foundPromotionEntity = promotionServiceImpl.findPromotionById(1L);
 
         assertNotNull(foundPromotionEntity, "The promotion should not be null");
         assertEquals(promotionEntity.getId(), foundPromotionEntity.getId());
@@ -127,7 +131,7 @@ class PromotionServiceImplTest {
     void test_findPromotionById_NotFound() {
         when(promotionRepository.findById(promotionEntity.getId())).thenReturn(Optional.empty());
 
-        NotFoundPromotion exception = assertThrows(NotFoundPromotion.class, () -> promotionServiceImpl.findPromotiontById(promotionEntity.getId()));
+        NotFoundPromotion exception = assertThrows(NotFoundPromotion.class, () -> promotionServiceImpl.findPromotionById(promotionEntity.getId()));
 
         assertEquals("Promotion not found with ID: " + promotionEntity.getId(), exception.getMessage(), "The exception message should be 'Promotion not found with ID: " + promotionEntity.getId());
     }
@@ -225,7 +229,8 @@ class PromotionServiceImplTest {
     @Test
     @DisplayName("Update Promotion - Null Details Exception")
     void testUpdatePromotionNullDetails() {
-        Exception exception = assertThrows(AddProductInvalidArgumentsExceptions.class, () -> promotionServiceImpl.updatePromotion(1L, null));
+        Exception exception = assertThrows(AddProductInvalidArgumentsExceptions.class,
+                () -> promotionServiceImpl.updatePromotion(1L, null));
         assertEquals("Product details must not be null.", exception.getMessage());
     }
 
@@ -264,30 +269,6 @@ class PromotionServiceImplTest {
         assertThrows(RuntimeException.class,
                 () -> promotionServiceImpl.updatePromotion(promotionEntity.getId(), existingPromotion));
     }
-
-    @Test
-    @DisplayName("Get active promotion")
-     void testGetActivePromotions() {
-        PromotionEntity promo1 = new PromotionEntity();
-        promo1.setStartDate(LocalDate.now().minusDays(1));
-        promo1.setEndDate(LocalDate.now().plusDays(1));
-        promo1.setPromotionType("SEASONAL");
-
-        PromotionEntity promo2 = new PromotionEntity();
-        promo2.setStartDate(LocalDate.now().minusDays(10));
-        promo2.setEndDate(LocalDate.now().minusDays(5));
-        promo2.setPromotionType("SEASONAL");
-
-        List<PromotionEntity> promotions = Arrays.asList(promo1, promo2);
-
-        when(promotionRepository.findAll()).thenReturn(promotions);
-
-        List<PromotionEntity> activePromotions = promotionServiceImpl.getActivePromotions();
-
-        assertEquals(1, activePromotions.size());
-        assertEquals(promo1, activePromotions.get(0));
-    }
-
     @Test
     @DisplayName("Calculate Discounted Price - NotFoundProduct")
     void testCalculateDiscountedPrice_ProductNotFound() {

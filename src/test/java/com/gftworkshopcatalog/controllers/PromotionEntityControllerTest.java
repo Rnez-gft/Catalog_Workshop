@@ -155,7 +155,7 @@ public class PromotionEntityControllerTest {
         PromotionEntity existingPromotion = new PromotionEntity(1L, 1L, 10.0, "Volume", 5, startDate, endDate, true);
         PromotionEntity updatedPromotion = new PromotionEntity(1L, 1L, 15.0, "Volume", 5, startDate, endDateUpdate, true);
 
-        when(promotionService.findPromotiontById(1L)).thenReturn(existingPromotion);
+        when(promotionService.findPromotionById(1L)).thenReturn(existingPromotion);
         when(promotionService.updatePromotion(eq(1L), any(PromotionEntity.class))).thenReturn(updatedPromotion);
         mockMvc.perform(put("/promotions/{id}", updatedPromotion.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -188,7 +188,7 @@ public class PromotionEntityControllerTest {
         LocalDate endDate = startDate.plusDays(10);
         PromotionEntity promotion = new PromotionEntity(1L, 1L, 10.0, "Volume", 5, startDate, endDate, true);
 
-        when(promotionService.findPromotiontById(promotion.getId())).thenReturn(promotion);
+        when(promotionService.findPromotionById(promotion.getId())).thenReturn(promotion);
         mockMvc.perform(get("/promotions/{id}", promotion.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -200,19 +200,19 @@ public class PromotionEntityControllerTest {
                 .andExpect(jsonPath("$.startDate").value(startDate.toString()))
                 .andExpect(jsonPath("$.endDate").value(endDate.toString()))
                 .andExpect(jsonPath("$.isActive").value(promotion.getIsActive()));
-        verify(promotionService).findPromotiontById(promotion.getId());
+        verify(promotionService).findPromotionById(promotion.getId());
     }
     @Test
     @DisplayName("Get promotion details by ID - NotFound")
     void getPromotionById_NotFound() throws Exception {
         Long promotionId = 999L;
 
-        when(promotionService.findPromotiontById(promotionId)).thenThrow(new NotFoundPromotion("Promotion not found with ID: " + promotionId));
+        when(promotionService.findPromotionById(promotionId)).thenThrow(new NotFoundPromotion("Promotion not found with ID: " + promotionId));
         mockMvc.perform(get("/promotions/{id}", promotionId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Promotion not found with ID: " + promotionId));
-        verify(promotionService).findPromotiontById(promotionId);
+        verify(promotionService).findPromotionById(promotionId);
     }
     @Test
     @DisplayName("Delete a promotion - Success")

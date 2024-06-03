@@ -51,7 +51,7 @@ public class PromotionController {
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
     public ResponseEntity<PromotionEntity> getPromotionsById(@Parameter(description = "Promotion ID")@PathVariable Long id) {
-        PromotionEntity promotion = promotionService.findPromotiontById(id);
+        PromotionEntity promotion = promotionService.findPromotionById(id);
         return ResponseEntity.ok(promotion);
     }
     @PostMapping
