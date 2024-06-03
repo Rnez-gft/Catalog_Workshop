@@ -33,7 +33,7 @@ public class RelatedProductsServiceImpl implements RelatedProductsService {
     public Optional<OrdersDTO> getLatestOrder(Long userId){
 
         return Optional.ofNullable(restClient.get()
-                .uri(baseUrl + orderUri + userId)
+                .uri(baseUrl + orderUri, userId)
                 .retrieve()
                 .body(OrdersDTO.class));
     }
