@@ -178,7 +178,7 @@ public class ProductController {
     })
     public ResponseEntity<List<ProductEntity>> getPriceProductCheckoutV2(
             @Parameter(description = "List of cart products") @RequestBody List<CartProductDTO> cartProducts) {
-        List<ProductEntity> discountedProducts = productServiceImpl.calculateDiscountedPriceV2(cartProducts);
+        List<ProductEntity> discountedProducts = productServiceImpl.calculateListDiscountedPrice(cartProducts);
         return ResponseEntity.ok(discountedProducts);
     }
 }
