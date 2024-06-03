@@ -6,17 +6,22 @@ import com.gftworkshopcatalog.exceptions.BadRequest;
 import com.gftworkshopcatalog.exceptions.NotFoundProduct;
 import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.model.PromotionEntity;
+import com.gftworkshopcatalog.operations.PromotionOperations;
 import com.gftworkshopcatalog.repositories.ProductRepository;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
 import com.gftworkshopcatalog.services.ProductService;
+import com.gftworkshopcatalog.services.PromotionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import com.gftworkshopcatalog.operations.ProductOperations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.gftworkshopcatalog.operations.ProductOperations.*;
+import static com.gftworkshopcatalog.operations.PromotionOperations.findActivePromotionByCategoryId;
 import static com.gftworkshopcatalog.utils.ProductValidationUtils.validateProductEntity;
 
 @Slf4j
@@ -123,14 +128,9 @@ public class ProductServiceImpl implements ProductService {
             return product.getPrice();
         }
 
-        private double calculateNewPrice(double originalPrice, PromotionEntity promotion, int quantity) {
-            if (quantity >= promotion.getVolumeThreshold()) {
-                return originalPrice * (1 - promotion.getDiscount());
-            }
-            return originalPrice;
-        }
 
-    public List<ProductEntity> calculateDiscountedPriceV2(List<CartProductDTO> cartProducts) {
+
+    public List<ProductEntity> calculateListDiscountedPrice(List<CartProductDTO> cartProducts) {
         List<ProductEntity> discountedProducts = new ArrayList<>();
 
         for (CartProductDTO cartProduct : cartProducts) {
@@ -145,43 +145,9 @@ public class ProductServiceImpl implements ProductService {
         return discountedProducts;
     }
 
-    private ProductEntity findProductById(Long productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundProduct("Product not found with ID: " + productId));
-    }
 
-    private PromotionEntity findActivePromotionByCategoryId(Long categoryId) {
-        return promotionRepository.findActivePromotionByCategoryId(categoryId);
-    }
 
-    private double calculateDiscountedPricePerUnit(ProductEntity product, PromotionEntity promotion, int quantity) {
-        if (promotion != null && promotion.getIsActive() && "VOLUME".equalsIgnoreCase(promotion.getPromotionType())) {
-            return calculateNewPriceV2(product.getPrice(), promotion, quantity);
-        }
-        return product.getPrice();
-    }
 
-    private ProductEntity createDiscountedProductEntity(ProductEntity product, double discountedPricePerUnit, int quantity) {
-        double totalPrice = discountedPricePerUnit * quantity;
-        double totalWeight = product.getWeight() * quantity;
 
-        ProductEntity discountedProduct = new ProductEntity();
-        discountedProduct.setId(product.getId());
-        discountedProduct.setName(product.getName());
-        discountedProduct.setDescription(product.getDescription());
-        discountedProduct.setPrice(totalPrice);
-        discountedProduct.setCategoryId(product.getCategoryId());
-        discountedProduct.setWeight(totalWeight);
-        discountedProduct.setCurrentStock(product.getCurrentStock());
-        discountedProduct.setMinStock(product.getMinStock());
 
-        return discountedProduct;
-    }
-
-    public double calculateNewPriceV2(double originalPrice, PromotionEntity promotion, int quantity) {
-        if (quantity >= promotion.getVolumeThreshold()) {
-            return originalPrice * (1 - promotion.getDiscount());
-        }
-        return originalPrice;
-    }
 }

@@ -1,5 +1,6 @@
 package com.gftworkshopcatalog.services;
 
+import com.gftworkshopcatalog.api.dto.CartProductDTO;
 import com.gftworkshopcatalog.model.ProductEntity;
 
 import java.util.List;
@@ -13,4 +14,5 @@ public interface ProductService {
     void deleteProduct(long productId);
     ProductEntity updateProductPrice(long productId, double newPrice);
     ProductEntity updateProductStock(long productId, int newStock);
+    List<ProductEntity> calculateListDiscountedPrice(List<CartProductDTO> cartProducts);
 }

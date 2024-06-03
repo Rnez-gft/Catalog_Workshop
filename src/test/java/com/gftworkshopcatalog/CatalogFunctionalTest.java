@@ -10,6 +10,7 @@ import com.gftworkshopcatalog.model.ProductEntity;
 import com.gftworkshopcatalog.model.PromotionEntity;
 import com.gftworkshopcatalog.repositories.PromotionRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -196,6 +197,7 @@ class CatalogFunctionalTest {
                 .expectBody()
                 .jsonPath("$.status").isEqualTo("BAD_REQUEST");
     }
+
 
     @Test
     @DisplayName("Delete Product - Success")
