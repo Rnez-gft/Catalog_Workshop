@@ -68,7 +68,7 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<ProductEntity> getProductDetails(@Parameter(description = "Product ID")@PathVariable long id) {
+    public ResponseEntity<ProductEntity> getProductDetails(@Parameter(description = "Product ID")@PathVariable Long id) {
             ProductEntity productEntity = productServiceImpl.findProductById(id);
             return ResponseEntity.ok(productEntity);
     }
@@ -100,7 +100,7 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<ProductEntity> deleteProduct(@Parameter(description = "Product ID")@PathVariable long id) {
+    public ResponseEntity<ProductEntity> deleteProduct(@Parameter(description = "Product ID")@PathVariable Long id) {
             productServiceImpl.deleteProduct(id);
             return ResponseEntity.noContent().build();
     }
@@ -115,7 +115,7 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<ProductEntity> updateProductPrice(@Parameter(description = "Product ID")@PathVariable long id, @Parameter(description = "New price to update the current one")@RequestParam double newPrice) {
+    public ResponseEntity<ProductEntity> updateProductPrice(@Parameter(description = "Product ID")@PathVariable Long id, @Parameter(description = "New price to update the current one")@RequestParam double newPrice) {
             ProductEntity updatedProductEntity = productServiceImpl.updateProductPrice(id, newPrice);
             return ResponseEntity.ok(updatedProductEntity);
     }
@@ -130,7 +130,7 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<ProductEntity> updateProductStock(@Parameter(description = "Product ID")@PathVariable long id, @Parameter(description = "Quantity of the stock to change")@RequestParam int quantity) {
+    public ResponseEntity<ProductEntity> updateProductStock(@Parameter(description = "Product ID")@PathVariable Long id, @Parameter(description = "Quantity of the stock to change")@RequestParam int quantity) {
             ProductEntity updatedProductEntity = productServiceImpl.updateProductStock(id, quantity);
             return ResponseEntity.ok(updatedProductEntity);
     }

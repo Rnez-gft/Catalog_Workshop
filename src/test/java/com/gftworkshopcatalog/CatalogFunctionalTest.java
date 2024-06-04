@@ -92,7 +92,7 @@ class CatalogFunctionalTest {
     @Test
     @DisplayName("Get Product by ID - Success")
     void testGetProductDetails() {
-        long productId = 1L;
+        long productId = 5L;
 
         webTestClient.get().uri("/products/{id}", productId)
                 .exchange()
@@ -129,7 +129,7 @@ class CatalogFunctionalTest {
     @Test
     @DisplayName("Update Product - Success")
     void testUpdateProduct() {
-        long productId = 1L;
+        long productId = 5L;
 
         ProductEntity updatedProductEntity = new ProductEntity();
         updatedProductEntity.setName("Updated Product Name");
@@ -203,7 +203,7 @@ class CatalogFunctionalTest {
     @DisplayName("Delete Product - Success")
     void testDeleteProduct() {
 
-        webTestClient.delete().uri("/products/{id}", 1L)
+        webTestClient.delete().uri("/products/{id}", 3L)
                 .exchange()
                 .expectStatus().isNoContent()
                 .expectBody()
@@ -354,7 +354,7 @@ class CatalogFunctionalTest {
     @Test
     @DisplayName("Delete a promotion - Success")
     void testDeletePromotionSuccess() {
-        Long promotionId = 2L;
+        Long promotionId = 3L;
 
         webTestClient.delete().uri("/promotions/{id}", promotionId)
                 .exchange()

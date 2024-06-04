@@ -68,7 +68,7 @@ public class CategoryController {
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
 
-    public ResponseEntity<CategoryEntity> deleteCategoryById(@Parameter(description = "Category ID") @PathVariable("categoryId") long categoryId) {
+    public ResponseEntity<CategoryEntity> deleteCategoryById(@Parameter(description = "Category ID") @PathVariable("categoryId") Long categoryId) {
             categoryService.deleteCategoryById(categoryId);
             return ResponseEntity.noContent().build();
     }
@@ -101,7 +101,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<?> listProductsByCategoryIdAndName(
+    public ResponseEntity<List<ProductEntity>> listProductsByCategoryIdAndName(
             @Parameter(description = "Category ID") @PathVariable("categoryId") Long categoryId,
             @Parameter(description = "First word of the product name") @PathVariable("name") String name) {
 

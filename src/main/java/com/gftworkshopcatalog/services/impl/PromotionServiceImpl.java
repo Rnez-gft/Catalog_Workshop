@@ -19,6 +19,8 @@ import static com.gftworkshopcatalog.utils.PromotionValidationUtils.validateProm
 public class PromotionServiceImpl implements PromotionService {
     private final PromotionRepository promotionRepository;
     private final ProductRepository productRepository;
+    private static final String PROMOTION_NOT_FOUND = "Promotion not found with ID: ";
+    private static final String PROMOTION_DETAILS_NULL = "Promotion details must not be null";
     public PromotionServiceImpl(PromotionRepository promotionRepository, ProductRepository productRepository) {
         this.promotionRepository = promotionRepository;
         this.productRepository = productRepository;
@@ -31,28 +33,28 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     public List<PromotionEntity> findAllPromotions() {
+        log.info("Retrieving all promotions.");
             return promotionRepository.findAll();
     }
     public PromotionEntity findPromotionById(long promotionId) {
+        log.info("Searching for promotion by ID: {}", promotionId);
         return promotionRepository.findById(promotionId)
-                .orElseThrow(() -> new NotFoundPromotion("Promotion not found with ID: " + promotionId));
+                .orElseThrow(() -> new NotFoundPromotion(PROMOTION_NOT_FOUND + promotionId));
     }
     public PromotionEntity addPromotion(PromotionEntity promotionEntity) {
         if (promotionEntity == null) {
-            throw new IllegalArgumentException("Promotion details must not be null");
+            log.error(PROMOTION_DETAILS_NULL);
+            throw new IllegalArgumentException(PROMOTION_DETAILS_NULL);
         }
         validatePromotionEntity(promotionEntity);
-
         return promotionRepository.save(promotionEntity);
     }
     public PromotionEntity updatePromotion(long promotionId, PromotionEntity promotionEntityDetails) {
-
         if (promotionEntityDetails == null) {
-            throw new AddProductInvalidArgumentsExceptions("Product details must not be null.");
+            log.error("Details null in the new promotion");
+            throw new AddProductInvalidArgumentsExceptions(PROMOTION_DETAILS_NULL);
         }
-
         validatePromotionEntity(promotionEntityDetails);
-
         PromotionEntity existingPromotion = findPromotionById(promotionId);
         updatePromotionEntity(existingPromotion, promotionEntityDetails);
         return promotionRepository.save(existingPromotion);
@@ -67,6 +69,7 @@ public class PromotionServiceImpl implements PromotionService {
     }
     public void deletePromotion(long promotionId) {
         PromotionEntity promotion = findPromotionById(promotionId);
+        log.info("Deleting promotion with ID: {}", promotionId);
         promotionRepository.delete(promotion);
     }
 }

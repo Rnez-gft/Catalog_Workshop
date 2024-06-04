@@ -231,7 +231,7 @@ class PromotionServiceImplTest {
     void testUpdatePromotionNullDetails() {
         Exception exception = assertThrows(AddProductInvalidArgumentsExceptions.class,
                 () -> promotionServiceImpl.updatePromotion(1L, null));
-        assertEquals("Product details must not be null.", exception.getMessage());
+        assertEquals("Promotion details must not be null", exception.getMessage());
     }
 
     @Test

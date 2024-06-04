@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-public class PromotionEntityControllerTest {
+class PromotionEntityControllerTest {
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
@@ -208,7 +208,7 @@ public class PromotionEntityControllerTest {
     @Test
     @DisplayName("Get promotion details by ID - NotFound")
     void getPromotionById_NotFound() throws Exception {
-        Long promotionId = 999L;
+        long promotionId = 999L;
 
         when(promotionService.findPromotionById(promotionId)).thenThrow(new NotFoundPromotion("Promotion not found with ID: " + promotionId));
         mockMvc.perform(get("/promotions/{id}", promotionId)
@@ -230,7 +230,7 @@ public class PromotionEntityControllerTest {
     @Test
     @DisplayName("Delete a promotion - NotFoundPromotion")
     void deletePromotion_NotFound() throws Exception {
-        Long promotionId = 999L;
+        long promotionId = 999L;
 
         doThrow(new NotFoundPromotion("Promotion not found with ID: " + promotionId))
                 .when(promotionService).deletePromotion(promotionId);
