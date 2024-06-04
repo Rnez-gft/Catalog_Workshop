@@ -58,7 +58,7 @@ public class CategoryController {
             return new ResponseEntity<>(createdCategoryEntity, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{categoryId}")
+    @DeleteMapping("/{id}")
     @Operation(summary = "Delete a category", description = "Deletes a specific category.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Category deleted"),
@@ -68,12 +68,12 @@ public class CategoryController {
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
 
-    public ResponseEntity<CategoryEntity> deleteCategoryById(@Parameter(description = "Category ID") @PathVariable("categoryId") long categoryId) {
+    public ResponseEntity<CategoryEntity> deleteCategoryById(@Parameter(description = "Category ID") @PathVariable("id") long categoryId) {
             categoryService.deleteCategoryById(categoryId);
             return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{categoryId}/products")
+    @GetMapping("/{id}/products")
     @Operation(summary = "List all products by category ID", description = "Returns a list of all products for the specified category ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product list",
@@ -84,13 +84,13 @@ public class CategoryController {
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
 
-    public ResponseEntity<List<ProductEntity>> listProductsByCategoryId(@Parameter(description = "Category ID") @PathVariable("categoryId") Long categoryId) {
+    public ResponseEntity<List<ProductEntity>> listProductsByCategoryId(@Parameter(description = "Category ID") @PathVariable("id") Long categoryId) {
             List<ProductEntity> products = categoryService.findProductsByCategoryId(categoryId);
             return ResponseEntity.ok(products);
 
     }
 
-    @GetMapping("/{categoryId}/{name}/products")
+    @GetMapping("/{id}/{productName}/products")
     @Operation(summary = "List all products by category ID and name",
             description = "Returns a list of all products for the specified category ID and name.")
     @ApiResponses(value = {
@@ -102,8 +102,8 @@ public class CategoryController {
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
     public ResponseEntity<?> listProductsByCategoryIdAndName(
-            @Parameter(description = "Category ID") @PathVariable("categoryId") Long categoryId,
-            @Parameter(description = "First word of the product name") @PathVariable("name") String name) {
+            @Parameter(description = "Category ID") @PathVariable("id") Long categoryId,
+            @Parameter(description = "First word of the product name") @PathVariable("productName") String name) {
 
         List<ProductEntity> products = categoryService.findProductsByCategoryIdAndName(categoryId, name);
         return ResponseEntity.ok(products);
