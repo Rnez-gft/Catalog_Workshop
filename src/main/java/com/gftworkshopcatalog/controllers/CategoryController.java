@@ -69,6 +69,7 @@ public class CategoryController {
     })
 
     public ResponseEntity<CategoryEntity> deleteCategoryById(@Parameter(description = "Category ID") @PathVariable("id") long categoryId) {
+
             categoryService.deleteCategoryById(categoryId);
             return ResponseEntity.noContent().build();
     }
@@ -101,6 +102,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
+
     public ResponseEntity<?> listProductsByCategoryIdAndName(
             @Parameter(description = "Category ID") @PathVariable("id") Long categoryId,
             @Parameter(description = "First word of the product name") @PathVariable("productName") String name) {

@@ -17,8 +17,8 @@ import java.time.LocalDate;
 public class PromotionEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(nullable = false)
+    private Long promotionId;
 
     @Column(nullable = false)
     private Long categoryId;
@@ -44,7 +44,7 @@ public class PromotionEntity implements Serializable {
     @Override
     public String toString() {
         return "PromotionEntity{" +
-                "id=" + id +
+                "promotionId=" + promotionId +
                 ", categoryId=" + categoryId +
                 ", discount=" + discount +
                 ", promotionType='" + promotionType + '\'' +

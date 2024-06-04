@@ -80,7 +80,7 @@ public class PromotionController {
             @ApiResponse(responseCode = "500", description = "Error response",
                     content = { @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)) })
     })
-    public ResponseEntity<PromotionEntity> updatePromotion(@Parameter(description = "Promotion ID")@PathVariable long id, @RequestBody PromotionEntity promotionDetails){
+    public ResponseEntity<PromotionEntity> updatePromotion(@Parameter(description = "Promotion ID")@PathVariable Long id, @RequestBody PromotionEntity promotionDetails){
         PromotionEntity updatedPromotion = promotionService.updatePromotion(id, promotionDetails);
         return ResponseEntity.ok(updatedPromotion);
     }

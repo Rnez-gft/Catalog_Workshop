@@ -57,7 +57,7 @@ class PromotionServiceImplTest {
         product.setCategoryId(1L);
 
         promotionEntity = PromotionEntity.builder()
-                .id(1L)
+                .promotionId(1L)
                 .categoryId(1L)
                 .discount(0.2)
                 .promotionType("Volume")
@@ -72,7 +72,7 @@ class PromotionServiceImplTest {
     @DisplayName("Find all promotions - Success")
     void findAllPromotions(){
         PromotionEntity promotion2 = PromotionEntity.builder()
-                .id(2L)
+                .promotionId(2L)
                 .categoryId(3L)
                 .discount(0.15)
                 .promotionType("Volume")
@@ -87,8 +87,8 @@ class PromotionServiceImplTest {
 
         assertNotNull(allPromotionEntities, "The promotion list should not be null");
         assertEquals(2, allPromotionEntities.size(),"The promotion list should contain 2 items");
-        assertTrue(allPromotionEntities.contains(promotionEntity), "The list should contain the promotion with the ID: " + promotionEntity.getId());
-        assertTrue(allPromotionEntities.contains(promotion2), "The list should contain the promotion with the ID: " + promotion2.getId());
+        assertTrue(allPromotionEntities.contains(promotionEntity), "The list should contain the promotion with the ID: " + promotionEntity.getPromotionId());
+        assertTrue(allPromotionEntities.contains(promotion2), "The list should contain the promotion with the ID: " + promotion2.getPromotionId());
     }
     @Test
     @DisplayName("Find all promotions - Should return empty list when no promotions exist")
@@ -117,7 +117,7 @@ class PromotionServiceImplTest {
         PromotionEntity foundPromotionEntity = promotionServiceImpl.findPromotionById(1L);
 
         assertNotNull(foundPromotionEntity, "The promotion should not be null");
-        assertEquals(promotionEntity.getId(), foundPromotionEntity.getId());
+        assertEquals(promotionEntity.getPromotionId(), foundPromotionEntity.getPromotionId());
         assertEquals(promotionEntity.getCategoryId(), foundPromotionEntity.getCategoryId());
         assertEquals(promotionEntity.getDiscount(), foundPromotionEntity.getDiscount());
         assertEquals(promotionEntity.getPromotionType(), foundPromotionEntity.getPromotionType());
@@ -129,40 +129,40 @@ class PromotionServiceImplTest {
     @Test
     @DisplayName("Find promotion by ID - NotFoundPromotion")
     void test_findPromotionById_NotFound() {
-        when(promotionRepository.findById(promotionEntity.getId())).thenReturn(Optional.empty());
+        when(promotionRepository.findById(promotionEntity.getPromotionId())).thenReturn(Optional.empty());
 
-        NotFoundPromotion exception = assertThrows(NotFoundPromotion.class, () -> promotionServiceImpl.findPromotionById(promotionEntity.getId()));
+        NotFoundPromotion exception = assertThrows(NotFoundPromotion.class, () -> promotionServiceImpl.findPromotionById(promotionEntity.getPromotionId()));
 
-        assertEquals("Promotion not found with ID: " + promotionEntity.getId(), exception.getMessage(), "The exception message should be 'Promotion not found with ID: " + promotionEntity.getId());
+        assertEquals("Promotion not found with ID: " + promotionEntity.getPromotionId(), exception.getMessage(), "The exception message should be 'Promotion not found with ID: " + promotionEntity.getPromotionId());
     }
 
     @Test
     @DisplayName("Delete promotion - Success")
     void test_deletePromotion() {
-        when(promotionRepository.findById(promotionEntity.getId())).thenReturn(Optional.of(promotionEntity));
+        when(promotionRepository.findById(promotionEntity.getPromotionId())).thenReturn(Optional.of(promotionEntity));
 
-        promotionServiceImpl.deletePromotion(promotionEntity.getId());
+        promotionServiceImpl.deletePromotion(promotionEntity.getPromotionId());
 
         verify(promotionRepository, times(1)).delete(promotionEntity);
     }
     @Test
     @DisplayName("Delete Promotion - NotFoundPromotion")
     void test_deletePromotion_NotFound() {
-        when(promotionRepository.existsById(promotionEntity.getId())).thenReturn(false);
+        when(promotionRepository.existsById(promotionEntity.getPromotionId())).thenReturn(false);
 
-        NotFoundPromotion exception = assertThrows(NotFoundPromotion.class, () -> promotionServiceImpl.deletePromotion(promotionEntity.getId()));
+        NotFoundPromotion exception = assertThrows(NotFoundPromotion.class, () -> promotionServiceImpl.deletePromotion(promotionEntity.getPromotionId()));
 
-        assertEquals("Promotion not found with ID: " + promotionEntity.getId(), exception.getMessage(), "The exception message should be 'Promotion not found with ID: " + promotionEntity.getId());
+        assertEquals("Promotion not found with ID: " + promotionEntity.getPromotionId(), exception.getMessage(), "The exception message should be 'Promotion not found with ID: " + promotionEntity.getPromotionId());
     }
     @Test
     @DisplayName("Delete Promotion - InternalServiceException")
     void test_deletePromotion_DataAccessException() {
-        when(promotionRepository.findById(promotionEntity.getId())).thenReturn(Optional.of(promotionEntity));
-        doThrow(new InternalServiceException("Failed to delete promotion with ID: " + promotionEntity.getId()) {}).when(promotionRepository).delete(promotionEntity);
+        when(promotionRepository.findById(promotionEntity.getPromotionId())).thenReturn(Optional.of(promotionEntity));
+        doThrow(new InternalServiceException("Failed to delete promotion with ID: " + promotionEntity.getPromotionId()) {}).when(promotionRepository).delete(promotionEntity);
 
-        InternalServiceException exception = assertThrows(InternalServiceException.class, () -> promotionServiceImpl.deletePromotion(promotionEntity.getId()));
+        InternalServiceException exception = assertThrows(InternalServiceException.class, () -> promotionServiceImpl.deletePromotion(promotionEntity.getPromotionId()));
 
-        assertEquals("Failed to delete promotion with ID: " + promotionEntity.getId(), exception.getMessage(), "The exception message should be 'Failed to delete promotion with ID: " + promotionEntity.getId());
+        assertEquals("Failed to delete promotion with ID: " + promotionEntity.getPromotionId(), exception.getMessage(), "The exception message should be 'Failed to delete promotion with ID: " + promotionEntity.getPromotionId());
     }
     @Test
     @DisplayName("Add a new promotion - Success")
@@ -203,7 +203,7 @@ class PromotionServiceImplTest {
     @DisplayName("Update a promotion - Success")
     void updatePromotion_Success(){
         PromotionEntity updateDetails = PromotionEntity.builder()
-                .id(promotionEntity.getId())
+                .promotionId(promotionEntity.getPromotionId())
                 .categoryId(2L)
                 .discount(0.15)
                 .promotionType("Seasonal")
@@ -212,10 +212,10 @@ class PromotionServiceImplTest {
                 .endDate(LocalDate.of(2024, 9,1))
                 .build();
 
-        when(promotionRepository.findById(updateDetails.getId())).thenReturn(Optional.of(promotionEntity));
+        when(promotionRepository.findById(updateDetails.getPromotionId())).thenReturn(Optional.of(promotionEntity));
         when(promotionRepository.save(any(PromotionEntity.class))).thenReturn(updateDetails);
 
-        PromotionEntity result = promotionServiceImpl.updatePromotion(updateDetails.getId(), updateDetails);
+        PromotionEntity result = promotionServiceImpl.updatePromotion(updateDetails.getPromotionId(), updateDetails);
         assertAll(
                 () -> assertEquals(0.15, result.getDiscount()),
                 () -> assertEquals(2, result.getCategoryId()),
@@ -231,14 +231,14 @@ class PromotionServiceImplTest {
     void testUpdatePromotionNullDetails() {
         Exception exception = assertThrows(AddProductInvalidArgumentsExceptions.class,
                 () -> promotionServiceImpl.updatePromotion(1L, null));
-        assertEquals("Product details must not be null.", exception.getMessage());
+        assertEquals("Promotion details must not be null", exception.getMessage());
     }
 
     @Test
     @DisplayName("Update a promotion - NotFoundPromotion")
     void updatePromotion_NotFound() {
         PromotionEntity existingPromotion = PromotionEntity.builder()
-                .id(promotionEntity.getId())
+                .promotionId(promotionEntity.getPromotionId())
                 .categoryId(1L)
                 .discount(0.1)
                 .promotionType("Volume")
@@ -246,16 +246,16 @@ class PromotionServiceImplTest {
                 .startDate(LocalDate.of(2024, 6, 1))
                 .endDate(LocalDate.of(2024, 8, 1))
                 .build();
-        when(promotionRepository.findById(promotionEntity.getId())).thenReturn(Optional.empty());
+        when(promotionRepository.findById(promotionEntity.getPromotionId())).thenReturn(Optional.empty());
 
         assertThrows(NotFoundPromotion.class,
-                () -> promotionServiceImpl.updatePromotion(promotionEntity.getId(), existingPromotion));
+                () -> promotionServiceImpl.updatePromotion(promotionEntity.getPromotionId(), existingPromotion));
     }
     @Test
     @DisplayName("Update a promotion - InternalServiceException")
     void updatePromotion_InternalServiceException() {
         PromotionEntity existingPromotion = PromotionEntity.builder()
-                .id(promotionEntity.getId())
+                .promotionId(promotionEntity.getPromotionId())
                 .categoryId(1L)
                 .discount(0.1)
                 .promotionType("Volume")
@@ -263,11 +263,11 @@ class PromotionServiceImplTest {
                 .startDate(LocalDate.of(2024, 6, 1))
                 .endDate(LocalDate.of(2024, 8, 1))
                 .build();
-        when(promotionRepository.findById(promotionEntity.getId())).thenReturn(Optional.of(existingPromotion));
+        when(promotionRepository.findById(promotionEntity.getPromotionId())).thenReturn(Optional.of(existingPromotion));
         when(promotionRepository.save(any(PromotionEntity.class))).thenThrow(new InternalServiceException("Database failure") {});
 
         assertThrows(RuntimeException.class,
-                () -> promotionServiceImpl.updatePromotion(promotionEntity.getId(), existingPromotion));
+                () -> promotionServiceImpl.updatePromotion(promotionEntity.getPromotionId(), existingPromotion));
     }
     @Test
     @DisplayName("Calculate Discounted Price - NotFoundProduct")

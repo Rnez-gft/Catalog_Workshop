@@ -311,7 +311,7 @@ class ProductServiceImplTest {
         double originalPrice = 100.0;
         int quantity = 4;
 
-        double newPrice = ProductOperations.calculateNewPriceV2(originalPrice, promotion1, quantity);
+        double newPrice = ProductOperations.calculateNewPrice(originalPrice, promotion1, quantity);
 
         assertEquals(originalPrice, newPrice);
     }
@@ -322,7 +322,7 @@ class ProductServiceImplTest {
         double originalPrice = 100.0;
         int quantity = 5;
 
-        double newPrice = ProductOperations.calculateNewPriceV2(originalPrice, promotion1, quantity);
+        double newPrice = ProductOperations.calculateNewPrice(originalPrice, promotion1, quantity);
 
         assertEquals(80.0, newPrice);
     }

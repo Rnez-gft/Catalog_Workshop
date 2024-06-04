@@ -7,16 +7,16 @@ import java.util.List;
 
 public interface CategoryService {
 
-    public CategoryEntity addCategory(CategoryEntity categoryEntity);
+    CategoryEntity addCategory(CategoryEntity categoryEntity);
 
-    public List<CategoryEntity> getAllCategories();
+    List<CategoryEntity> getAllCategories();
 
-    public void deleteCategoryById(long categoryId);
+    void deleteCategoryById(long categoryId);
 
-    public CategoryEntity findCategoryById(long categoryId);
+    CategoryEntity findCategoryById(long categoryId);
 
-    public List<ProductEntity> findProductsByCategoryId(Long categoryId);
+    List<ProductEntity> findProductsByCategoryId(Long categoryId);
 
-    public List<ProductEntity> findProductsByCategoryIdAndName(Long categoryId, String namePref);
+    List<ProductEntity> findProductsByCategoryIdAndName(Long categoryId, String namePref);
 
 }
