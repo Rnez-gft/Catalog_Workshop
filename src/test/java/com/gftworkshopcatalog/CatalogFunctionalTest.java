@@ -242,12 +242,12 @@ class CatalogFunctionalTest {
         PromotionEntity existingPromotion = promotionRepository.findAll().stream().findFirst()
                 .orElseThrow(() -> new IllegalStateException("No promotions available for testing"));
 
-        webTestClient.get().uri("/promotions/{id}", existingPromotion.getId())
+        webTestClient.get().uri("/promotions/{id}", existingPromotion.getPromotionId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
-                .jsonPath("$.id").isEqualTo(existingPromotion.getId());
+                .jsonPath("$.promotionId").isEqualTo(existingPromotion.getPromotionId());
     }
 
     @Test
@@ -316,7 +316,7 @@ class CatalogFunctionalTest {
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
-                .jsonPath("$.id").isEqualTo(promotionId)
+                .jsonPath("$.promotionId").isEqualTo(promotionId)
                 .jsonPath("$.discount").isEqualTo(0.20);
     }
 

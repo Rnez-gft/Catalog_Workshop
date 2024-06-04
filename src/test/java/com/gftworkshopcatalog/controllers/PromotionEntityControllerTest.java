@@ -86,7 +86,7 @@ public class PromotionEntityControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id").value(promotions.get(0).getId()))
+                .andExpect(jsonPath("$[0].promotionId").value(promotions.get(0).getPromotionId()))
                 .andExpect(jsonPath("$[0].categoryId").value(promotions.get(0).getCategoryId()))
                 .andExpect(jsonPath("$[0].discount").value(promotions.get(0).getDiscount()))
                 .andExpect(jsonPath("$[0].promotionType").value(promotions.get(0).getPromotionType()))
@@ -94,7 +94,7 @@ public class PromotionEntityControllerTest {
                 .andExpect(jsonPath("$[0].startDate").value(promotions.get(0).getStartDate().toString()))
                 .andExpect(jsonPath("$[0].endDate").value(promotions.get(0).getEndDate().toString()))
                 .andExpect(jsonPath("$[0].isActive").value(promotions.get(0).getIsActive()))
-                .andExpect(jsonPath("$[1].id").value(promotions.get(1).getId()))
+                .andExpect(jsonPath("$[1].promotionId").value(promotions.get(1).getPromotionId()))
                 .andExpect(jsonPath("$[1].categoryId").value(promotions.get(1).getCategoryId()))
                 .andExpect(jsonPath("$[1].discount").value(promotions.get(1).getDiscount()))
                 .andExpect(jsonPath("$[1].promotionType").value(promotions.get(1).getPromotionType()))
@@ -126,7 +126,7 @@ public class PromotionEntityControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(promotion)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(promotion.getId()))
+                .andExpect(jsonPath("$.promotionId").value(promotion.getPromotionId()))
                 .andExpect(jsonPath("$.discount").value(promotion.getDiscount()))
                 .andExpect(jsonPath("$.startDate").value(startDate.toString()))
                 .andExpect(jsonPath("$.endDate").value(endDate.toString()));
@@ -157,11 +157,11 @@ public class PromotionEntityControllerTest {
 
         when(promotionService.findPromotionById(1L)).thenReturn(existingPromotion);
         when(promotionService.updatePromotion(eq(1L), any(PromotionEntity.class))).thenReturn(updatedPromotion);
-        mockMvc.perform(put("/promotions/{id}", updatedPromotion.getId())
+        mockMvc.perform(put("/promotions/{id}", updatedPromotion.getPromotionId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedPromotion)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(updatedPromotion.getId()))
+                .andExpect(jsonPath("$.promotionId").value(updatedPromotion.getPromotionId()))
                 .andExpect(jsonPath("$.discount").value(updatedPromotion.getDiscount()))
                 .andExpect(jsonPath("$.endDate").value(updatedPromotion.getEndDate().toString()));
         verify(promotionService).updatePromotion(eq(1L), any(PromotionEntity.class));
@@ -188,11 +188,12 @@ public class PromotionEntityControllerTest {
         LocalDate endDate = startDate.plusDays(10);
         PromotionEntity promotion = new PromotionEntity(1L, 1L, 10.0, "Volume", 5, startDate, endDate, true);
 
-        when(promotionService.findPromotionById(promotion.getId())).thenReturn(promotion);
-        mockMvc.perform(get("/promotions/{id}", promotion.getId())
+        when(promotionService.findPromotionById(promotion.getPromotionId())).thenReturn(promotion);
+        mockMvc.perform(get("/promotions/{id}", promotion.getPromotionId())
+
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(promotion.getId()))
+                .andExpect(jsonPath("$.promotionId").value(promotion.getPromotionId()))
                 .andExpect(jsonPath("$.categoryId").value(promotion.getCategoryId()))
                 .andExpect(jsonPath("$.discount").value(promotion.getDiscount()))
                 .andExpect(jsonPath("$.promotionType").value(promotion.getPromotionType()))
@@ -200,7 +201,9 @@ public class PromotionEntityControllerTest {
                 .andExpect(jsonPath("$.startDate").value(startDate.toString()))
                 .andExpect(jsonPath("$.endDate").value(endDate.toString()))
                 .andExpect(jsonPath("$.isActive").value(promotion.getIsActive()));
-        verify(promotionService).findPromotionById(promotion.getId());
+
+        verify(promotionService).findPromotionById(promotion.getPromotionId());
+
     }
     @Test
     @DisplayName("Get promotion details by ID - NotFound")
